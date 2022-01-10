@@ -14,8 +14,6 @@ public class Robbi {
 	private Logger logger = Logger.getLogger(Robbi.class.getName());
 	private Territory territory;
 
-	// FIXME check for Deadlocks
-
 	private volatile int x;
 	private volatile int y;
 	private Item inBag = null;
@@ -141,9 +139,9 @@ public class Robbi {
 			default:
 				break;
 			}
-			territory.setChanged();
-			territory.notifyAllObservers();
 		}
+		territory.setChanged();
+		territory.notifyAllObservers();
 	}
 
 	/**
@@ -152,9 +150,9 @@ public class Robbi {
 	public final void linksUm() {
 		synchronized (territory) {
 			direction = direction.next();
-			territory.setChanged();
-			territory.notifyAllObservers();
 		}
+		territory.setChanged();
+		territory.notifyAllObservers();
 	}
 
 	/**
@@ -168,9 +166,9 @@ public class Robbi {
 				inBag = null;
 			else
 				throw new TileIsFullException();
-			territory.setChanged();
-			territory.notifyAllObservers();
 		}
+		territory.setChanged();
+		territory.notifyAllObservers();
 	}
 
 	/**
@@ -185,9 +183,9 @@ public class Robbi {
 				throw new BagIsFullException();
 			}
 			inBag = territory.removeItem(x, y);
-			territory.setChanged();
-			territory.notifyAllObservers();
 		}
+		territory.setChanged();
+		territory.notifyAllObservers();
 	}
 
 	/**
@@ -196,10 +194,11 @@ public class Robbi {
 	 */
 	public final void schiebeSchrotthaufen() {
 		synchronized (territory) {
-
-			if (!vornSchrotthaufen())
+			territory.deactivateNotification();
+			if (!vornSchrotthaufen()) {
+				territory.activateNotification();
 				throw new NoPileOfScrapAheadException();
-
+			}
 			int dx = switch (direction) {
 			case EAST:
 				yield x + 2;
@@ -216,10 +215,12 @@ public class Robbi {
 			default:
 				yield y;
 			};
+
 			Tile t = territory.getTile(dx, dy);
-			if (t instanceof Stockpile || t instanceof PileOfScrap)
+			if (t instanceof Stockpile || t instanceof PileOfScrap) {
+				territory.activateNotification();
 				throw new TileBlockedException();
-			else {
+			} else {
 				if (territory.getTile(dx, dy) instanceof Hollow)
 					territory.clearTile(dx, dy);
 				else
@@ -244,6 +245,7 @@ public class Robbi {
 			}
 			vor();
 		}
+		territory.activateNotification();
 	}
 
 	/**

@@ -1,5 +1,8 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 
 /**
@@ -7,23 +10,24 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * This class contains all datastructures and utility functions to control the
  * territory.
  * 
- * FIXME check for deadlocks!!!
- * 
  * @author Jonas Pohl
  *
  */
 public class Territory extends Observable {
+
+	private static final Logger logger = Logger.getLogger(Territory.class.toString());
+
 	private Robbi robbi;
 
-	private volatile Tile tiles[][];
+	private Tile tiles[][];
 
-	private volatile boolean sizeChanged = false;
+	private boolean sizeChanged = false;
 
 	private static final int DEFAULT_NUMBER_OF_COLUMNS = 6;
 	private static final int DEFAULT_NUMBER_OF_ROWS = 6;
 
-	private volatile int NUMBER_OF_COLUMNS = DEFAULT_NUMBER_OF_COLUMNS;
-	private volatile int NUMBER_OF_ROWS = DEFAULT_NUMBER_OF_ROWS;
+	private int NUMBER_OF_COLUMNS = DEFAULT_NUMBER_OF_COLUMNS;
+	private int NUMBER_OF_ROWS = DEFAULT_NUMBER_OF_ROWS;
 
 	public Territory() {
 		robbi = new Robbi(this);
@@ -36,7 +40,7 @@ public class Territory extends Observable {
 	}
 	// ============ HELPER =========
 
-	public Tile getTile(int x, int y) {
+	public synchronized Tile getTile(int x, int y) {
 		x += NUMBER_OF_COLUMNS;
 		x %= NUMBER_OF_COLUMNS;
 		y += NUMBER_OF_ROWS;
@@ -44,19 +48,19 @@ public class Territory extends Observable {
 		return tiles[x][y];
 	}
 
-	public int getNumRows() {
+	public synchronized int getNumRows() {
 		return NUMBER_OF_ROWS;
 	}
 
-	public int getNumCols() {
+	public synchronized int getNumCols() {
 		return NUMBER_OF_COLUMNS;
 	}
 
-	public boolean hasSizeChanged() {
+	public synchronized boolean hasSizeChanged() {
 		return sizeChanged;
 	}
 
-	public void setSizeChanged(boolean flag) {
+	public synchronized void setSizeChanged(boolean flag) {
 		this.sizeChanged = flag;
 	}
 
@@ -71,7 +75,7 @@ public class Territory extends Observable {
 		return robbi;
 	}
 
-	public DIRECTION getRobbiDirection() {
+	public synchronized DIRECTION getRobbiDirection() {
 		return robbi.getFacing();
 	}
 
@@ -97,7 +101,7 @@ public class Territory extends Observable {
 		return true;
 	}
 
-	public Item getItem(int x, int y) { // TODO make synchronized
+	public synchronized Item getItem(int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		return t.getItem();
 	}
@@ -142,16 +146,16 @@ public class Territory extends Observable {
 		}
 		tiles = newTiles;
 
+		logger.log(Level.INFO, "updated size to " + NUMBER_OF_COLUMNS + "x" + NUMBER_OF_ROWS);
+
 		setChanged();
 		notifyAllObservers();
 	}
 
 	public synchronized void placeRobbi(int x, int y) {
-
 		if ((x >= 0 && x < NUMBER_OF_COLUMNS && y >= 0 && y < NUMBER_OF_ROWS) && !(tiles[x][y] instanceof Hollow)) {
 			robbi.setPosition(x, y);
 		}
-
 		setChanged();
 		notifyAllObservers();
 	}
@@ -258,12 +262,11 @@ public class Territory extends Observable {
 		}
 	}
 
-	public int getRobbiX() {
+	public synchronized int getRobbiX() {
 		return robbi.getX();
 	}
 
-	public int getRobbiY() {
+	public synchronized int getRobbiY() {
 		return robbi.getY();
 	}
-
 }
