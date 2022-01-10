@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public class Stockpile extends Tile {
 
+	private static final long serialVersionUID = 1L;
+
 	ArrayList<Item> items;
 	// TODO Queue more efficient?
 	// check if queue would be better, allowing an easier iteration over the

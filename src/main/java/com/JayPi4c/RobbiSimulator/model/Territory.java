@@ -1,7 +1,9 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.Serializable;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 
@@ -13,11 +15,13 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * @author Jonas Pohl
  *
  */
-public class Territory extends Observable {
+public class Territory extends Observable implements Serializable {
 
-	private static final Logger logger = Logger.getLogger(Territory.class.toString());
+	private static final long serialVersionUID = 1L;
 
-	private Robbi robbi;
+	private static final Logger logger = LogManager.getLogger(Territory.class);
+
+	private transient Robbi robbi;
 
 	private Tile tiles[][];
 
@@ -66,8 +70,10 @@ public class Territory extends Observable {
 
 	public synchronized void setRobbi(Robbi robbi) {
 		robbi.setTerritory(this);
-		robbi.setPosition(this.robbi.getX(), this.robbi.getY());
-		robbi.setFacing(this.robbi.getFacing());
+		if (this.robbi != null) {
+			robbi.setPosition(this.robbi.getX(), this.robbi.getY());
+			robbi.setFacing(this.robbi.getFacing());
+		}
 		this.robbi = robbi;
 	}
 
@@ -77,6 +83,10 @@ public class Territory extends Observable {
 
 	public synchronized DIRECTION getRobbiDirection() {
 		return robbi.getFacing();
+	}
+
+	public synchronized Item getRobbiItem() {
+		return robbi.getItem();
 	}
 
 	private int normalizeCoord(int i, int bound) {
@@ -113,6 +123,18 @@ public class Territory extends Observable {
 		return t.pickItem();
 	}
 
+	public synchronized void update(Territory territory, Item item, int x, int y, DIRECTION facing) {
+		this.tiles = territory.tiles;
+		this.sizeChanged = territory.sizeChanged;
+		this.NUMBER_OF_COLUMNS = territory.NUMBER_OF_COLUMNS;
+		this.NUMBER_OF_ROWS = territory.NUMBER_OF_ROWS;
+		this.robbi.setPosition(x, y);
+		this.robbi.setFacing(facing);
+		this.robbi.setItem(item);
+		setChanged();
+		notifyAllObservers();
+	}
+
 	// ========= GUI FUNCTIONS ===========
 
 	public synchronized void changeSize(int newCols, int newRows) {
@@ -146,7 +168,7 @@ public class Territory extends Observable {
 		}
 		tiles = newTiles;
 
-		logger.log(Level.INFO, "updated size to " + NUMBER_OF_COLUMNS + "x" + NUMBER_OF_ROWS);
+		logger.debug("updated size to {}x{}", NUMBER_OF_COLUMNS, NUMBER_OF_ROWS);
 
 		setChanged();
 		notifyAllObservers();

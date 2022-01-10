@@ -7,6 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * This class contains the contents, the name of program and whether it is
+ * edited or not
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class Program {
 
 	private String name;
@@ -16,6 +23,12 @@ public class Program {
 
 	private boolean edited = false;
 
+	/**
+	 * Creates and loads a program from a given file and the program name
+	 * 
+	 * @param f    the file on the fileSystem storing the program
+	 * @param name the name of the program
+	 */
 	public Program(File f, String name) {
 		this.file = f;
 		this.name = name;
@@ -30,27 +43,46 @@ public class Program {
 			String content = bobTheBuilder.toString();
 
 			editorContent = content.replace(ProgramController.createPrefix(name), "");
-			int index = editorContent.lastIndexOf('}');
+			int endIndex = editorContent.lastIndexOf('}');
+			int startIndex = editorContent.lastIndexOf('}', endIndex - 1);
 			// if(index >= 0) // not needed since we know for sure, that a closed curly
 			// bracket is in the string.
-			editorContent = new StringBuilder(editorContent).replace(index, index + 1, "").toString();
+			editorContent = new StringBuilder(editorContent).delete(startIndex + 1, endIndex + 1).toString();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * 
+	 * @return the file corresponding to this program
+	 */
 	public File getFile() {
 		return file;
 	}
 
+	/**
+	 * 
+	 * @return the name of the program
+	 */
 	public String getName() {
 		return this.name;
 	}
 
+	/**
+	 * 
+	 * @return the real content of the editor
+	 */
 	public String getEditorContent() {
 		return this.editorContent;
 	}
 
+	/**
+	 * saves the text of the editor-content into the corresponding file It does only
+	 * save the given text, if the changes were made
+	 * 
+	 * @param text the text to save in the file
+	 */
 	public void save(String text) {
 		if (!edited)
 			return;
@@ -65,10 +97,20 @@ public class Program {
 		edited = false;
 	}
 
+	/**
+	 * Sets the edited flag
+	 * 
+	 * @param flag the value of the edited flag
+	 */
 	public void setEdited(boolean flag) {
 		edited = flag;
 	}
 
+	/**
+	 * returns whether the editor-content has changed
+	 * 
+	 * @return true if content is edited, false otherwise
+	 */
 	public boolean isEdited() {
 		return edited;
 	}

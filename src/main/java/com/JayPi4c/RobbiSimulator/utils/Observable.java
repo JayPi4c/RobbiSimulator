@@ -3,6 +3,7 @@ package com.JayPi4c.RobbiSimulator.utils;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Observable {
+
 	public CopyOnWriteArrayList<Observer> observers; // faster than vector for read access and thread save
 
 	boolean changed;
