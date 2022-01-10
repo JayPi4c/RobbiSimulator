@@ -14,6 +14,7 @@ import com.JayPi4c.RobbiSimulator.model.Tile;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 import com.JayPi4c.RobbiSimulator.utils.Observer;
 
+import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -103,7 +104,6 @@ public class TerritoryPanel extends Canvas implements Observer {
 	private void paintTerritory() {
 
 		GraphicsContext gc = getGraphicsContext2D();
-
 		for (int i = 0; i < territory.getNumCols(); i++) {
 			// gc.setStroke(Color.BLACK);
 			// gc.setLineWidth(CELLSPACER);
@@ -123,16 +123,24 @@ public class TerritoryPanel extends Canvas implements Observer {
 				} else if (t instanceof Stockpile) {
 					gc.drawImage(tileImages[STOCKPILE], getPos(i), getPos(j), CELLSIZE, CELLSIZE);
 					Stockpile stockpile = (Stockpile) t;
+					boolean nutDrawn = false;
+					boolean accuDrawn = false;
+					boolean screwDrawn = false;
 					for (Item item : stockpile.getAllItems()) {
-						if (item instanceof Nut) {
+						if (!nutDrawn && item instanceof Nut) {
 							gc.drawImage(itemImages[NUT], getPos(i) + CELLSIZE / 2, getPos(j), CELLSIZE / 2,
 									CELLSIZE / 2);
-						} else if (item instanceof Accu) {
+							nutDrawn = true;
+						} else if (!accuDrawn && item instanceof Accu) {
 							gc.drawImage(itemImages[ACCU], getPos(i), getPos(j), CELLSIZE / 2, CELLSIZE / 2);
-						} else if (item instanceof Screw) {
+							accuDrawn = true;
+						} else if (!screwDrawn && item instanceof Screw) {
 							gc.drawImage(itemImages[SCREW], getPos(i) + CELLSIZE / 3, getPos(j) + CELLSIZE / 2,
 									CELLSIZE / 2, CELLSIZE / 2);
+							screwDrawn = true;
 						}
+						if (nutDrawn && accuDrawn && screwDrawn)
+							break;
 					}
 				}
 				if (!(t instanceof Stockpile)) {
@@ -148,6 +156,7 @@ public class TerritoryPanel extends Canvas implements Observer {
 				}
 			}
 		}
+
 		// gc.strokeLine(getPos(territory.getNumCols()) - 1, 0,
 		// getPos(territory.getNumCols()) - 1,
 		// getPos(territory.getNumRows()));
@@ -173,7 +182,6 @@ public class TerritoryPanel extends Canvas implements Observer {
 	}
 
 	/**
-	 * taken from https://stackoverflow.com/a/18262938/13670629 <br>
 	 * Sets the transform for the GraphicsContext to rotate around a pivot point.
 	 *
 	 * @param gc    the graphics context the transform to applied to.
@@ -182,6 +190,8 @@ public class TerritoryPanel extends Canvas implements Observer {
 	 *              co-ordinates).
 	 * @param py    the y pivot co-ordinate for the rotation (in canvas
 	 *              co-ordinates).
+	 * @see <a href=
+	 *      "https://stackoverflow.com/a/18262938/13670629">Stackoverflow</a>
 	 */
 	private void rotate(GraphicsContext gc, double angle, double px, double py) {
 		Rotate r = new Rotate(angle, px, py);
@@ -189,7 +199,6 @@ public class TerritoryPanel extends Canvas implements Observer {
 	}
 
 	/**
-	 * taken from https://stackoverflow.com/a/18262938/13670629 <br>
 	 * Draws an image on a graphics context.
 	 *
 	 * The image is drawn at (tlpx, tlpy) rotated by angle pivoted around the point:
@@ -201,6 +210,8 @@ public class TerritoryPanel extends Canvas implements Observer {
 	 *              canvas co-ordinates).
 	 * @param tlpy  the top left y co-ordinate where the image will be plotted (in
 	 *              canvas co-ordinates).
+	 * @see <a href=
+	 *      "https://stackoverflow.com/a/18262938/13670629">Stackoverflow</a>
 	 */
 	private void drawRotatedImage(GraphicsContext gc, Image image, double angle, double tlpx, double tlpy, double w,
 			double h) {
@@ -235,6 +246,10 @@ public class TerritoryPanel extends Canvas implements Observer {
 
 	@Override
 	public void update(Observable observable) {
+		Platform.runLater(this::update);
+	}
+
+	public void update() {
 		if (territory.hasSizeChanged()) {
 			center(bounds);
 			territory.setSizeChanged(false);
