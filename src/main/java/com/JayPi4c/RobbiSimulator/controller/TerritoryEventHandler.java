@@ -6,6 +6,7 @@ import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Window;
 
 /**
  * This class combines all functions needed to control the user interaction with
@@ -16,11 +17,11 @@ import javafx.scene.input.MouseEvent;
  */
 public class TerritoryEventHandler implements EventHandler<MouseEvent> {
 
-	Territory territory;
+	private Territory territory;
 
-	boolean robbiDragged = false;
+	private boolean robbiDragged = false;
 
-	ButtonState buttonState;
+	private ButtonState buttonState;
 
 	private RobbiContextMenu robbiContextMenu;
 
@@ -29,15 +30,17 @@ public class TerritoryEventHandler implements EventHandler<MouseEvent> {
 	 * RobbiContextMenu if the user right-clicks on Robbi
 	 * 
 	 * @param territory      the Territory this handler is for
-	 * @param territoryPanel the TerritoryPanel, this handler is handles
+	 * @param territoryPanel the TerritoryPanel, this handler is handling
 	 * @param buttonState    the ButtonState for this eventHandler
+	 * @param parent         the parent window to show alerts relative to it
 	 */
-	public TerritoryEventHandler(Territory territory, TerritoryPanel territoryPanel, ButtonState buttonState) {
+	public TerritoryEventHandler(Territory territory, TerritoryPanel territoryPanel, ButtonState buttonState,
+			Window parent) {
 		this.territory = territory;
 		this.buttonState = buttonState;
 		territoryPanel.setOnContextMenuRequested(event -> {
 			if (territory.robbiOnTile(getCol(event.getX()), getRow(event.getY()))) {
-				robbiContextMenu = new RobbiContextMenu(territory);
+				robbiContextMenu = new RobbiContextMenu(territory, parent);
 				robbiContextMenu.show(territoryPanel.getScene().getWindow(), event.getScreenX(), event.getScreenY());
 			}
 		});

@@ -1,6 +1,7 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import java.io.Serializable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -9,26 +10,52 @@ import java.io.Serializable;
  * 
  * @author Jonas Pohl
  */
-public class Robbi implements Serializable {
+public class Robbi {
+	private static final Logger logger = LogManager.getLogger(Robbi.class);
 
-	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Attribute to store the territory in which robbi is living
+	 */
 	private Territory territory;
-
+	/**
+	 * Attribute to store robbis x position in the territory
+	 */
 	private volatile int x;
+	/**
+	 * Attribute to store robbis y position in the territory
+	 */
 	private volatile int y;
+	/**
+	 * Attribute to store robbis item
+	 */
 	private Item inBag = null;
 
+	/**
+	 * Attribute to store robbis facing
+	 */
 	private volatile DIRECTION direction;
 
+	/**
+	 * Constructor to create a custom robbi via class-loader
+	 */
 	public Robbi() {
-
+		// needed for class-loader
 	}
 
+	/**
+	 * The main-Method which will be overwritten by every custom Robbi
+	 * implementation. When starting a simulation, this method will be called.
+	 */
 	public void main() {
-		// will be overwritten
+		// will be overritten
+		logger.error("Please overrite the main-method");
 	}
 
+	/**
+	 * Constructor to create a new robbi with the given territory.
+	 * 
+	 * @param t the territory in which robbi is placed.
+	 */
 	Robbi(Territory t) {
 		this.territory = t;
 		this.x = 0;
@@ -39,10 +66,10 @@ public class Robbi implements Serializable {
 	// ============= HELPER ================
 
 	/**
-	 * Set the position of robbi Be careful, Robbi does not check if it is in bounds
+	 * Sets the position of robbi.
 	 * 
-	 * @param x
-	 * @param y
+	 * @param x new x position
+	 * @param y new y position
 	 */
 	void setPosition(int x, int y) {
 		synchronized (territory) {
@@ -58,7 +85,7 @@ public class Robbi implements Serializable {
 	/**
 	 * Get Robbis X Position
 	 * 
-	 * @return
+	 * @return robbis x postion
 	 */
 	int getX() {
 		return x;
@@ -67,32 +94,57 @@ public class Robbi implements Serializable {
 	/**
 	 * Get Robbis Y Position
 	 * 
-	 * @return
+	 * @return robbis y position
 	 */
 	int getY() {
 		return y;
 	}
 
+	/**
+	 * Getter for robbis facing.
+	 * 
+	 * @return robbis current facing
+	 */
 	DIRECTION getFacing() {
 		return this.direction;
 	}
 
+	/**
+	 * Getter for the item robbi is currently holding.
+	 * 
+	 * @return the item in robbis bag.
+	 */
 	Item getItem() {
 		synchronized (territory) {
 			return inBag;
 		}
 	}
 
+	/**
+	 * Puts the given Item in Robbis bag.
+	 * 
+	 * @param item the item to put into robbis bag
+	 */
 	void setItem(Item item) {
 		synchronized (territory) {
 			this.inBag = item;
 		}
 	}
 
+	/**
+	 * Setter for the territory.
+	 * 
+	 * @param t the new territory
+	 */
 	void setTerritory(Territory t) {
 		this.territory = t;
 	}
 
+	/**
+	 * Updates the facing of robbi to the given facing.
+	 * 
+	 * @param facing robbis new facing
+	 */
 	void setFacing(DIRECTION facing) {
 		synchronized (territory) {
 			this.direction = facing;
@@ -102,7 +154,7 @@ public class Robbi implements Serializable {
 	// ==================== PUBLIC FUNCTIONS ==========
 
 	/**
-	 * If possible move Robbi one tile towards the direction it is facing
+	 * If possible move Robbi one tile towards the direction it is facing.
 	 */
 	public final void vor() {
 		synchronized (territory) {
@@ -157,7 +209,7 @@ public class Robbi implements Serializable {
 	}
 
 	/**
-	 * Turn Robbi counterclockwise
+	 * Turn Robbi counterclockwise.
 	 */
 	public final void linksUm() {
 		synchronized (territory) {
@@ -168,7 +220,7 @@ public class Robbi implements Serializable {
 	}
 
 	/**
-	 * If possible drop the item that is stored in the bag
+	 * If possible drop the item that is stored in the bag.
 	 */
 	public final void legeAb() {
 		synchronized (territory) {
@@ -184,7 +236,7 @@ public class Robbi implements Serializable {
 	}
 
 	/**
-	 * if possible take the item that occupies the tile Robbi is on
+	 * if possible take the item that occupies the tile Robbi is on.
 	 */
 	public final void nehmeAuf() {
 		synchronized (territory) {
@@ -202,7 +254,7 @@ public class Robbi implements Serializable {
 
 	/**
 	 * If a pile of scrap is ahead of Robbi and afterwards a nonblocking tile, Robbi
-	 * pushes the pile of scrap one tile the direction he is facing
+	 * pushes the pile of scrap one tile the direction he is facing.
 	 */
 	public final void schiebeSchrotthaufen() {
 		synchronized (territory) {
@@ -212,20 +264,14 @@ public class Robbi implements Serializable {
 				throw new NoPileOfScrapAheadException();
 			}
 			int dx = switch (direction) {
-			case EAST:
-				yield x + 2;
-			case WEST:
-				yield x - 2;
-			default:
-				yield x;
+			case EAST -> x + 2;
+			case WEST -> x - 2;
+			default -> x;
 			};
 			int dy = switch (direction) {
-			case NORTH:
-				yield y - 2;
-			case SOUTH:
-				yield y + 2;
-			default:
-				yield y;
+			case NORTH -> y - 2;
+			case SOUTH -> y + 2;
+			default -> y;
 			};
 
 			Tile t = territory.getTile(dx, dy);
@@ -238,20 +284,14 @@ public class Robbi implements Serializable {
 				else
 					territory.placePileOfScrap(dx, dy);
 				int px = switch (direction) {
-				case EAST:
-					yield x + 1;
-				case WEST:
-					yield x - 1;
-				default:
-					yield x;
+				case EAST -> x + 1;
+				case WEST -> x - 1;
+				default -> x;
 				};
 				int py = switch (direction) {
-				case NORTH:
-					yield y - 1;
-				case SOUTH:
-					yield y + 1;
-				default:
-					yield y;
+				case NORTH -> y - 1;
+				case SOUTH -> y + 1;
+				default -> y;
 				};
 				territory.clearTile(px, py);
 			}
@@ -263,7 +303,7 @@ public class Robbi implements Serializable {
 	/**
 	 * checks if an Item is on the tile Robbi is on.
 	 * 
-	 * @return
+	 * @return true if an item is on robbis tile, false otherwise
 	 */
 	public final boolean gegenstandDa() {
 		synchronized (territory) {
@@ -274,7 +314,7 @@ public class Robbi implements Serializable {
 	/**
 	 * Checks if the tile on which Robbi stands is a stockpile
 	 * 
-	 * @return
+	 * @return true if the current tile is an instanceof Stockpile, false otherwise
 	 */
 	public final boolean istLagerplatz() {
 		synchronized (territory) {
@@ -283,27 +323,21 @@ public class Robbi implements Serializable {
 	}
 
 	/**
-	 * checks if a hollow is ahead of Robbi
+	 * checks if a hollow is ahead of Robbi.
 	 * 
-	 * @return
+	 * @return true if an hollow is ahead, false otherwise
 	 */
 	public final boolean vornKuhle() {
 		synchronized (territory) {
 			int dx = switch (direction) {
-			case EAST:
-				yield x + 1;
-			case WEST:
-				yield x - 1;
-			default:
-				yield x;
+			case EAST -> x + 1;
+			case WEST -> x - 1;
+			default -> x;
 			};
 			int dy = switch (direction) {
-			case NORTH:
-				yield y - 1;
-			case SOUTH:
-				yield y + 1;
-			default:
-				yield y;
+			case NORTH -> y - 1;
+			case SOUTH -> y + 1;
+			default -> y;
 			};
 			return territory.getTile(dx, dy) instanceof Hollow;
 		}
@@ -312,34 +346,28 @@ public class Robbi implements Serializable {
 	/**
 	 * checks if a pile of scrap is ahead of Robbi.
 	 * 
-	 * @return
+	 * @return true if a pile of scrap is ahead of robbi, false otherwise
 	 */
 	public final boolean vornSchrotthaufen() {
 		synchronized (territory) {
 			int dx = switch (direction) {
-			case EAST:
-				yield x + 1;
-			case WEST:
-				yield x - 1;
-			default:
-				yield x;
+			case EAST -> x + 1;
+			case WEST -> x - 1;
+			default -> x;
 			};
 			int dy = switch (direction) {
-			case NORTH:
-				yield y - 1;
-			case SOUTH:
-				yield y + 1;
-			default:
-				yield y;
+			case NORTH -> y - 1;
+			case SOUTH -> y + 1;
+			default -> y;
 			};
 			return territory.getTile(dx, dy) instanceof PileOfScrap;
 		}
 	}
 
 	/**
-	 * checks if an item is in Robbis bag
+	 * checks if an item is in Robbis bag.
 	 * 
-	 * @return
+	 * @return true if an item is in the bag, false otherwise
 	 */
 	public final boolean istTascheVoll() {
 		synchronized (territory) {
@@ -349,6 +377,9 @@ public class Robbi implements Serializable {
 
 	// =================== DEBUG ===================
 
+	/**
+	 * Prints robbis current facing into the console.
+	 */
 	void print() {
 		switch (direction) {
 		case NORTH:

@@ -20,6 +20,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.transform.Rotate;
+import javafx.stage.Window;
 
 /**
  * 
@@ -51,11 +52,20 @@ public class TerritoryPanel extends Canvas implements Observer {
 	// store current bounds to allow centering on updated territory size
 	private Bounds bounds;
 
-	public TerritoryPanel(Territory territory, ButtonState buttonState) {
+	/**
+	 * Constructor to create a new territory panel for the given territory.
+	 * 
+	 * @param territory   the territory this panel is for
+	 * @param buttonState the buttonState to be able to create a
+	 *                    TerritoryEventHandler
+	 * @param parent      the parent Window to show alerts relative to the calling
+	 *                    window
+	 */
+	public TerritoryPanel(Territory territory, ButtonState buttonState, Window parent) {
 		this.territory = territory;
 		this.territory.addObserver(this);
 
-		TerritoryEventHandler eventHandler = new TerritoryEventHandler(territory, this, buttonState);
+		TerritoryEventHandler eventHandler = new TerritoryEventHandler(territory, this, buttonState, parent);
 		this.setOnMousePressed(eventHandler);
 		this.setOnMouseDragged(eventHandler);
 		this.setOnMouseReleased(eventHandler);
@@ -63,14 +73,28 @@ public class TerritoryPanel extends Canvas implements Observer {
 		drawPanel();
 	}
 
+	/**
+	 * Getter for the CELLSIZE.
+	 * 
+	 * @return CELLSIZE value
+	 */
 	public static int getCellsize() {
 		return CELLSIZE;
 	}
 
+	/**
+	 * Getter for the CELLSPACER.
+	 * 
+	 * @return CELLSPACER value
+	 */
 	public static int getCellspacer() {
 		return CELLSPACER;
 	}
 
+	/**
+	 * Loads all images for the Territory GUI into static variables.<br>
+	 * Needs to be called at startup, before the territory is drawn the first time.
+	 */
 	public static void loadImages() {
 		robbiImage = new Image("img/0Robbi32.png");
 
@@ -84,6 +108,10 @@ public class TerritoryPanel extends Canvas implements Observer {
 		itemImages[ACCU] = new Image("img/Accu32.png");
 	}
 
+	/**
+	 * updates the size of the territory if the size has changed. Paints the
+	 * territory afterwards.
+	 */
 	private void drawPanel() {
 		if (getWidth() != getTerritoryWidth())
 			setWidth(getTerritoryWidth());
@@ -93,14 +121,29 @@ public class TerritoryPanel extends Canvas implements Observer {
 
 	}
 
+	/**
+	 * Getter for the territory width.
+	 * 
+	 * @return the width of the territory, calculated by number of cols, Cellsize
+	 *         and cellspacer
+	 */
 	private int getTerritoryWidth() {
 		return (territory.getNumCols()) * (CELLSIZE + CELLSPACER);
 	}
 
+	/**
+	 * Getter for the territory height.
+	 * 
+	 * @return the height of the territory, calculated by number of rows, Cellsize
+	 *         and cellspacer
+	 */
 	private int getTerritoryHeight() {
 		return (territory.getNumRows()) * (CELLSIZE + CELLSPACER);
 	}
 
+	/**
+	 * Paint all graphics for the territory and the robbi on the GUI.
+	 */
 	private void paintTerritory() {
 
 		GraphicsContext gc = getGraphicsContext2D();
@@ -172,7 +215,6 @@ public class TerritoryPanel extends Canvas implements Observer {
 		case SOUTH:
 			yield 90;
 		case EAST:
-			yield 0;
 		default:
 			yield 0;
 		};
@@ -226,9 +268,10 @@ public class TerritoryPanel extends Canvas implements Observer {
 	}
 
 	/**
-	 * taken from Dibo
+	 * taken from Dibo<br>
+	 * Centers the territory-panel in the center of the viewPortBounds.
 	 * 
-	 * @param vpb
+	 * @param vpb The bounds in which the territory has to be centered
 	 */
 	public void center(Bounds vpb) {
 		this.bounds = vpb;
@@ -249,6 +292,10 @@ public class TerritoryPanel extends Canvas implements Observer {
 		Platform.runLater(this::update);
 	}
 
+	/**
+	 * Centers the territory if the size has changed. Afterwards, it draws the
+	 * territorypanel.
+	 */
 	public void update() {
 		if (territory.hasSizeChanged()) {
 			center(bounds);

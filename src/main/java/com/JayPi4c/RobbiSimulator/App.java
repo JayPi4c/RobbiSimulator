@@ -4,13 +4,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
+import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
@@ -38,7 +38,7 @@ public class App extends Application {
 	/**
 	 * Application entry point
 	 * 
-	 * @param args
+	 * @param args the arguments from the command line
 	 */
 	public static void main(String[] args) {
 		launch(args);
@@ -51,11 +51,8 @@ public class App extends Application {
 		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {
 			logger.error("Failed to load Program Controller");
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle(Messages.getString("Init.error.title"));
-			alert.setHeaderText(Messages.getString("Init.error.header"));
-			alert.setContentText(Messages.getString("Init.error.message"));
-			alert.showAndWait();
+			AlertHelper.showAlertAndWait(AlertType.ERROR, Messages.getString("Init.error.message"), null, null,
+					Messages.getString("Init.error.title"), Messages.getString("Init.error.header"));
 			Platform.exit();
 		}
 		logger.debug("loading Program Controller successfully");

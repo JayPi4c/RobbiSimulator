@@ -15,6 +15,7 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * @author Jonas Pohl
  *
  */
+//@XmlRootElement
 public class Territory extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -23,16 +24,31 @@ public class Territory extends Observable implements Serializable {
 
 	private transient Robbi robbi;
 
+	/**
+	 * Array-attribute to store the real territory
+	 */
 	private Tile tiles[][];
-
+	/**
+	 * Attribute to save if the territory has changed.
+	 */
 	private boolean sizeChanged = false;
 
 	private static final int DEFAULT_NUMBER_OF_COLUMNS = 6;
 	private static final int DEFAULT_NUMBER_OF_ROWS = 6;
 
+	/**
+	 * Attribute to store the current number of columns of the territory.
+	 */
 	private int NUMBER_OF_COLUMNS = DEFAULT_NUMBER_OF_COLUMNS;
+	/**
+	 * Attribute to store the current number of rows of the territory.
+	 */
 	private int NUMBER_OF_ROWS = DEFAULT_NUMBER_OF_ROWS;
 
+	/**
+	 * Creates a new Territory with a new robbi instance and initializes all tiles
+	 * to the default size.
+	 */
 	public Territory() {
 		robbi = new Robbi(this);
 		tiles = new Tile[DEFAULT_NUMBER_OF_COLUMNS][DEFAULT_NUMBER_OF_ROWS];
@@ -44,6 +60,13 @@ public class Territory extends Observable implements Serializable {
 	}
 	// ============ HELPER =========
 
+	/**
+	 * Calculates the tile for the given x and y coordinates.
+	 * 
+	 * @param x tiles x ordinate
+	 * @param y tiles y ordinate
+	 * @return the tile for the corresponding coordinate
+	 */
 	public synchronized Tile getTile(int x, int y) {
 		x += NUMBER_OF_COLUMNS;
 		x %= NUMBER_OF_COLUMNS;
@@ -52,43 +75,92 @@ public class Territory extends Observable implements Serializable {
 		return tiles[x][y];
 	}
 
+	/**
+	 * Getter for the current number of rows.
+	 * 
+	 * @return the current number of rows
+	 */
 	public synchronized int getNumRows() {
 		return NUMBER_OF_ROWS;
 	}
 
+	/**
+	 * Getter for the current number of columns.
+	 * 
+	 * @return the current number of columns
+	 */
 	public synchronized int getNumCols() {
 		return NUMBER_OF_COLUMNS;
 	}
 
+	/**
+	 * Getter to check if the size of the territory has changed.
+	 * 
+	 * @return true if the size has changed, false otherwise
+	 */
 	public synchronized boolean hasSizeChanged() {
 		return sizeChanged;
 	}
 
+	/**
+	 * Setter to update if the size has changed.
+	 * 
+	 * @param flag new value for the sizeChanged attribute
+	 */
 	public synchronized void setSizeChanged(boolean flag) {
 		this.sizeChanged = flag;
 	}
 
+	/**
+	 * Setter to update Robbi in the territory.
+	 * 
+	 * @param robbi the new Robbi for the territory
+	 */
 	public synchronized void setRobbi(Robbi robbi) {
 		robbi.setTerritory(this);
 		if (this.robbi != null) {
 			robbi.setPosition(this.robbi.getX(), this.robbi.getY());
 			robbi.setFacing(this.robbi.getFacing());
+			robbi.setItem(this.robbi.getItem());
 		}
 		this.robbi = robbi;
 	}
 
+	/**
+	 * Getter for the current robbi in the territory.
+	 * 
+	 * @return the current robbi
+	 */
 	public synchronized Robbi getRobbi() {
 		return robbi;
 	}
 
+	/**
+	 * Getter for robbis current direction.
+	 * 
+	 * @return robbis current direction
+	 */
 	public synchronized DIRECTION getRobbiDirection() {
 		return robbi.getFacing();
 	}
 
+	/**
+	 * Getter for robbis current item.
+	 * 
+	 * @return the item robbi is currently holding. null, if robbi does not have
+	 *         one.
+	 */
 	public synchronized Item getRobbiItem() {
 		return robbi.getItem();
 	}
 
+	/**
+	 * Helper to bound a value to a given bound
+	 * 
+	 * @param i     the value to bound
+	 * @param bound the bound to limit i to
+	 * @return the normalized value of i
+	 */
 	private int normalizeCoord(int i, int bound) {
 		i %= bound;
 		i += bound;
@@ -96,10 +168,26 @@ public class Territory extends Observable implements Serializable {
 		return i;
 	}
 
+	/**
+	 * Checks if robbi is on the tile with the given coords.
+	 * 
+	 * @param col the columns to check
+	 * @param row the row to check
+	 * @return true if and only if robbi is on the tile provided by col and row,
+	 *         false otherwise
+	 */
 	public synchronized boolean robbiOnTile(int col, int row) {
 		return robbi.getX() == col && robbi.getY() == row;
 	}
 
+	/**
+	 * Placing the given item in the territory at the given x-y-position.
+	 * 
+	 * @param item the item to place in the territory
+	 * @param x    x-ordinate in the territory
+	 * @param y    y-ordinate in the territory
+	 * @return true if the item has been placed in the territory, false otherwise
+	 */
 	public synchronized boolean placeItem(Item item, int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		if (t.getItem() != null && !(t instanceof Stockpile))
@@ -111,11 +199,25 @@ public class Territory extends Observable implements Serializable {
 		return true;
 	}
 
+	/**
+	 * Getter for the item in the territory at the given position.
+	 * 
+	 * @param x x-ordinate in the territory
+	 * @param y y-ordinate in the territory
+	 * @return the item, which is placed at the given position
+	 */
 	public synchronized Item getItem(int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		return t.getItem();
 	}
 
+	/**
+	 * Removes the item from the given position.
+	 * 
+	 * @param x x-ordinate in the territory
+	 * @param y y-ordinate in the territory
+	 * @return the item that has been removed from the tile
+	 */
 	public synchronized Item removeItem(int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		setChanged();
@@ -123,6 +225,18 @@ public class Territory extends Observable implements Serializable {
 		return t.pickItem();
 	}
 
+	/**
+	 * Updates the territory to the given territory and updates robbi with the
+	 * additional information. <br>
+	 * This method is used to update the territory to a territory state loaded from
+	 * a file.
+	 * 
+	 * @param territory the new territory
+	 * @param item      the item robbi has in his bag
+	 * @param x         robbis x position
+	 * @param y         robbis y positions
+	 * @param facing    robbis facing
+	 */
 	public synchronized void update(Territory territory, Item item, int x, int y, DIRECTION facing) {
 		this.tiles = territory.tiles;
 		this.sizeChanged = territory.sizeChanged;
@@ -137,6 +251,12 @@ public class Territory extends Observable implements Serializable {
 
 	// ========= GUI FUNCTIONS ===========
 
+	/**
+	 * Updates the size of the territory to the new size.
+	 * 
+	 * @param newCols new number of columns in the territory
+	 * @param newRows new number of rows in the territory
+	 */
 	public synchronized void changeSize(int newCols, int newRows) {
 		if (newCols <= 0 || newRows <= 0)
 			throw new IllegalArgumentException("Diese Größe ist für das Territorium nicht zulässig");
@@ -174,6 +294,12 @@ public class Territory extends Observable implements Serializable {
 		notifyAllObservers();
 	}
 
+	/**
+	 * move robbi to the given position.
+	 * 
+	 * @param x robbis new x-position
+	 * @param y robbis new y-position
+	 */
 	public synchronized void placeRobbi(int x, int y) {
 		if ((x >= 0 && x < NUMBER_OF_COLUMNS && y >= 0 && y < NUMBER_OF_ROWS) && !(tiles[x][y] instanceof Hollow)) {
 			robbi.setPosition(x, y);
@@ -182,6 +308,13 @@ public class Territory extends Observable implements Serializable {
 		notifyAllObservers();
 	}
 
+	/**
+	 * Place a new Hollow at the given position if it is in bounds and robbi is not
+	 * on the tile.
+	 * 
+	 * @param x Hollows x-Position
+	 * @param y Hollows y-Position
+	 */
 	public synchronized void placeHollow(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
@@ -190,9 +323,14 @@ public class Territory extends Observable implements Serializable {
 			setChanged();
 			notifyAllObservers();
 		}
-
 	}
 
+	/**
+	 * Place a new PileOfScrap at the given position if it is in bounds.
+	 * 
+	 * @param x PileOfScrap x-Position
+	 * @param y PileOfScrap y-Position
+	 */
 	public synchronized void placePileOfScrap(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
@@ -203,6 +341,12 @@ public class Territory extends Observable implements Serializable {
 		}
 	}
 
+	/**
+	 * Place a new Stockpile at the given position if it is in bounds.
+	 * 
+	 * @param x Stockpile x-Position
+	 * @param y Stockpile y-Position
+	 */
 	public synchronized void placeStockpile(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
@@ -213,6 +357,12 @@ public class Territory extends Observable implements Serializable {
 		}
 	}
 
+	/**
+	 * Place a new Accu on the given tile if it is in bounds.
+	 * 
+	 * @param x Accu x-Position
+	 * @param y Accu y-Position
+	 */
 	public synchronized void placeAccu(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
@@ -224,6 +374,12 @@ public class Territory extends Observable implements Serializable {
 
 	}
 
+	/**
+	 * Place a new Screw on the given tile if it is in bounds.
+	 * 
+	 * @param x Screw x-Position
+	 * @param y Screw y-Position
+	 */
 	public synchronized void placeScrew(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
@@ -234,6 +390,12 @@ public class Territory extends Observable implements Serializable {
 		}
 	}
 
+	/**
+	 * Place a new Nut on the given tile if it is in bounds.
+	 * 
+	 * @param x Nut x-Position
+	 * @param y Nut y-Position
+	 */
 	public synchronized void placeNut(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
@@ -244,6 +406,12 @@ public class Territory extends Observable implements Serializable {
 		}
 	}
 
+	/**
+	 * Removes all elements from the tile and replaces it with a new default tile.
+	 * 
+	 * @param x Tile x-Position
+	 * @param y Tile y-Position
+	 */
 	public synchronized void clearTile(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
@@ -255,8 +423,10 @@ public class Territory extends Observable implements Serializable {
 	}
 
 	// ================== DEBUG =======
-
-	protected void print() {
+	/**
+	 * Debug method to print the territory in the console.
+	 */
+	public void print() {
 
 		for (int i = 0; i < NUMBER_OF_COLUMNS; i++) {
 			for (int j = 0; j < NUMBER_OF_ROWS; j++) {
@@ -284,10 +454,20 @@ public class Territory extends Observable implements Serializable {
 		}
 	}
 
+	/**
+	 * Getter for Robbis x Position.
+	 * 
+	 * @return robbis x Position
+	 */
 	public synchronized int getRobbiX() {
 		return robbi.getX();
 	}
 
+	/**
+	 * Getter for Robbis y Position.
+	 * 
+	 * @return robbis y Position
+	 */
 	public synchronized int getRobbiY() {
 		return robbi.getY();
 	}

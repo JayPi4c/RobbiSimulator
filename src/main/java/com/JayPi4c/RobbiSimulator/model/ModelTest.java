@@ -2,8 +2,18 @@ package com.JayPi4c.RobbiSimulator.model;
 
 import java.util.Scanner;
 
+/**
+ * Class to test the model in the console.
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class ModelTest {
-
+	/**
+	 * Starts a test program, which allows a basic robbi movement in the console.
+	 * 
+	 * @param args does nothing
+	 */
 	public static void main(String args[]) {
 		Territory t = new Territory();
 		Robbi robbi = t.getRobbi();
