@@ -42,12 +42,9 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 		grid.setHgap(20);
 		dialogPane.setContent(grid);
 		Platform.runLater(rowField::requestFocus);
-		dialog.setResultConverter(button -> {
-			if (button == ButtonType.OK) {
-				return new Dimension(Integer.parseInt(colField.getText()), Integer.parseInt(rowField.getText()));
-			}
-			return null;
-		});
+		dialog.setResultConverter(button -> button == ButtonType.OK
+				? new Dimension(Integer.parseInt(colField.getText()), Integer.parseInt(rowField.getText()))
+				: null);
 
 	}
 

@@ -7,8 +7,6 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * This class contains all datastructures and utility functions to control the
  * territory.
  * 
- * last modified 22.11.2021
- * 
  * @author Jonas Pohl
  *
  */
@@ -58,6 +56,13 @@ public class Territory extends Observable {
 
 	public void setSizeChanged(boolean flag) {
 		this.sizeChanged = flag;
+	}
+
+	public void setRobbi(Robbi robbi) {
+		robbi.setTerritory(this);
+		robbi.setPosition(this.robbi.getX(), this.robbi.getY());
+		robbi.setFacing(this.robbi.getFacing());
+		this.robbi = robbi;
 	}
 
 	public Robbi getRobbi() {

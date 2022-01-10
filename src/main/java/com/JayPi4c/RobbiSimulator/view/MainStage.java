@@ -194,7 +194,6 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		var vBox = new VBox(menubar, toolbar, splitPane, messageLabel);
 
 		mainStageController = new MainStageController(this, buttonState);
-
 		scene = new Scene(vBox);
 
 		setMinHeight(200);
@@ -207,10 +206,26 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 			program.save(textArea.getText());
 			ProgramController.close(program.getName());
 		});
+		// initJavaFX();
 
 		show();
 		textArea.requestFocus();
 		logger.log(Level.INFO, "Finished loading '" + program.getName() + "'");
+	}
+
+	// https://stackoverflow.com/questions/31219169/javafx-application-name-on-gnome
+	// does not work yet
+	/*
+	 * private void initJavaFX() { if
+	 * (System.getProperty("os.name").toLowerCase().contains("linux")) { try {
+	 * Toolkit xToolkit = Toolkit.getDefaultToolkit(); Field awtAppClassNameField =
+	 * xToolkit.getClass().getDeclaredField("com.JayPi4c.RobbiSimulator.App");
+	 * awtAppClassNameField.setAccessible(true); awtAppClassNameField.set(xToolkit,
+	 * "MyApp"); } catch (Exception ignored) { } } }
+	 */
+
+	public Territory getTerritory() {
+		return territory;
 	}
 
 	public MenuItem getSaveEditorMenuItem() {
@@ -295,6 +310,42 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 
 	public ToggleButton getDeleteFieldToggleButtonToolbar() {
 		return deleteFieldToggleButtonToolbar;
+	}
+
+	public MenuItem getItemPresentMenuItem() {
+		return itemPresentMenuItem;
+	}
+
+	public MenuItem getIsStockpileMenuItem() {
+		return isStockpileMenuItem;
+	}
+
+	public MenuItem getHollowAheadMenuItem() {
+		return hollowAheadMenuItem;
+	}
+
+	public MenuItem getIsBagFullMenuItem() {
+		return isBagFullMenuItem;
+	}
+
+	public MenuItem getPushPileOfScrapMenuItem() {
+		return pushPileOfScrapMenuItem;
+	}
+
+	public MenuItem getMoveMenuItem() {
+		return moveMenuItem;
+	}
+
+	public MenuItem getTurnLeftMenuItem() {
+		return turnLeftMenuItem;
+	}
+
+	public MenuItem getPutMenuItem() {
+		return putMenuItem;
+	}
+
+	public MenuItem getTakeMenuItem() {
+		return takeMenuItem;
 	}
 
 	public static void loadImages() {

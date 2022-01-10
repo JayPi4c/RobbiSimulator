@@ -19,7 +19,6 @@ import javafx.stage.Stage;
  * Hauptklasse des Robbi Simulators.<br>
  * Javaversion: 17 <br>
  * JavaFX: 17<br>
- * last modified 22.11.2021
  * 
  * @author Jonas Pohl
  *

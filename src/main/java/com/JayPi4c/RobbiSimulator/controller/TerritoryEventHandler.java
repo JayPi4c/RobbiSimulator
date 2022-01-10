@@ -1,6 +1,7 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
 import com.JayPi4c.RobbiSimulator.model.Territory;
+import com.JayPi4c.RobbiSimulator.view.RobbiContextMenu;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
 import javafx.event.EventHandler;
@@ -14,25 +15,30 @@ public class TerritoryEventHandler implements EventHandler<MouseEvent> {
 
 	ButtonState buttonState;
 
-	public TerritoryEventHandler(Territory territory, ButtonState buttonState) {
+	private RobbiContextMenu robbiContextMenu;
+
+	public TerritoryEventHandler(Territory territory, TerritoryPanel territoryPanel, ButtonState buttonState) {
 		this.territory = territory;
 		this.buttonState = buttonState;
+		territoryPanel.setOnContextMenuRequested(event -> {
+			if (territory.robbiOnTile(getCol(event.getX()), getRow(event.getY()))) {
+				robbiContextMenu = new RobbiContextMenu(territory);
+				robbiContextMenu.show(territoryPanel.getScene().getWindow(), event.getScreenX(), event.getScreenY());
+			}
+		});
+
 	}
 
 	@Override
 	public void handle(MouseEvent event) {
-		int col = (int) (event.getX() / (TerritoryPanel.getCellsize() + TerritoryPanel.getCellspacer()));
-		int row = (int) (event.getY() / (TerritoryPanel.getCellsize() + TerritoryPanel.getCellspacer()));
+		int col = getCol(event.getX());
+		int row = getRow(event.getY());
 		if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
 			robbiDragged = territory.robbiOnTile(col, row);
-		}
-
-		else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
+		} else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
 			if (robbiDragged)
 				territory.placeRobbi(col, row);
-		}
-
-		else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
+		} else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
 			if (!robbiDragged) {
 				switch (buttonState.getSelected()) {
 				case ButtonState.ROBBI:
@@ -67,6 +73,15 @@ public class TerritoryEventHandler implements EventHandler<MouseEvent> {
 			}
 			robbiDragged = false;
 		}
+
+	}
+
+	private int getCol(double x) {
+		return (int) (x / (TerritoryPanel.getCellsize() + TerritoryPanel.getCellspacer()));
+	}
+
+	private int getRow(double y) {
+		return (int) (y / (TerritoryPanel.getCellsize() + TerritoryPanel.getCellspacer()));
 
 	}
 

@@ -8,8 +8,6 @@ import java.util.logging.Logger;
  * This is the actor class of the simulator. All public functions in this class
  * will be available in the simulators editor.
  * 
- * last modified 22.11.2021
- * 
  * @author Jonas Pohl
  */
 public class Robbi {
@@ -26,7 +24,6 @@ public class Robbi {
 	}
 
 	public void main() {
-
 	}
 
 	Robbi(Territory t) {
@@ -74,6 +71,14 @@ public class Robbi {
 
 	DIRECTION getFacing() {
 		return this.direction;
+	}
+
+	void setTerritory(Territory t) {
+		this.territory = t;
+	}
+
+	void setFacing(DIRECTION facing) {
+		this.direction = facing;
 	}
 
 	// ==================== PUBLIC FUNCTIONS ==========
