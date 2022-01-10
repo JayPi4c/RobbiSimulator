@@ -25,8 +25,6 @@ import javafx.scene.transform.Rotate;
  * This class draws the territory on a panel to allow interacting with the
  * graphical interface.
  * 
- * last modified 15.11.2021
- * 
  * @author Jonas Pohl
  *
  */
@@ -56,7 +54,7 @@ public class TerritoryPanel extends Canvas implements Observer {
 		this.territory = territory;
 		this.territory.addObserver(this);
 
-		TerritoryEventHandler eventHandler = new TerritoryEventHandler(territory, buttonState);
+		TerritoryEventHandler eventHandler = new TerritoryEventHandler(territory, this, buttonState);
 		this.setOnMousePressed(eventHandler);
 		this.setOnMouseDragged(eventHandler);
 		this.setOnMouseReleased(eventHandler);

@@ -30,7 +30,10 @@ public class Program {
 			String content = bobTheBuilder.toString();
 
 			editorContent = content.replace(ProgramController.createPrefix(name), "");
-			editorContent = editorContent.substring(0, editorContent.length() - 2);
+			int index = editorContent.lastIndexOf('}');
+			// if(index >= 0) // not needed since we know for sure, that a closed curly
+			// bracket is in the string.
+			editorContent = new StringBuilder(editorContent).replace(index, index + 1, "").toString();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

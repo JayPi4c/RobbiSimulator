@@ -4,6 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,6 +27,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
@@ -47,7 +53,7 @@ public class ProgramController {
 
 	public static final String DEFAULT_CONTENT = "void main(){" + System.lineSeparator() + "\t// place your code here"
 			+ System.lineSeparator() + "}";
-	public static final String PREFIX_TEMPLATE = "public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{public ";
+	public static final String PREFIX_TEMPLATE = "import com.JayPi4c.RobbiSimulator.utils.annotations.*;public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{public ";
 	public static final String POSTFIX_TEMPLATE = "}";
 
 	private static final String VALID_IDENTIFIER_REGEX = "^([a-zA-Z_$][a-zA-Z\\d_$]*)$";
@@ -122,7 +128,6 @@ public class ProgramController {
 
 		Optional<String> result = dialog.showAndWait();
 		result.ifPresent(ProgramController::createAndShow);
-
 	}
 
 	public static void createAndShow(String programName) {
@@ -146,6 +151,7 @@ public class ProgramController {
 		Program program = new Program(f, programName);
 		Stage stage = new MainStage(program);
 		programs.put(programName, stage);
+		ProgramController.compile(program, false);
 
 	}
 
@@ -185,6 +191,11 @@ public class ProgramController {
 	}
 
 	public static void compile(Program program) {
+		compile(program, true);
+	}
+
+	public static void compile(Program program, boolean showAlerts) {
+		// TODO make sure Default annotations have correct value in String
 		JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
 		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 		StandardJavaFileManager manager = javac.getStandardFileManager(diagnostics, null, null);
@@ -197,10 +208,11 @@ public class ProgramController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		logger.log(Level.INFO, "compile success: " + Boolean.toString(success));
-		if (!success) {
-			diagnostics.toString();
 
+		if (!success) {
+			boolean showedAlert = false; // flag to indicate that only one alert is shown
+			diagnostics.toString();
+			logger.log(Level.WARNING, "Compilation failed");
 			for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
 				diagnostic.toString();
 
@@ -213,35 +225,62 @@ public class ProgramController {
 						diagnostic.getColumnNumber()));
 				logger.log(Level.WARNING, String.format("Startpostion/Endposition: %s/%s%n",
 						diagnostic.getStartPosition(), diagnostic.getEndPosition()));
-
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Compilation Error");
-				alert.setHeaderText(diagnostic.getKind().toString());
-				StringBuilder bobTheBuilder = new StringBuilder();
-				bobTheBuilder
-						.append(String.format(Messages.getString("Compilation.diagnostic.kind"), diagnostic.getKind()));
-				// bobTheBuilder.append(String.format("Quelle: %s%n", diagnostic.getSource()));
-				bobTheBuilder.append(String.format(Messages.getString("Compilation.diagnostic.CodeAndMessage"),
-						diagnostic.getCode(), diagnostic.getMessage(null)));
-				bobTheBuilder.append(
-						String.format(Messages.getString("Compilation.diagnostic.row"), diagnostic.getLineNumber()));
-				// bobTheBuilder.append(
-				// String.format("Position/Spalte: %s/%s%n", diagnostic.getPosition(),
-				// diagnostic.getColumnNumber()));
-				// bobTheBuilder.append(String.format("Startpostion/Endposition: %s/%s%n",
-				// diagnostic.getStartPosition(),
-				// diagnostic.getEndPosition()));
-				alert.setContentText(bobTheBuilder.toString());
+				if (showAlerts && !showedAlert) {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setTitle("Compilation Error");
+					alert.setHeaderText(diagnostic.getKind().toString());
+					StringBuilder bobTheBuilder = new StringBuilder();
+					bobTheBuilder.append(
+							String.format(Messages.getString("Compilation.diagnostic.kind"), diagnostic.getKind()));
+					// bobTheBuilder.append(String.format("Quelle: %s%n", diagnostic.getSource()));
+					bobTheBuilder.append(String.format(Messages.getString("Compilation.diagnostic.CodeAndMessage"),
+							diagnostic.getCode(), diagnostic.getMessage(null)));
+					bobTheBuilder.append(String.format(Messages.getString("Compilation.diagnostic.row"),
+							diagnostic.getLineNumber()));
+					// bobTheBuilder.append(
+					// String.format("Position/Spalte: %s/%s%n", diagnostic.getPosition(),
+					// diagnostic.getColumnNumber()));
+					// bobTheBuilder.append(String.format("Startpostion/Endposition: %s/%s%n",
+					// diagnostic.getStartPosition(),
+					// diagnostic.getEndPosition()));
+					alert.setContentText(bobTheBuilder.toString());
+					alert.showAndWait();
+					showedAlert = true;
+				}
+			}
+		} else {// compilation successful
+			logger.log(Level.INFO, "Compilation successful");
+			// set new Robbi in territory
+			MainStage s = (MainStage) programs.get(program.getName());
+			s.getTerritory().setRobbi(loadNewRobbi(program.getName()));
+			if (showAlerts) {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle(Messages.getString("Compilation.success.title"));
+				alert.setHeaderText(Messages.getString("Compilation.success.header"));
+				alert.setContentText(
+						String.format(Messages.getString("Compilation.success.message"), program.getName()));
 				alert.showAndWait();
 			}
-		} else {
-			logger.log(Level.INFO, "Compilation successful");
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle(Messages.getString("Compilation.success.title"));
-			alert.setHeaderText(Messages.getString("Compilation.success.header"));
-			alert.setContentText(String.format(Messages.getString("Compilation.success.message"), program.getName()));
-			alert.showAndWait();
 		}
+	}
+
+	private static Robbi loadNewRobbi(String name) {
+		try (URLClassLoader classLoader = new URLClassLoader(
+				new URL[] { new File(PATH_TO_PROGRAMS).toURI().toURL() })) {
+			Constructor<?> c = classLoader.loadClass(name).getConstructor();
+			Robbi r = (Robbi) c.newInstance();
+			return r;
+		} catch (MalformedURLException | InstantiationException | IllegalAccessException | InvocationTargetException
+				| ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static void close(String name) {
