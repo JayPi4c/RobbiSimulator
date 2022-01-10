@@ -17,8 +17,4 @@ public class Tile {
 		return it;
 	}
 
-	public void draw() {
-		// implement functionality to draw tile
-	}
-
 }
