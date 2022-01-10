@@ -18,7 +18,6 @@ import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import javafx.scene.transform.Rotate;
 
 /**
@@ -35,9 +34,9 @@ public class TerritoryPanel extends Canvas implements Observer {
 
 	private Territory territory;
 
-	private Image tileImages[] = new Image[4];
-	private Image itemImages[] = new Image[3];
-	private Image robbiImage;
+	private static Image tileImages[] = new Image[4];
+	private static Image itemImages[] = new Image[3];
+	private static Image robbiImage;
 
 	private final static int TILE = 0;
 	private final static int STOCKPILE = 1;
@@ -62,8 +61,7 @@ public class TerritoryPanel extends Canvas implements Observer {
 		this.setOnMouseDragged(eventHandler);
 		this.setOnMouseReleased(eventHandler);
 
-		loadImages();
-		init();
+		drawPanel();
 	}
 
 	public static int getCellsize() {
@@ -74,8 +72,7 @@ public class TerritoryPanel extends Canvas implements Observer {
 		return CELLSPACER;
 	}
 
-	private void loadImages() {
-
+	public static void loadImages() {
 		robbiImage = new Image("img/0Robbi32.png");
 
 		tileImages[TILE] = new Image("img/Tile32.png");
@@ -88,9 +85,11 @@ public class TerritoryPanel extends Canvas implements Observer {
 		itemImages[ACCU] = new Image("img/Accu32.png");
 	}
 
-	private void init() {
-		setWidth(getTerritoryWidth());
-		setHeight(getTerritoryHeight());
+	private void drawPanel() {
+		if (getWidth() != getTerritoryWidth())
+			setWidth(getTerritoryWidth());
+		if (getHeight() != getTerritoryHeight())
+			setHeight(getTerritoryHeight());
 		paintTerritory();
 
 	}
@@ -108,8 +107,8 @@ public class TerritoryPanel extends Canvas implements Observer {
 		GraphicsContext gc = getGraphicsContext2D();
 
 		for (int i = 0; i < territory.getNumCols(); i++) {
-			gc.setStroke(Color.BLACK);
-			gc.setLineWidth(CELLSPACER);
+			// gc.setStroke(Color.BLACK);
+			// gc.setLineWidth(CELLSPACER);
 			// gc.strokeLine(getPos(i) - 1, 0, getPos(i) - 1,
 			// getPos(territory.getNumRows()));
 			// gc.strokeLine(0, getPos(i) - 1, getPos(territory.getNumCols()), getPos(i) -
@@ -238,8 +237,11 @@ public class TerritoryPanel extends Canvas implements Observer {
 
 	@Override
 	public void update(Observable observable) {
-		center(bounds);
-		init();
+		if (territory.hasSizeChanged()) {
+			center(bounds);
+			territory.setSizeChanged(false);
+		}
+		drawPanel();
 	}
 
 }

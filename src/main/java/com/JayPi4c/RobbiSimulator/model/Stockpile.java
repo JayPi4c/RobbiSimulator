@@ -5,11 +5,12 @@ import java.util.ArrayList;
 public class Stockpile extends Tile {
 
 	ArrayList<Item> items;
-	// TODO überprüfen, ob sich eine queue besser eignet, da man dann durch die
-	// Elemente einfacher iterieren kann.
+	// TODO Queue more efficient?
+	// check if queue would be better, allowing an easier iteration over the
+	// elements.
 
 	public Stockpile() {
-		items = new ArrayList<Item>();
+		items = new ArrayList<>();
 	}
 
 	@Override

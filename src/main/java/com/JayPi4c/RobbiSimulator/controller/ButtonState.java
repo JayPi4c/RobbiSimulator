@@ -1,8 +1,6 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
-import com.JayPi4c.RobbiSimulator.utils.Observable;
-
-public class ButtonState extends Observable {
+public class ButtonState {
 
 	public static final int NONE = -1;
 	public static final int ROBBI = 0;
@@ -17,6 +15,10 @@ public class ButtonState extends Observable {
 	private int selected;
 
 	public ButtonState() {
+		selected = NONE;
+	}
+
+	public void deselect() {
 		selected = NONE;
 	}
 

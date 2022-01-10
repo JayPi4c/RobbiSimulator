@@ -8,7 +8,7 @@ import java.util.logging.Logger;
  * This is the actor class of the simulator. All public functions in this class
  * will be available in the simulators editor.
  * 
- * last modified 08.11.2021
+ * last modified 22.11.2021
  * 
  * @author Jonas Pohl
  */
@@ -20,6 +20,14 @@ public class Robbi {
 	private Item inBag = null;
 
 	private DIRECTION direction;
+
+	public Robbi() {
+
+	}
+
+	public void main() {
+
+	}
 
 	Robbi(Territory t) {
 		this.logger.setLevel(Level.WARNING);
