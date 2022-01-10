@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="javadoc">
-    <target name="javadoc">
-        <javadoc access="private" author="true" classpath="target/test-classes:/home/jonas/.m2/repository/org/openjfx/javafx-base/17/javafx-base-17.jar:/home/jonas/.m2/repository/org/openjfx/javafx-graphics/17/javafx-graphics-17.jar:/home/jonas/.m2/repository/org/openjfx/javafx-controls/17/javafx-controls-17-linux.jar:/home/jonas/.m2/repository/org/openjfx/javafx-graphics/17/javafx-graphics-17-linux.jar:/home/jonas/.m2/repository/org/openjfx/javafx-controls/17/javafx-controls-17.jar:/home/jonas/.m2/repository/org/openjfx/javafx-base/17/javafx-base-17-linux.jar" destdir="doc" doctitle="Robbi Simulator Documentation" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="com.JayPi4c.RobbiSimulator,com.JayPi4c.RobbiSimulator.utils" source="17" sourcepath="src/main/java:src/test/resources:src/main/resources:src/test/java" splitindex="true" use="true" version="true"/>
-    </target>
-</project>
