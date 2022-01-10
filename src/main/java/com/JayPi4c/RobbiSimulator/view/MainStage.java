@@ -1,10 +1,11 @@
 package com.JayPi4c.RobbiSimulator.view;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.MainStageController;
+import com.JayPi4c.RobbiSimulator.controller.TerritorySaveController;
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.controller.simulation.SimulationController;
@@ -42,14 +43,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MainStage extends Stage implements ILanguageChangeListener {
-	Logger logger = Logger.getLogger(MainStage.class.getName());
+	private static final Logger logger = LogManager.getLogger(MainStage.class);
 
 	private Territory territory;
 
 	private ButtonState buttonState;
 	private MainStageController mainStageController;
-
-	// private SimulationController simController;
 
 	private static final int MIN_SPEED_VALUE = 100;
 	private static final int MAX_SPEED_VALUE = 2500;
@@ -63,6 +62,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	private MenuItem openEditorMenuItem;
 	private MenuItem compileEditorMenuItem;
 	private MenuItem printEditorMenuItem;
+
 	private MenuItem quitEditorMenuItem;
 	private Menu editorMenu;
 
@@ -70,13 +70,16 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	private MenuItem saveXMLTerritoryMenuItem;
 	private MenuItem saveJAXBTerritoryMenuItem;
 	private MenuItem saveSerialTerritoryMenuItem;
+
 	private Menu saveTerritoryMenu;
 	private MenuItem loadXMLTerritoryMenuItem;
 	private MenuItem loadJAXBTerritoryMenuItem;
 	private MenuItem loadSerialTerritoryMenuItem;
 
 	private Menu loadTerritoryMenu;
-	private MenuItem saveAsPicMenuItem;
+	private Menu saveAsPicMenu;
+	private MenuItem saveAsPNGMenuItem;
+	private MenuItem saveAsGifMenuItem;
 	private MenuItem printTerritoryMenuItem;
 	private MenuItem changeSizeTerritoryMenuItem;
 	private RadioMenuItem placeRobbiTerritoryRadioMenuItem;
@@ -89,6 +92,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	private RadioMenuItem deleteFieldRadioMenuItem;
 	private Menu territoryMenu;
 	private ToggleGroup placeGroupTerritoryMenu;
+
 	// robbi Menu
 	private MenuItem itemPresentMenuItem;
 	private MenuItem isStockpileMenuItem;
@@ -202,6 +206,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		mainStageController = new MainStageController(this, buttonState);
 		// var simController =
 		new SimulationController(this, territory);
+		new TerritorySaveController(this);
 
 		scene = new Scene(vBox);
 
@@ -215,11 +220,10 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 			program.save(textArea.getText());
 			ProgramController.close(program.getName());
 		});
-		// initJavaFX();
 
 		show();
 		textArea.requestFocus();
-		logger.log(Level.INFO, "Finished loading '" + program.getName() + "'");
+		logger.info("Finished loading '{}'", program.getName());
 	}
 
 	// https://stackoverflow.com/questions/31219169/javafx-application-name-on-gnome
@@ -429,6 +433,34 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		return changeSizeButtonToolbar;
 	}
 
+	public MenuItem getSaveSerialTerritoryMenuItem() {
+		return saveSerialTerritoryMenuItem;
+	}
+
+	public MenuItem getLoadSerialTerritoryMenuItem() {
+		return loadSerialTerritoryMenuItem;
+	}
+
+	public MenuItem getPrintEditorMenuItem() {
+		return printEditorMenuItem;
+	}
+
+	public TerritoryPanel getTerritoryPanel() {
+		return territoryPanel;
+	}
+
+	public MenuItem getPrintTerritoryMenuItem() {
+		return printTerritoryMenuItem;
+	}
+
+	public MenuItem getSaveAsPNGMenuItem() {
+		return saveAsPNGMenuItem;
+	}
+
+	public MenuItem getSaveAsGifMenuItem() {
+		return saveAsGifMenuItem;
+	}
+
 	public static void loadImages() {
 		newImage = new Image("img/New24.gif");
 		saveImage = new Image("img/Save24.gif");
@@ -459,7 +491,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * Erstelle den Editoreintrag für die Menubar
 	 */
 	private void createEditor() {
-		logger.log(Level.INFO, "Create editor entry for menubar");
+		logger.debug("Create editor entry for menubar");
 		newEditorMenuItem = new MenuItem(Messages.getString("Menu.editor.new"));
 		newEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 		newEditorMenuItem.setMnemonicParsing(true);
@@ -490,7 +522,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * Erstelle den Territoriumseintrag für die Menubar
 	 */
 	private void createTerritory() {
-		logger.log(Level.INFO, "Create territory entry for menubar");
+		logger.debug("Create territory entry for menubar");
 		saveXMLTerritoryMenuItem = new MenuItem(Messages.getString("Menu.territory.save.xml"));
 		saveJAXBTerritoryMenuItem = new MenuItem(Messages.getString("Menu.territory.save.jaxb"));
 		saveSerialTerritoryMenuItem = new MenuItem(Messages.getString("Menu.territory.save.serialize"));
@@ -502,7 +534,12 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		loadSerialTerritoryMenuItem = new MenuItem(Messages.getString("Menu.territory.load.deserialize"));
 		loadTerritoryMenu = new Menu(Messages.getString("Menu.territory.load"), null, loadXMLTerritoryMenuItem,
 				loadJAXBTerritoryMenuItem, loadSerialTerritoryMenuItem);
-		saveAsPicMenuItem = new MenuItem(Messages.getString("Menu.territory.saveAsPic"));
+
+		saveAsPNGMenuItem = new MenuItem(Messages.getString("Menu.territory.saveAsPic.png"));
+		saveAsGifMenuItem = new MenuItem(Messages.getString("Menu.territory.saveAsPic.gif"));
+		saveAsPicMenu = new Menu(Messages.getString("Menu.territory.saveAsPic"), null, saveAsPNGMenuItem,
+				saveAsGifMenuItem);
+
 		printTerritoryMenuItem = new MenuItem(Messages.getString("Menu.territory.print"));
 		changeSizeTerritoryMenuItem = new MenuItem(Messages.getString("Menu.territory.size"));
 
@@ -534,7 +571,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		deleteFieldRadioMenuItem.setToggleGroup(placeGroupTerritoryMenu);
 
 		territoryMenu = new Menu(Messages.getString("Menu.territory"), null, saveTerritoryMenu, loadTerritoryMenu,
-				saveAsPicMenuItem, printTerritoryMenuItem, changeSizeTerritoryMenuItem, new SeparatorMenuItem(),
+				saveAsPicMenu, printTerritoryMenuItem, changeSizeTerritoryMenuItem, new SeparatorMenuItem(),
 				placeRobbiTerritoryRadioMenuItem, placeHollowTerritoryRadioMenuItem,
 				placePileOfScrapTerritoryRadioMenuItem, placeStockpileTerritoryRadioMenuItem,
 				placeAccuTerritoryRadioMenuItem, placeScrewTerritoryRadioMenuItem, placeNutTerritoryRadioMenuItem,
@@ -545,7 +582,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * Erstelle den Robbieintrag für die Menubar
 	 */
 	private void createRobbi() {
-		logger.log(Level.INFO, "Create Robbi entry for menubar");
+		logger.debug("Create Robbi entry for menubar");
 		territoryMenu.setMnemonicParsing(true);
 		itemPresentMenuItem = new MenuItem(Messages.getString("Menu.robbi.itemPresent"));
 		isStockpileMenuItem = new MenuItem(Messages.getString("Menu.robbi.isStockpile"));
@@ -576,7 +613,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * Erstelle den Simulationseintrag für die Menubar
 	 */
 	private void createSimulation() {
-		logger.log(Level.INFO, "Create simulation entry for menubar");
+		logger.debug("Create simulation entry for menubar");
 
 		startMenuItem = new MenuItem(Messages.getString("Menu.simulation.start"));
 		startMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F11, KeyCombination.CONTROL_DOWN));
@@ -622,7 +659,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * Erstelle die gesamte Menubar mit allen Einträgen
 	 */
 	private void createMenuBar() {
-		logger.log(Level.INFO, "Create menubar");
+		logger.debug("Create menubar");
 
 		createEditor();
 		createTerritory();
@@ -637,7 +674,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * erreichende Buttons
 	 */
 	private void createToolbar() {
-		logger.log(Level.INFO, "Create toolbar");
+		logger.debug("Create toolbar");
 
 		newButtonToolbar = new Button(null, new ImageView(newImage));
 		newButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.control.new")));
@@ -735,7 +772,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		stopToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
 		stopToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.stop")));
 
-		speedSliderToolbar = new Slider(MIN_SPEED_VALUE, MAX_SPEED_VALUE, (MIN_SPEED_VALUE + MAX_SPEED_VALUE) / 2);
+		speedSliderToolbar = new Slider(MIN_SPEED_VALUE, MAX_SPEED_VALUE, (MIN_SPEED_VALUE + MAX_SPEED_VALUE) / 2d);
 		speedSliderToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.speed")));
 
 		toolbar = new ToolBar(newButtonToolbar, loadButtonToolbar, new Separator(), saveButtonToolbar,
@@ -752,7 +789,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * finden sind.
 	 */
 	private void createContentPane() {
-		logger.log(Level.INFO, "Create content panel");
+		logger.debug("Create content panel");
 
 		textArea = new TextArea(program.getEditorContent());
 		textArea.setMinWidth(250);
@@ -772,7 +809,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * Erstelle ein label, welches dem Benutzer zusätzliches Feedback geben kann
 	 */
 	private void createMessageLabel() {
-		logger.log(Level.INFO, "Create message label");
+		logger.debug("Create message label");
 		messageLabel = new Label(Messages.getString("Messages.label.greeting"));
 	}
 
@@ -798,7 +835,9 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		loadJAXBTerritoryMenuItem.setText(Messages.getString("Menu.territory.load.jaxb"));
 		loadSerialTerritoryMenuItem.setText(Messages.getString("Menu.territory.load.deserialize"));
 		loadTerritoryMenu.setText(Messages.getString("Menu.territory.load"));
-		saveAsPicMenuItem.setText(Messages.getString("Menu.territory.saveAsPic"));
+		saveAsPNGMenuItem.setText(Messages.getString("Menu.territory.saveAsPic.png"));
+		saveAsGifMenuItem.setText(Messages.getString("Menu.territory.saveAsPic.gif"));
+		saveAsPicMenu.setText(Messages.getString("Menu.territory.saveAsPic"));
 		printTerritoryMenuItem.setText(Messages.getString("Menu.territory.print"));
 
 		changeSizeTerritoryMenuItem.setText(Messages.getString("Menu.territory.size"));

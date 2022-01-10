@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -14,8 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.lang.model.SourceVersion;
@@ -26,6 +23,9 @@ import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
@@ -43,11 +43,22 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+/**
+ * This controller contains all functionality to initialize the application,
+ * load, save and compile a program. Furthermore, it creates and opens a new
+ * stage, if a new Program is loaded, or it loads the DefaultProgram on the
+ * Application start
+ * 
+ * FIXME Compile on program load
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class ProgramController {
 
-	private static final Logger logger = Logger.getLogger(ProgramController.class.getName());
+	private static final Logger logger = LogManager.getLogger(ProgramController.class);
 
-	private static final String PATH_TO_PROGRAMS = "programs";
+	public static final String PATH_TO_PROGRAMS = "programs";
 	public static final String DEFAULT_ROBBI_FILE_NAME = "DefaultRobbi";
 	public static final String DEFAULT_FILE_EXTENSION = ".java";
 
@@ -56,13 +67,19 @@ public class ProgramController {
 	public static final String PREFIX_TEMPLATE = "import com.JayPi4c.RobbiSimulator.utils.annotations.*;public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{public ";
 	public static final String POSTFIX_TEMPLATE = "}";
 
-	private static final String VALID_IDENTIFIER_REGEX = "^([a-zA-Z_$][a-zA-Z\\d_$]*)$";
+	// private static final String VALID_IDENTIFIER_REGEX =
+	// "^([a-zA-Z_$][a-zA-Z\\d_$]*)$";
 
 	private static HashMap<String, Stage> programs;
 
+	private ProgramController() {
+	}
+
 	/**
+	 * Initializes the Application on startup and makes sure the programs folder and
+	 * the DefaultRobbi class exists
 	 * 
-	 * @return true if initialization finished successful, false otherwise
+	 * @return true if initialization finished successfully, false otherwise
 	 */
 	public static boolean initialize() {
 		File dir = new File(PATH_TO_PROGRAMS);
@@ -93,6 +110,12 @@ public class ProgramController {
 		return true;
 	}
 
+	/**
+	 * Creates a Dialog and asks the user to for the name of the new program.
+	 * Afterwards, it initiates the creation of a new stage for the program.
+	 * 
+	 * @see ProgramController#createAndShow(String)
+	 */
 	public static void createAndShow() {
 		Dialog<String> dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("New.dialog.title"));
@@ -110,14 +133,16 @@ public class ProgramController {
 				.map(file -> file.getName().replace(DEFAULT_FILE_EXTENSION, ""))
 				.collect(Collectors.toCollection(ArrayList::new));
 
-		logger.log(Level.INFO, "found following files in 'programs' directory:");
-		filenamesInDirectory.forEach(f -> logger.log(Level.INFO, f));
+		logger.debug("Found following files in 'programs' directory:");
+		filenamesInDirectory.forEach(f -> logger.debug(f));
 
 		nameField.textProperty()
 				.addListener((observable, oldVal, newVal) -> dialog.getDialogPane().lookupButton(ButtonType.OK)
-						.setDisable(!nameField.getText().matches(VALID_IDENTIFIER_REGEX)
-								|| SourceVersion.isKeyword(nameField.getText()) // https://stackoverflow.com/a/54141029/13670629
+						.setDisable(SourceVersion.isKeyword(nameField.getText()) // https://stackoverflow.com/a/54141029/13670629
+								|| !SourceVersion.isIdentifier(nameField.getText())
+								// || !nameField.getText().matches(VALID_IDENTIFIER_REGEX)
 								|| filenamesInDirectory.contains(nameField.getText())));
+
 		dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 		GridPane grid = new GridPane();
 		grid.addRow(0, new Label(Messages.getString("New.dialog.name")), nameField);
@@ -130,6 +155,13 @@ public class ProgramController {
 		result.ifPresent(ProgramController::createAndShow);
 	}
 
+	/**
+	 * Creates a new file with default content, if it does not exist. Afterwards, it
+	 * creates a program and a new Stage. Finally, it compiles the code and loads
+	 * the Robbi instance into the simulation
+	 * 
+	 * @param programName
+	 */
 	public static void createAndShow(String programName) {
 		String content = createTemplate(programName, DEFAULT_CONTENT);
 		File f = new File(PATH_TO_PROGRAMS + File.separatorChar + programName + DEFAULT_FILE_EXTENSION);
@@ -155,45 +187,83 @@ public class ProgramController {
 
 	}
 
+	/**
+	 * Creates the prefix for the program-file
+	 * 
+	 * @param name the name of the class
+	 * @return the prefix for the class
+	 */
 	public static String createPrefix(String name) {
 		return String.format(PREFIX_TEMPLATE, name);
 	}
 
+	/**
+	 * Creates the postfix for the program-file
+	 * 
+	 * @return the postfix for the class
+	 */
 	public static String createPostfix() {
 		return POSTFIX_TEMPLATE;
 	}
 
+	/**
+	 * Creates the template for a compilable class
+	 * 
+	 * @param name    the name of the class
+	 * @param content the content of the class
+	 * @return a String containing a compilable java code with the given content
+	 */
 	public static String createTemplate(String name, String content) {
 		return createPrefix(name) + content + createPostfix();
 
 	}
 
+	/**
+	 * TODO restrict fileManager to load only files from programs folder
+	 * 
+	 * Opens a FileChooser and loads the selected file. If the file is already
+	 * loaded, the ProgramController requests the focus for the loaded program.
+	 * Otherwise it creates a new program and a new stage.
+	 */
 	public static void openProgram() {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("open Program");
+		fileChooser.setTitle("open Program"); // TODO change internationalization
 		fileChooser.setInitialDirectory(new File(PATH_TO_PROGRAMS));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(Messages.getString("Open.dialog.filter"),
 				"*" + DEFAULT_FILE_EXTENSION));
 
-		File f = fileChooser.showOpenDialog(null);
-		if (f == null)
-			return;
-		String name = f.getName().replaceFirst(DEFAULT_FILE_EXTENSION, "");
-		if (!programs.containsKey(name)) {
-			logger.log(Level.INFO, "Opening '" + name + "' since it is not loaded yet.");
-			Program program = new Program(f, name);
-			Stage stage = new MainStage(program);
-			programs.put(name, stage);
-		} else {
-			logger.log(Level.INFO, "File is already loaded! Requesting focus...");
-			programs.get(name).requestFocus();
+		File file = fileChooser.showOpenDialog(null);
+		if (file != null) {
+			String name = file.getName().replaceFirst(DEFAULT_FILE_EXTENSION, "");
+			if (!programs.containsKey(name)) {
+				logger.debug("Opening '{}' since it is not loaded yet.", name);
+				Program program = new Program(file, name);
+				Stage stage = new MainStage(program);
+				programs.put(name, stage);
+			} else {
+				logger.debug("File is already loaded! Requesting focus...");
+				programs.get(name).requestFocus();
+			}
 		}
+
 	}
 
+	/**
+	 * Compiles the given Program and shows an error Alert if the Compilation failed
+	 * otherwise it shows an success alert
+	 * 
+	 * @param program
+	 */
 	public static void compile(Program program) {
 		compile(program, true);
 	}
 
+	/**
+	 * Compiles the given program and shows alerts, if they are activated
+	 * 
+	 * @param program    the program to compile
+	 * @param showAlerts flag to determine if the alerts need to be shown or not
+	 */
 	public static void compile(Program program, boolean showAlerts) {
 		// TODO make sure Default annotations have correct value in String
 		JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
@@ -212,19 +282,17 @@ public class ProgramController {
 		if (!success) {
 			boolean showedAlert = false; // flag to indicate that only one alert is shown
 			diagnostics.toString();
-			logger.log(Level.WARNING, "Compilation failed");
+			logger.error("Compilation failed");
 			for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
 				diagnostic.toString();
 
-				logger.log(Level.WARNING, "Kind: %s%n", diagnostic.getKind());
-				logger.log(Level.WARNING, "Quelle: %s%n", diagnostic.getSource());
-				logger.log(Level.WARNING, String.format("Code und Nachricht: %s: %s%n", diagnostic.getCode(),
-						diagnostic.getMessage(null)));
-				logger.log(Level.WARNING, "Zeile: %s%n", diagnostic.getLineNumber());
-				logger.log(Level.WARNING, String.format("Position/Spalte: %s/%s%n", diagnostic.getPosition(),
-						diagnostic.getColumnNumber()));
-				logger.log(Level.WARNING, String.format("Startpostion/Endposition: %s/%s%n",
-						diagnostic.getStartPosition(), diagnostic.getEndPosition()));
+				logger.error("Kind: {}", diagnostic.getKind());
+				logger.error("Quelle: {}", diagnostic.getSource());
+				logger.error("Code und Nachricht: {}: {}", diagnostic.getCode(), diagnostic.getMessage(null));
+				logger.error("Zeile: {}", diagnostic.getLineNumber());
+				logger.error("Position/Spalte: {}/{}", diagnostic.getPosition(), diagnostic.getColumnNumber());
+				logger.error("Startpostion/Endposition: {}/{}", diagnostic.getStartPosition(),
+						diagnostic.getEndPosition());
 				if (showAlerts && !showedAlert) {
 					Alert alert = new Alert(AlertType.ERROR);
 					alert.setTitle("Compilation Error");
@@ -249,7 +317,7 @@ public class ProgramController {
 				}
 			}
 		} else {// compilation successful
-			logger.log(Level.INFO, "Compilation successful");
+			logger.info("Compilation successful");
 			// set new Robbi in territory
 			MainStage s = (MainStage) programs.get(program.getName());
 			s.getTerritory().setRobbi(loadNewRobbi(program.getName()));
@@ -264,31 +332,34 @@ public class ProgramController {
 		}
 	}
 
+	/**
+	 * Loads a new Robbi by the name of the class
+	 * 
+	 * @param name the name of the class
+	 * @return an instance of the class given by the name
+	 */
 	private static Robbi loadNewRobbi(String name) {
 		try (URLClassLoader classLoader = new URLClassLoader(
 				new URL[] { new File(PATH_TO_PROGRAMS).toURI().toURL() })) {
 			Constructor<?> c = classLoader.loadClass(name).getConstructor();
 			Robbi r = (Robbi) c.newInstance();
 			return r;
-		} catch (MalformedURLException | InstantiationException | IllegalAccessException | InvocationTargetException
-				| ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | ClassNotFoundException
+				| NoSuchMethodException | SecurityException | IOException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
+	/**
+	 * Removes the program from the programsList in order to make sure it can be
+	 * reopened later
+	 * 
+	 * @param name the name of the program which is closed
+	 */
 	public static void close(String name) {
 		programs.remove(name);
-		logger.log(Level.INFO, "Closing program '" + name + "'");
-	}
-
-	private ProgramController() {
+		logger.debug("Closing program '{}'", name);
 	}
 
 }

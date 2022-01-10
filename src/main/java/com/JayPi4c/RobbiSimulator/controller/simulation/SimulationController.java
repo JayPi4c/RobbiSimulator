@@ -1,14 +1,20 @@
 package com.JayPi4c.RobbiSimulator.controller.simulation;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
+import javafx.application.Platform;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
 
 public class SimulationController {
 
-	Simulation simulation;
+	private static final Logger logger = LogManager.getLogger(SimulationController.class);
+
+	private Simulation simulation;
 
 	private MainStage stage;
 	private Territory territory;
@@ -69,6 +75,7 @@ public class SimulationController {
 	}
 
 	private void start() {
+		logger.debug("Starting new simulation");
 		simulation = new Simulation(territory, this);
 		simulation.setDaemon(true); // program should exit even if simulation is running
 		simulation.start();
@@ -76,6 +83,7 @@ public class SimulationController {
 	}
 
 	private void resume() {
+		logger.debug("Resuming simulation");
 		simulation.setPause(false);
 		synchronized (simulation) {
 			simulation.notify();
@@ -84,24 +92,33 @@ public class SimulationController {
 	}
 
 	private void pause() {
+		logger.debug("Pausing simulation");
 		simulation.setPause(true);
 		disableButtonStates(false, true, false);
 	}
 
 	private void stop() {
+		logger.debug("Stopping simulation");
 		simulation.setStop(true);
 		simulation.setPause(false);
 		simulation.interrupt();
 		synchronized (simulation) {
 			simulation.notify();
 		}
-
 	}
 
 	private void disableButtonStates(boolean start, boolean pause, boolean stop) {
-		startToolbar.setDisable(start);
-		pauseToolbar.setDisable(pause);
-		stopToolbar.setDisable(stop);
+		if (!Platform.isFxApplicationThread()) {
+			Platform.runLater(() -> {
+				startToolbar.setDisable(start);
+				pauseToolbar.setDisable(pause);
+				stopToolbar.setDisable(stop);
+			});
+		} else {
+			startToolbar.setDisable(start);
+			pauseToolbar.setDisable(pause);
+			stopToolbar.setDisable(stop);
+		}
 	}
 
 }

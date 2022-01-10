@@ -1,7 +1,7 @@
 package com.JayPi4c.RobbiSimulator;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
@@ -25,28 +25,32 @@ import javafx.stage.Stage;
  */
 public class App extends Application {
 
-	Logger logger = Logger.getLogger(App.class.getName());
+	private static final Logger logger = LogManager.getLogger(App.class);
 
 	@Override
 	public void start(Stage primaryStage) {
-		logger.log(Level.INFO, "starting application");
-		logger.log(Level.INFO, "creating scene");
+		logger.info("Starting application");
+		logger.debug("Creating scene");
 		ProgramController.createAndShow(ProgramController.DEFAULT_ROBBI_FILE_NAME);
-		logger.log(Level.INFO, "Scene creation done");
+		logger.debug("Scene creation done");
 	}
 
+	/**
+	 * Application entry point
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
 
 	@Override
 	public void init() {
-		// logger.setLevel(Level.WARNING);
-		logger.log(Level.INFO, "initialize application");
+		logger.info("Initialize application");
 
-		logger.log(Level.INFO, "loading Program Controller");
+		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {
-			logger.log(Level.SEVERE, "Failed to load Program Controller");
+			logger.error("Failed to load Program Controller");
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle(Messages.getString("Init.error.title"));
 			alert.setHeaderText(Messages.getString("Init.error.header"));
@@ -54,19 +58,19 @@ public class App extends Application {
 			alert.showAndWait();
 			Platform.exit();
 		}
-		logger.log(Level.INFO, "loading Program Controller successfully");
+		logger.debug("loading Program Controller successfully");
 
-		logger.log(Level.INFO, "Loading images");
+		logger.debug("Loading images");
 		MainStage.loadImages();
 		TerritoryPanel.loadImages();
-		logger.log(Level.INFO, "Finished loading images");
+		logger.debug("Finished loading images");
 
 	}
 
 	@Override
 	public void stop() {
 		// do some final serialization
-		logger.log(Level.INFO, "Quitting application");
+		logger.info("Quitting application");
 	}
 
 }
