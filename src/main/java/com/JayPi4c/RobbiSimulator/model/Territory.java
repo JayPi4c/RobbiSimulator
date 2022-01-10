@@ -7,21 +7,23 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * This class contains all datastructures and utility functions to control the
  * territory.
  * 
+ * FIXME check for deadlocks!!!
+ * 
  * @author Jonas Pohl
  *
  */
 public class Territory extends Observable {
 	private Robbi robbi;
 
-	private Tile tiles[][];
+	private volatile Tile tiles[][];
 
-	private boolean sizeChanged = false;
+	private volatile boolean sizeChanged = false;
 
 	private static final int DEFAULT_NUMBER_OF_COLUMNS = 6;
 	private static final int DEFAULT_NUMBER_OF_ROWS = 6;
 
-	private int NUMBER_OF_COLUMNS = DEFAULT_NUMBER_OF_COLUMNS;
-	private int NUMBER_OF_ROWS = DEFAULT_NUMBER_OF_ROWS;
+	private volatile int NUMBER_OF_COLUMNS = DEFAULT_NUMBER_OF_COLUMNS;
+	private volatile int NUMBER_OF_ROWS = DEFAULT_NUMBER_OF_ROWS;
 
 	public Territory() {
 		robbi = new Robbi(this);
@@ -58,14 +60,14 @@ public class Territory extends Observable {
 		this.sizeChanged = flag;
 	}
 
-	public void setRobbi(Robbi robbi) {
+	public synchronized void setRobbi(Robbi robbi) {
 		robbi.setTerritory(this);
 		robbi.setPosition(this.robbi.getX(), this.robbi.getY());
 		robbi.setFacing(this.robbi.getFacing());
 		this.robbi = robbi;
 	}
 
-	public Robbi getRobbi() {
+	public synchronized Robbi getRobbi() {
 		return robbi;
 	}
 
@@ -80,11 +82,11 @@ public class Territory extends Observable {
 		return i;
 	}
 
-	public boolean robbiOnTile(int col, int row) {
+	public synchronized boolean robbiOnTile(int col, int row) {
 		return robbi.getX() == col && robbi.getY() == row;
 	}
 
-	public boolean placeItem(Item item, int x, int y) {
+	public synchronized boolean placeItem(Item item, int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		if (t.getItem() != null && !(t instanceof Stockpile))
 			return false;
@@ -95,12 +97,12 @@ public class Territory extends Observable {
 		return true;
 	}
 
-	public Item getItem(int x, int y) {
+	public Item getItem(int x, int y) { // TODO make synchronized
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		return t.getItem();
 	}
 
-	public Item removeItem(int x, int y) {
+	public synchronized Item removeItem(int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		setChanged();
 		notifyAllObservers();
@@ -109,7 +111,7 @@ public class Territory extends Observable {
 
 	// ========= GUI FUNCTIONS ===========
 
-	public void changeSize(int newCols, int newRows) {
+	public synchronized void changeSize(int newCols, int newRows) {
 		if (newCols <= 0 || newRows <= 0)
 			throw new IllegalArgumentException("Diese Größe ist für das Territorium nicht zulässig");
 		if (newCols != NUMBER_OF_COLUMNS || newRows != NUMBER_OF_ROWS)
@@ -144,7 +146,7 @@ public class Territory extends Observable {
 		notifyAllObservers();
 	}
 
-	public void placeRobbi(int x, int y) {
+	public synchronized void placeRobbi(int x, int y) {
 
 		if ((x >= 0 && x < NUMBER_OF_COLUMNS && y >= 0 && y < NUMBER_OF_ROWS) && !(tiles[x][y] instanceof Hollow)) {
 			robbi.setPosition(x, y);
@@ -154,10 +156,10 @@ public class Territory extends Observable {
 		notifyAllObservers();
 	}
 
-	public void placeHollow(int x, int y) {
+	public synchronized void placeHollow(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
-		if ((x < NUMBER_OF_ROWS && y < NUMBER_OF_COLUMNS) && !(x == robbi.getX() && y == robbi.getY())) {
+		if ((x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) && !(x == robbi.getX() && y == robbi.getY())) {
 			tiles[x][y] = new Hollow();
 			setChanged();
 			notifyAllObservers();
@@ -165,7 +167,7 @@ public class Territory extends Observable {
 
 	}
 
-	public void placePileOfScrap(int x, int y) {
+	public synchronized void placePileOfScrap(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -175,7 +177,7 @@ public class Territory extends Observable {
 		}
 	}
 
-	public void placeStockpile(int x, int y) {
+	public synchronized void placeStockpile(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -185,7 +187,7 @@ public class Territory extends Observable {
 		}
 	}
 
-	public void placeAccu(int x, int y) {
+	public synchronized void placeAccu(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -196,7 +198,7 @@ public class Territory extends Observable {
 
 	}
 
-	public void placeScrew(int x, int y) {
+	public synchronized void placeScrew(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -206,7 +208,7 @@ public class Territory extends Observable {
 		}
 	}
 
-	public void placeNut(int x, int y) {
+	public synchronized void placeNut(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -216,7 +218,7 @@ public class Territory extends Observable {
 		}
 	}
 
-	public void clearTile(int x, int y) {
+	public synchronized void clearTile(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {

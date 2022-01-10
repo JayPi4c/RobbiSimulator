@@ -14,6 +14,7 @@ import com.JayPi4c.RobbiSimulator.model.Tile;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 import com.JayPi4c.RobbiSimulator.utils.Observer;
 
+import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -103,7 +104,6 @@ public class TerritoryPanel extends Canvas implements Observer {
 	private void paintTerritory() {
 
 		GraphicsContext gc = getGraphicsContext2D();
-
 		for (int i = 0; i < territory.getNumCols(); i++) {
 			// gc.setStroke(Color.BLACK);
 			// gc.setLineWidth(CELLSPACER);
@@ -148,6 +148,7 @@ public class TerritoryPanel extends Canvas implements Observer {
 				}
 			}
 		}
+
 		// gc.strokeLine(getPos(territory.getNumCols()) - 1, 0,
 		// getPos(territory.getNumCols()) - 1,
 		// getPos(territory.getNumRows()));
@@ -235,6 +236,10 @@ public class TerritoryPanel extends Canvas implements Observer {
 
 	@Override
 	public void update(Observable observable) {
+		Platform.runLater(this::update);
+	}
+
+	public void update() {
 		if (territory.hasSizeChanged()) {
 			center(bounds);
 			territory.setSizeChanged(false);

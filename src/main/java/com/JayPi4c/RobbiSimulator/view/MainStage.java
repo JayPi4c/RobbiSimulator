@@ -8,6 +8,7 @@ import com.JayPi4c.RobbiSimulator.controller.ChangeTerritorySizeHandler;
 import com.JayPi4c.RobbiSimulator.controller.MainStageController;
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
+import com.JayPi4c.RobbiSimulator.controller.simulation.SimulationController;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
@@ -48,6 +49,11 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 
 	private ButtonState buttonState;
 	private MainStageController mainStageController;
+
+	// private SimulationController simController;
+
+	private static final int MIN_SPEED_VALUE = 100;
+	private static final int MAX_SPEED_VALUE = 2500;
 
 	private Program program;
 
@@ -194,6 +200,9 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		var vBox = new VBox(menubar, toolbar, splitPane, messageLabel);
 
 		mainStageController = new MainStageController(this, buttonState);
+		// var simController =
+		new SimulationController(this, territory);
+
 		scene = new Scene(vBox);
 
 		setMinHeight(200);
@@ -223,6 +232,34 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * awtAppClassNameField.setAccessible(true); awtAppClassNameField.set(xToolkit,
 	 * "MyApp"); } catch (Exception ignored) { } } }
 	 */
+
+	public MenuItem getStartMenuItem() {
+		return startMenuItem;
+	}
+
+	public MenuItem getPauseMenuItem() {
+		return pauseMenuItem;
+	}
+
+	public MenuItem getStopMenuItem() {
+		return stopMenuItem;
+	}
+
+	public ToggleButton getStartToggleButtonToolbar() {
+		return startToggleButtonToolbar;
+	}
+
+	public ToggleButton getPauseToggleButtonToolbar() {
+		return pauseToggleButtonToolbar;
+	}
+
+	public ToggleButton getStopToggleButtonToolbar() {
+		return stopToggleButtonToolbar;
+	}
+
+	public Slider getSpeedSliderToolbar() {
+		return speedSliderToolbar;
+	}
 
 	public Territory getTerritory() {
 		return territory;
@@ -667,7 +704,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		stopToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
 		stopToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.stop")));
 
-		speedSliderToolbar = new Slider(0, 100, 50);
+		speedSliderToolbar = new Slider(MIN_SPEED_VALUE, MAX_SPEED_VALUE, (MIN_SPEED_VALUE + MAX_SPEED_VALUE) / 2);
 		speedSliderToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.speed")));
 
 		toolbar = new ToolBar(newButtonToolbar, loadButtonToolbar, new Separator(), saveButtonToolbar,
