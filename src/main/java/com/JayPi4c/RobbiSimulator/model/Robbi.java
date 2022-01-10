@@ -1,5 +1,8 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * 
  * This is the actor class of the simulator. All public functions in this class
@@ -10,7 +13,7 @@ package com.JayPi4c.RobbiSimulator.model;
  * @author Jonas Pohl
  */
 public class Robbi {
-
+	private Logger logger = Logger.getLogger(Robbi.class.getName());
 	private Territory territory;
 
 	private int x, y;
@@ -19,6 +22,7 @@ public class Robbi {
 	private DIRECTION direction;
 
 	Robbi(Territory t) {
+		this.logger.setLevel(Level.WARNING);
 		this.territory = t;
 		this.x = 0;
 		this.y = 0;
@@ -115,6 +119,8 @@ public class Robbi {
 		default:
 			break;
 		}
+		territory.setChanged();
+		territory.notifyAllObservers();
 	}
 
 	/**
@@ -122,6 +128,8 @@ public class Robbi {
 	 */
 	public final void linksUm() {
 		direction = direction.next();
+		territory.setChanged();
+		territory.notifyAllObservers();
 	}
 
 	/**
@@ -134,6 +142,8 @@ public class Robbi {
 			inBag = null;
 		else
 			throw new TileIsFullException();
+		territory.setChanged();
+		territory.notifyAllObservers();
 	}
 
 	/**
@@ -147,6 +157,8 @@ public class Robbi {
 			throw new BagIsFullException();
 		}
 		inBag = territory.removeItem(x, y);
+		territory.setChanged();
+		territory.notifyAllObservers();
 	}
 
 	/**
@@ -199,7 +211,6 @@ public class Robbi {
 				yield y;
 			};
 			territory.clearTile(px, py);
-			;
 		}
 		vor();
 	}
@@ -269,7 +280,7 @@ public class Robbi {
 		default:
 			yield y;
 		};
-		System.out.println(dx + " " + dy);
+		logger.info(dx + " " + dy);
 		return territory.getTile(dx, dy) instanceof PileOfScrap;
 	}
 

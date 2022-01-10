@@ -1,16 +1,18 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import com.JayPi4c.RobbiSimulator.utils.Observable;
+
 /**
  * 
  * This class contains all datastructures and utility functions to control the
  * territory.
  * 
- * last modified 08.11.2021
+ * last modified 15.11.2021
  * 
  * @author Jonas Pohl
  *
  */
-public class Territory {
+public class Territory extends Observable {
 	private Robbi robbi;
 
 	private Tile tiles[][];
@@ -57,9 +59,14 @@ public class Territory {
 	}
 
 	private int normalizeCoord(int i, int bound) {
+		i %= bound;
 		i += bound;
 		i %= bound;
 		return i;
+	}
+
+	public boolean robbiOnTile(int col, int row) {
+		return robbi.getX() == col && robbi.getY() == row;
 	}
 
 	public boolean placeItem(Item item, int x, int y) {
@@ -68,6 +75,8 @@ public class Territory {
 			return false;
 
 		t.setItem(item);
+		setChanged();
+		notifyAllObservers();
 		return true;
 	}
 
@@ -78,6 +87,8 @@ public class Territory {
 
 	public Item removeItem(int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
+		setChanged();
+		notifyAllObservers();
 		return t.pickItem();
 	}
 
@@ -109,65 +120,91 @@ public class Territory {
 			robbi.setPosition(0, 0);
 		}
 		tiles = newTiles;
+
+		setChanged();
+		notifyAllObservers();
 	}
 
 	public void placeRobbi(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_ROWS);
-		y = normalizeCoord(y, NUMBER_OF_COLUMNS);
-		if ((x < NUMBER_OF_ROWS && y <= NUMBER_OF_COLUMNS) && !(tiles[x][y] instanceof Hollow)) {
+
+		if ((x < NUMBER_OF_COLUMNS && y <= NUMBER_OF_ROWS) && !(tiles[x][y] instanceof Hollow)) {
 			robbi.setPosition(x, y);
 		}
+
+		setChanged();
+		notifyAllObservers();
 	}
 
 	public void placeHollow(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_ROWS);
-		y = normalizeCoord(y, NUMBER_OF_COLUMNS);
-		if ((x < NUMBER_OF_ROWS && y <= NUMBER_OF_COLUMNS) && !(x == robbi.getX() && y == robbi.getY())) {
+		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
+		y = normalizeCoord(y, NUMBER_OF_ROWS);
+		if ((x < NUMBER_OF_ROWS && y < NUMBER_OF_COLUMNS) && !(x == robbi.getX() && y == robbi.getY())) {
 			tiles[x][y] = new Hollow();
+			setChanged();
+			notifyAllObservers();
 		}
+
 	}
 
 	public void placePileOfScrap(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_ROWS);
-		y = normalizeCoord(y, NUMBER_OF_COLUMNS);
-		if (x < NUMBER_OF_ROWS && y <= NUMBER_OF_COLUMNS)
+		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
+		y = normalizeCoord(y, NUMBER_OF_ROWS);
+		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
 			tiles[x][y] = new PileOfScrap();
+			setChanged();
+			notifyAllObservers();
+		}
 	}
 
 	public void placeStockpile(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_ROWS);
-		y = normalizeCoord(y, NUMBER_OF_COLUMNS);
-		if (x < NUMBER_OF_ROWS && y <= NUMBER_OF_COLUMNS)
+		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
+		y = normalizeCoord(y, NUMBER_OF_ROWS);
+		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
 			tiles[x][y] = new Stockpile();
+			setChanged();
+			notifyAllObservers();
+		}
 	}
 
 	public void placeAccu(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_ROWS);
-		y = normalizeCoord(y, NUMBER_OF_COLUMNS);
-		if ((x < NUMBER_OF_ROWS && y <= NUMBER_OF_COLUMNS))
+		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
+		y = normalizeCoord(y, NUMBER_OF_ROWS);
+		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
 			tiles[x][y].setItem(new Accu());
+			setChanged();
+			notifyAllObservers();
+		}
 
 	}
 
 	public void placeScrew(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_ROWS);
-		y = normalizeCoord(y, NUMBER_OF_COLUMNS);
-		if ((x < NUMBER_OF_ROWS && y <= NUMBER_OF_COLUMNS))
+		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
+		y = normalizeCoord(y, NUMBER_OF_ROWS);
+		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
 			tiles[x][y].setItem(new Screw());
+			setChanged();
+			notifyAllObservers();
+		}
 	}
 
 	public void placeNut(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_ROWS);
-		y = normalizeCoord(y, NUMBER_OF_COLUMNS);
-		if ((x < NUMBER_OF_ROWS && y <= NUMBER_OF_COLUMNS))
+		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
+		y = normalizeCoord(y, NUMBER_OF_ROWS);
+		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
 			tiles[x][y].setItem(new Nut());
+			setChanged();
+			notifyAllObservers();
+		}
 	}
 
 	public void clearTile(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_ROWS);
-		y = normalizeCoord(y, NUMBER_OF_COLUMNS);
-		if ((x < NUMBER_OF_ROWS && y <= NUMBER_OF_COLUMNS))
+		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
+		y = normalizeCoord(y, NUMBER_OF_ROWS);
+		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
 			tiles[x][y] = new Tile();
+			setChanged();
+			notifyAllObservers();
+		}
 	}
 
 	// ================== DEBUG =======
