@@ -5,7 +5,7 @@ package com.JayPi4c.RobbiSimulator.model;
  * This class contains all datastructures and utility functions to control the
  * territory.
  * 
- * last modified 01.11.2021
+ * last modified 08.11.2021
  * 
  * @author Jonas Pohl
  *
@@ -52,6 +52,10 @@ public class Territory {
 		return robbi;
 	}
 
+	public DIRECTION getRobbiDirection() {
+		return robbi.getFacing();
+	}
+
 	private int normalizeCoord(int i, int bound) {
 		i += bound;
 		i %= bound;
@@ -80,15 +84,26 @@ public class Territory {
 	// ========= GUI FUNCTIONS ===========
 
 	public void changeSize(int newCols, int newRows) {
+		if (newCols <= 0 || newRows <= 0)
+			throw new IllegalArgumentException("Diese Größe ist für das Territorium nicht zulässig");
 		NUMBER_OF_COLUMNS = newCols;
 		NUMBER_OF_ROWS = newRows;
-		Tile newTiles[][] = new Tile[newCols][newRows];
-		for (int i = 0; i < newCols; i++) {
-			for (int j = 0; j < newRows; j++) {
+		// create the new territory
+		Tile newTiles[][] = new Tile[NUMBER_OF_COLUMNS][NUMBER_OF_ROWS];
+		for (int i = 0; i < NUMBER_OF_COLUMNS; i++) {
+			for (int j = 0; j < NUMBER_OF_ROWS; j++) {
+				newTiles[i][j] = new Tile();
+			}
+		}
+
+		// copy the old territory into the new
+		for (int i = 0; i < tiles.length && i < newCols; i++) {
+			for (int j = 0; j < tiles[i].length && j < newRows; j++) {
 				newTiles[i][j] = tiles[i][j];
 			}
 		}
-		if (robbi.getX() >= newCols || robbi.getY() > newRows) {
+
+		if (robbi.getX() >= NUMBER_OF_COLUMNS || robbi.getY() > NUMBER_OF_ROWS) {
 			if (newTiles[0][0] instanceof Hollow)
 				newTiles[0][0] = new Tile();
 			robbi.setPosition(0, 0);
@@ -183,6 +198,14 @@ public class Territory {
 			}
 			System.out.println();
 		}
+	}
+
+	public int getRobbiX() {
+		return robbi.getX();
+	}
+
+	public int getRobbiY() {
+		return robbi.getY();
 	}
 
 }

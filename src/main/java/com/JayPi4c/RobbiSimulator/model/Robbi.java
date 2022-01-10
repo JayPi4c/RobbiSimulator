@@ -5,7 +5,7 @@ package com.JayPi4c.RobbiSimulator.model;
  * This is the actor class of the simulator. All public functions in this class
  * will be available in the simulators editor.
  * 
- * last modified 05.11.2021
+ * last modified 08.11.2021
  * 
  * @author Jonas Pohl
  */
@@ -15,21 +15,6 @@ public class Robbi {
 
 	private int x, y;
 	private Item inBag = null;
-
-	private enum DIRECTION {
-		NORTH, WEST, SOUTH, EAST;
-
-		private static DIRECTION[] vals = values();
-
-		public DIRECTION next() {
-			return vals[(this.ordinal() + 1) % vals.length];
-		}
-
-		@SuppressWarnings("unused")
-		public DIRECTION previous() {
-			return vals[(this.ordinal() + vals.length - 1) % vals.length];
-		}
-	}
 
 	private DIRECTION direction;
 
@@ -49,6 +34,10 @@ public class Robbi {
 	 * @param y
 	 */
 	void setPosition(int x, int y) {
+		if (x < 0 || y < 0 || x >= territory.getNumCols() || y >= territory.getNumRows())
+			throw new IllegalArgumentException("Robbi kann nicht außerhalb des Territoriums platziert werden.");
+		if (territory.getTile(x, y) instanceof Hollow)
+			throw new TileBlockedException();
 		this.x = x;
 		this.y = y;
 	}
@@ -71,12 +60,16 @@ public class Robbi {
 		return y;
 	}
 
+	DIRECTION getFacing() {
+		return this.direction;
+	}
+
 	// ==================== PUBLIC FUNCTIONS ==========
 
 	/**
 	 * If possible move Robbi one tile towards the direction it is facing
 	 */
-	public void vor() {
+	public final void vor() {
 		Tile t;
 		switch (direction) {
 		case NORTH:
@@ -127,14 +120,14 @@ public class Robbi {
 	/**
 	 * Turn Robbi counterclockwise
 	 */
-	public void linksUm() {
+	public final void linksUm() {
 		direction = direction.next();
 	}
 
 	/**
 	 * If possible drop the item that is stored in the bag
 	 */
-	public void legeAb() {
+	public final void legeAb() {
 		if (inBag == null)
 			throw new BagIsEmptyException();
 		if (territory.placeItem(inBag, x, y))
@@ -146,7 +139,7 @@ public class Robbi {
 	/**
 	 * if possible take the item that occupies the tile Robbi is on
 	 */
-	public void nehmeAuf() {
+	public final void nehmeAuf() {
 		Item item = territory.getItem(x, y);
 		if (item == null)
 			throw new NoItemException();
@@ -160,7 +153,7 @@ public class Robbi {
 	 * If a pile of scrap is ahead of Robbi and afterwards a nonblocking tile, Robbi
 	 * pushes the pile of scrap one tile the direction he is facing
 	 */
-	public void schiebeSchrotthaufen() {
+	public final void schiebeSchrotthaufen() {
 
 		if (!vornSchrotthaufen())
 			throw new NoPileOfScrapAheadException();
@@ -216,7 +209,7 @@ public class Robbi {
 	 * 
 	 * @return
 	 */
-	public boolean gegenstandDa() {
+	public final boolean gegenstandDa() {
 		return territory.getItem(x, y) != null;
 	}
 
@@ -225,7 +218,7 @@ public class Robbi {
 	 * 
 	 * @return
 	 */
-	public boolean istLagerplatz() {
+	public final boolean istLagerplatz() {
 		return territory.getTile(x, y) instanceof Stockpile;
 	}
 
@@ -234,7 +227,7 @@ public class Robbi {
 	 * 
 	 * @return
 	 */
-	public boolean vornKuhle() {
+	public final boolean vornKuhle() {
 		int dx = switch (direction) {
 		case EAST:
 			yield x + 1;
@@ -259,7 +252,7 @@ public class Robbi {
 	 * 
 	 * @return
 	 */
-	public boolean vornSchrotthaufen() {
+	public final boolean vornSchrotthaufen() {
 		int dx = switch (direction) {
 		case EAST:
 			yield x + 1;
@@ -285,7 +278,7 @@ public class Robbi {
 	 * 
 	 * @return
 	 */
-	public boolean istTascheVoll() {
+	public final boolean istTascheVoll() {
 		return inBag != null;
 	}
 
