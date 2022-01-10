@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
  *
  */
 public class Messages {
-	private static String BUNDLE_NAME = "lang.messages_de";
+	private static String BUNDLE_NAME = "lang.messages_de_DE";
 	private static ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	private static ArrayList<ILanguageChangeListener> listeners = new ArrayList<>();

@@ -1,5 +1,7 @@
 package com.JayPi4c.RobbiSimulator.view;
 
+import com.JayPi4c.RobbiSimulator.controller.ButtonState;
+import com.JayPi4c.RobbiSimulator.controller.TerritoryEventHandler;
 import com.JayPi4c.RobbiSimulator.model.Accu;
 import com.JayPi4c.RobbiSimulator.model.Hollow;
 import com.JayPi4c.RobbiSimulator.model.Item;
@@ -9,6 +11,8 @@ import com.JayPi4c.RobbiSimulator.model.Screw;
 import com.JayPi4c.RobbiSimulator.model.Stockpile;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.model.Tile;
+import com.JayPi4c.RobbiSimulator.utils.Observable;
+import com.JayPi4c.RobbiSimulator.utils.Observer;
 
 import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
@@ -22,12 +26,12 @@ import javafx.scene.transform.Rotate;
  * This class draws the territory on a panel to allow interacting with the
  * graphical interface.
  * 
- * last modified 08.11.2021
+ * last modified 15.11.2021
  * 
  * @author Jonas Pohl
  *
  */
-public class TerritoryPanel extends Canvas {
+public class TerritoryPanel extends Canvas implements Observer {
 
 	private Territory territory;
 
@@ -35,21 +39,39 @@ public class TerritoryPanel extends Canvas {
 	private Image itemImages[] = new Image[3];
 	private Image robbiImage;
 
-	private int TILE = 0;
-	private int STOCKPILE = 1;
-	private int HOLLOW = 2;
-	private int PILEOFSCRAP = 3;
-	private int NUT = 0;
-	private int SCREW = 1;
-	private int ACCU = 2;
+	private final static int TILE = 0;
+	private final static int STOCKPILE = 1;
+	private final static int HOLLOW = 2;
+	private final static int PILEOFSCRAP = 3;
+	private final static int NUT = 0;
+	private final static int SCREW = 1;
+	private final static int ACCU = 2;
 
 	private static final int CELLSIZE = 32;
+	private static final int CELLSPACER = 1;
 
-	public TerritoryPanel(Territory territory) {
+	// store current bounds to allow centering on updated territory size
+	private Bounds bounds;
+
+	public TerritoryPanel(Territory territory, ButtonState buttonState) {
 		this.territory = territory;
+		this.territory.addObserver(this);
+
+		TerritoryEventHandler eventHandler = new TerritoryEventHandler(territory, buttonState);
+		this.setOnMousePressed(eventHandler);
+		this.setOnMouseDragged(eventHandler);
+		this.setOnMouseReleased(eventHandler);
+
 		loadImages();
 		init();
+	}
 
+	public static int getCellsize() {
+		return CELLSIZE;
+	}
+
+	public static int getCellspacer() {
+		return CELLSPACER;
 	}
 
 	private void loadImages() {
@@ -70,14 +92,15 @@ public class TerritoryPanel extends Canvas {
 		setWidth(getTerritoryWidth());
 		setHeight(getTerritoryHeight());
 		paintTerritory();
+
 	}
 
 	private int getTerritoryWidth() {
-		return (territory.getNumCols()) * (CELLSIZE + 2);
+		return (territory.getNumCols()) * (CELLSIZE + CELLSPACER);
 	}
 
 	private int getTerritoryHeight() {
-		return (territory.getNumRows()) * (CELLSIZE + 2);
+		return (territory.getNumRows()) * (CELLSIZE + CELLSPACER);
 	}
 
 	private void paintTerritory() {
@@ -86,7 +109,7 @@ public class TerritoryPanel extends Canvas {
 
 		for (int i = 0; i < territory.getNumCols(); i++) {
 			gc.setStroke(Color.BLACK);
-			gc.setLineWidth(1);
+			gc.setLineWidth(CELLSPACER);
 			// gc.strokeLine(getPos(i) - 1, 0, getPos(i) - 1,
 			// getPos(territory.getNumRows()));
 			// gc.strokeLine(0, getPos(i) - 1, getPos(territory.getNumCols()), getPos(i) -
@@ -147,8 +170,8 @@ public class TerritoryPanel extends Canvas {
 		default:
 			yield 0;
 		};
-		drawRotatedImage(gc, robbiImage, angle, territory.getRobbiX() * (CELLSIZE + 1) + 1,
-				territory.getRobbiY() * (CELLSIZE + 1) + 1, CELLSIZE, CELLSIZE);
+		drawRotatedImage(gc, robbiImage, angle, territory.getRobbiX() * (CELLSIZE + CELLSPACER) + CELLSPACER,
+				territory.getRobbiY() * (CELLSIZE + CELLSPACER) + CELLSPACER, CELLSIZE, CELLSIZE);
 
 	}
 
@@ -191,10 +214,16 @@ public class TerritoryPanel extends Canvas {
 	}
 
 	private int getPos(int val) {
-		return (val) * (CELLSIZE + 1) + 1;
+		return (val) * (CELLSIZE + CELLSPACER) + CELLSPACER;
 	}
 
+	/**
+	 * taken from Dibo
+	 * 
+	 * @param vpb
+	 */
 	public void center(Bounds vpb) {
+		this.bounds = vpb;
 		double w = vpb.getWidth();
 		double h = vpb.getHeight();
 		if (w > getTerritoryWidth()) {
@@ -205,6 +234,12 @@ public class TerritoryPanel extends Canvas {
 			setTranslateY((h - getTerritoryHeight()) / 2);
 		} else
 			setTranslateY(0);
+	}
+
+	@Override
+	public void update(Observable observable) {
+		center(bounds);
+		init();
 	}
 
 }
