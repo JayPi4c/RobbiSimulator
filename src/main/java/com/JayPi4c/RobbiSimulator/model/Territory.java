@@ -7,7 +7,7 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * This class contains all datastructures and utility functions to control the
  * territory.
  * 
- * last modified 15.11.2021
+ * last modified 22.11.2021
  * 
  * @author Jonas Pohl
  *
@@ -17,8 +17,10 @@ public class Territory extends Observable {
 
 	private Tile tiles[][];
 
-	private static final int DEFAULT_NUMBER_OF_COLUMNS = 10;
-	private static final int DEFAULT_NUMBER_OF_ROWS = 10;
+	private boolean sizeChanged = false;
+
+	private static final int DEFAULT_NUMBER_OF_COLUMNS = 6;
+	private static final int DEFAULT_NUMBER_OF_ROWS = 6;
 
 	private int NUMBER_OF_COLUMNS = DEFAULT_NUMBER_OF_COLUMNS;
 	private int NUMBER_OF_ROWS = DEFAULT_NUMBER_OF_ROWS;
@@ -48,6 +50,14 @@ public class Territory extends Observable {
 
 	public int getNumCols() {
 		return NUMBER_OF_COLUMNS;
+	}
+
+	public boolean hasSizeChanged() {
+		return sizeChanged;
+	}
+
+	public void setSizeChanged(boolean flag) {
+		this.sizeChanged = flag;
 	}
 
 	public Robbi getRobbi() {
@@ -97,6 +107,10 @@ public class Territory extends Observable {
 	public void changeSize(int newCols, int newRows) {
 		if (newCols <= 0 || newRows <= 0)
 			throw new IllegalArgumentException("Diese Größe ist für das Territorium nicht zulässig");
+		if (newCols != NUMBER_OF_COLUMNS || newRows != NUMBER_OF_ROWS)
+			sizeChanged = true;
+		else
+			return;
 		NUMBER_OF_COLUMNS = newCols;
 		NUMBER_OF_ROWS = newRows;
 		// create the new territory
@@ -127,7 +141,7 @@ public class Territory extends Observable {
 
 	public void placeRobbi(int x, int y) {
 
-		if ((x < NUMBER_OF_COLUMNS && y <= NUMBER_OF_ROWS) && !(tiles[x][y] instanceof Hollow)) {
+		if ((x >= 0 && x < NUMBER_OF_COLUMNS && y >= 0 && y < NUMBER_OF_ROWS) && !(tiles[x][y] instanceof Hollow)) {
 			robbi.setPosition(x, y);
 		}
 
