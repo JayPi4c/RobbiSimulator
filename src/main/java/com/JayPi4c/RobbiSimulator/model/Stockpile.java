@@ -18,7 +18,7 @@ public class Stockpile extends Tile {
 	}
 
 	public Item getItem() {
-		return items.get(items.size() - 1);
+		return (items.size() == 0) ? null : items.get(items.size() - 1);
 	}
 
 	@Override
