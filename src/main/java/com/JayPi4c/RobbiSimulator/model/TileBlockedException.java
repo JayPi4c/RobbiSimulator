@@ -1,11 +1,13 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import com.JayPi4c.RobbiSimulator.utils.Messages;
+
 public class TileBlockedException extends RobbiException {
 
 	private static final long serialVersionUID = 1L;
 
 	public TileBlockedException() {
-		super("Ooops! Robbi can't push this pile of scrap. The next tile is blocked.");
+		super(Messages.getString("Exception.TileBlocked"));
 	}
 
 }

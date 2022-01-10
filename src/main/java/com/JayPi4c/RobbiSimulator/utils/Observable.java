@@ -7,6 +7,8 @@ public class Observable {
 
 	boolean changed;
 
+	boolean notify = true;
+
 	public Observable() {
 		observers = new ArrayList<Observer>();
 		changed = false;
@@ -17,15 +19,26 @@ public class Observable {
 	}
 
 	public void notifyAllObservers() {
-		if (changed) {
-			for (Observer s : observers)
-				s.update(this);
+		if (notify) {
+			if (changed) {
+				for (Observer s : observers)
+					s.update(this);
+			}
+			changed = false;
 		}
-		changed = false;
 	}
 
 	public void addObserver(Observer obs) {
 		observers.add(obs);
+	}
+
+	public void activateNotification() {
+		this.notify = true;
+		notifyAllObservers();
+	}
+
+	public void deactivateNotification() {
+		this.notify = false;
 	}
 
 }
