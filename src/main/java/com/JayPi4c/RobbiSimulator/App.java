@@ -1,7 +1,12 @@
 package com.JayPi4c.RobbiSimulator;
 
+import com.JayPi4c.RobbiSimulator.model.Accu;
+import com.JayPi4c.RobbiSimulator.model.Nut;
+import com.JayPi4c.RobbiSimulator.model.Screw;
+import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -11,6 +16,8 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Slider;
@@ -25,7 +32,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -35,7 +41,7 @@ import javafx.stage.Stage;
  * Hauptklasse des Robbi Simulators.<br>
  * Javaversion: 17 <br>
  * JavaFX: 17<br>
- * last modified 29.10.2021
+ * last modified 08.11.2021
  * 
  * @author Jonas Pohl
  *
@@ -43,6 +49,8 @@ import javafx.stage.Stage;
 public class App extends Application implements ILanguageChangeListener {
 
 	private Stage primaryStage;
+
+	private Territory territory;
 
 	// Menu Bar
 	// editor Menu
@@ -130,11 +138,14 @@ public class App extends Application implements ILanguageChangeListener {
 
 	// Content Pane
 	private TextArea textArea;
-	private Pane simulationField;
+	private ScrollPane territoryScrollPane;
+	private TerritoryPanel territoryPanel;
 	private SplitPane splitPane;
 
 	// Message Label
 	private Label messageLabel;
+
+	private Scene scene;
 
 	/**
 	 * Erstelle den Editoreintrag für die Menubar
@@ -294,6 +305,14 @@ public class App extends Application implements ILanguageChangeListener {
 		placeRobbiToggleButtonToolbar = new ToggleButton(null, new ImageView(new Image("img/Robbi24.png")));
 		placeRobbiToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeRobbi")));
 		placeRobbiToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
+		/*
+		 * change cursor, when placing object
+		 * 
+		 * placeRobbiToggleButtonToolbar.setOnAction(e -> { if
+		 * (placeRobbiToggleButtonToolbar.isSelected()) scene.setCursor(new
+		 * ImageCursor(new Image("img/0Robbi32.png"))); else
+		 * scene.setCursor(Cursor.DEFAULT); });
+		 */
 
 		placeHollowToggleButtonToolbar = new ToggleButton(null, new ImageView(new Image("img/Hollow24.png")));
 		placeHollowToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
@@ -372,8 +391,17 @@ public class App extends Application implements ILanguageChangeListener {
 					// place your code here.
 				}
 				""");
-		simulationField = new Pane();
-		splitPane = new SplitPane(textArea, simulationField);
+		textArea.setMinWidth(250);
+
+		territoryPanel = new TerritoryPanel(this.territory);
+
+		territoryScrollPane = new ScrollPane(territoryPanel);
+		territoryScrollPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		territoryScrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+		territoryScrollPane.viewportBoundsProperty().addListener((observable, oldValue, newValue) -> {
+			territoryPanel.center(newValue);
+		});
+		splitPane = new SplitPane(textArea, territoryScrollPane);
 	}
 
 	/**
@@ -398,7 +426,9 @@ public class App extends Application implements ILanguageChangeListener {
 		VBox.setVgrow(splitPane, Priority.ALWAYS);
 		var vBox = new VBox(menubar, toolbar, splitPane, messageLabel);
 
-		var scene = new Scene(vBox);
+		scene = new Scene(vBox);
+		primaryStage.setMinHeight(200);
+		primaryStage.setMinWidth(500);
 
 		primaryStage.setScene(scene);
 		primaryStage.getIcons().add(new Image("img/Robbi24.png"));
@@ -412,8 +442,23 @@ public class App extends Application implements ILanguageChangeListener {
 
 	@Override
 	public void init() {
-		// create standard territory
 		System.out.println("init");
+
+		territory = new Territory();
+		// TODO remove debug init commands when
+		territory.placeAccu(3, 3);
+		territory.placeHollow(1, 0);
+		territory.placePileOfScrap(0, 2);
+		territory.placeHollow(0, 3);
+
+		territory.placeStockpile(2, 1);
+		territory.getTile(2, 1).setItem(new Accu());
+		territory.getTile(2, 1).setItem(new Nut());
+		territory.getTile(2, 1).setItem(new Screw());
+		territory.getRobbi().linksUm();
+
+		territory.changeSize(5, 7);
+		// territory.changeSize(25, 35);
 	}
 
 	@Override

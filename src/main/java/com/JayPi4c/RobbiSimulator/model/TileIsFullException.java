@@ -6,7 +6,6 @@ public class TileIsFullException extends RobbiException {
 
 	public TileIsFullException() {
 		super("Ooops! There is already an item on the tile. Robbi can't place anything here.");
-		// TODO Auto-generated constructor stub
 	}
 
 }
