@@ -1,16 +1,16 @@
 package com.JayPi4c.RobbiSimulator.utils;
 
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Observable {
-	public ArrayList<Observer> observers;
+	public CopyOnWriteArrayList<Observer> observers; // faster than vector for read access and thread save
 
 	boolean changed;
 
 	boolean notify = true;
 
 	public Observable() {
-		observers = new ArrayList<Observer>();
+		observers = new CopyOnWriteArrayList<>();
 		changed = false;
 	}
 
@@ -30,6 +30,10 @@ public class Observable {
 
 	public void addObserver(Observer obs) {
 		observers.add(obs);
+	}
+
+	public boolean removeObserver(Observer obs) {
+		return observers.remove(obs);
 	}
 
 	public void activateNotification() {

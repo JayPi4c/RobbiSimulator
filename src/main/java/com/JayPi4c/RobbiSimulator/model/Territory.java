@@ -1,5 +1,8 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 
 /**
@@ -11,6 +14,9 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  *
  */
 public class Territory extends Observable {
+
+	private static final Logger logger = Logger.getLogger(Territory.class.toString());
+
 	private Robbi robbi;
 
 	private Tile tiles[][];
@@ -34,7 +40,7 @@ public class Territory extends Observable {
 	}
 	// ============ HELPER =========
 
-	public Tile getTile(int x, int y) {
+	public synchronized Tile getTile(int x, int y) {
 		x += NUMBER_OF_COLUMNS;
 		x %= NUMBER_OF_COLUMNS;
 		y += NUMBER_OF_ROWS;
@@ -42,34 +48,34 @@ public class Territory extends Observable {
 		return tiles[x][y];
 	}
 
-	public int getNumRows() {
+	public synchronized int getNumRows() {
 		return NUMBER_OF_ROWS;
 	}
 
-	public int getNumCols() {
+	public synchronized int getNumCols() {
 		return NUMBER_OF_COLUMNS;
 	}
 
-	public boolean hasSizeChanged() {
+	public synchronized boolean hasSizeChanged() {
 		return sizeChanged;
 	}
 
-	public void setSizeChanged(boolean flag) {
+	public synchronized void setSizeChanged(boolean flag) {
 		this.sizeChanged = flag;
 	}
 
-	public void setRobbi(Robbi robbi) {
+	public synchronized void setRobbi(Robbi robbi) {
 		robbi.setTerritory(this);
 		robbi.setPosition(this.robbi.getX(), this.robbi.getY());
 		robbi.setFacing(this.robbi.getFacing());
 		this.robbi = robbi;
 	}
 
-	public Robbi getRobbi() {
+	public synchronized Robbi getRobbi() {
 		return robbi;
 	}
 
-	public DIRECTION getRobbiDirection() {
+	public synchronized DIRECTION getRobbiDirection() {
 		return robbi.getFacing();
 	}
 
@@ -80,11 +86,11 @@ public class Territory extends Observable {
 		return i;
 	}
 
-	public boolean robbiOnTile(int col, int row) {
+	public synchronized boolean robbiOnTile(int col, int row) {
 		return robbi.getX() == col && robbi.getY() == row;
 	}
 
-	public boolean placeItem(Item item, int x, int y) {
+	public synchronized boolean placeItem(Item item, int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		if (t.getItem() != null && !(t instanceof Stockpile))
 			return false;
@@ -95,12 +101,12 @@ public class Territory extends Observable {
 		return true;
 	}
 
-	public Item getItem(int x, int y) {
+	public synchronized Item getItem(int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		return t.getItem();
 	}
 
-	public Item removeItem(int x, int y) {
+	public synchronized Item removeItem(int x, int y) {
 		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
 		setChanged();
 		notifyAllObservers();
@@ -109,7 +115,7 @@ public class Territory extends Observable {
 
 	// ========= GUI FUNCTIONS ===========
 
-	public void changeSize(int newCols, int newRows) {
+	public synchronized void changeSize(int newCols, int newRows) {
 		if (newCols <= 0 || newRows <= 0)
 			throw new IllegalArgumentException("Diese Größe ist für das Territorium nicht zulässig");
 		if (newCols != NUMBER_OF_COLUMNS || newRows != NUMBER_OF_ROWS)
@@ -140,24 +146,24 @@ public class Territory extends Observable {
 		}
 		tiles = newTiles;
 
+		logger.log(Level.INFO, "updated size to " + NUMBER_OF_COLUMNS + "x" + NUMBER_OF_ROWS);
+
 		setChanged();
 		notifyAllObservers();
 	}
 
-	public void placeRobbi(int x, int y) {
-
+	public synchronized void placeRobbi(int x, int y) {
 		if ((x >= 0 && x < NUMBER_OF_COLUMNS && y >= 0 && y < NUMBER_OF_ROWS) && !(tiles[x][y] instanceof Hollow)) {
 			robbi.setPosition(x, y);
 		}
-
 		setChanged();
 		notifyAllObservers();
 	}
 
-	public void placeHollow(int x, int y) {
+	public synchronized void placeHollow(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
-		if ((x < NUMBER_OF_ROWS && y < NUMBER_OF_COLUMNS) && !(x == robbi.getX() && y == robbi.getY())) {
+		if ((x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) && !(x == robbi.getX() && y == robbi.getY())) {
 			tiles[x][y] = new Hollow();
 			setChanged();
 			notifyAllObservers();
@@ -165,7 +171,7 @@ public class Territory extends Observable {
 
 	}
 
-	public void placePileOfScrap(int x, int y) {
+	public synchronized void placePileOfScrap(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -175,7 +181,7 @@ public class Territory extends Observable {
 		}
 	}
 
-	public void placeStockpile(int x, int y) {
+	public synchronized void placeStockpile(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -185,7 +191,7 @@ public class Territory extends Observable {
 		}
 	}
 
-	public void placeAccu(int x, int y) {
+	public synchronized void placeAccu(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -196,7 +202,7 @@ public class Territory extends Observable {
 
 	}
 
-	public void placeScrew(int x, int y) {
+	public synchronized void placeScrew(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -206,7 +212,7 @@ public class Territory extends Observable {
 		}
 	}
 
-	public void placeNut(int x, int y) {
+	public synchronized void placeNut(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -216,7 +222,7 @@ public class Territory extends Observable {
 		}
 	}
 
-	public void clearTile(int x, int y) {
+	public synchronized void clearTile(int x, int y) {
 		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
 		y = normalizeCoord(y, NUMBER_OF_ROWS);
 		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
@@ -256,12 +262,11 @@ public class Territory extends Observable {
 		}
 	}
 
-	public int getRobbiX() {
+	public synchronized int getRobbiX() {
 		return robbi.getX();
 	}
 
-	public int getRobbiY() {
+	public synchronized int getRobbiY() {
 		return robbi.getY();
 	}
-
 }

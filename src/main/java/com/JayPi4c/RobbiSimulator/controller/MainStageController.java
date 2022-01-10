@@ -1,5 +1,9 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import java.util.logging.Logger;
+
+import com.JayPi4c.RobbiSimulator.controller.program.Program;
+import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.model.BagIsEmptyException;
 import com.JayPi4c.RobbiSimulator.model.BagIsFullException;
 import com.JayPi4c.RobbiSimulator.model.HollowAheadException;
@@ -22,6 +26,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 
 public class MainStageController {
+	Logger logger = Logger.getLogger(MainStageController.class.toString());
 
 	private ButtonState buttonState;
 
@@ -34,6 +39,42 @@ public class MainStageController {
 	public MainStageController(MainStage mainStage, ButtonState buttonState) {
 		this.mainStage = mainStage;
 		this.buttonState = buttonState;
+
+		// editor actions
+		mainStage.getNewEditorMenuItem().setOnAction(e -> ProgramController.createAndShow());
+		mainStage.getNewButtonToolbar().onActionProperty().bind(mainStage.getNewEditorMenuItem().onActionProperty());
+
+		mainStage.getOpenEditorMenuItem().setOnAction(e -> ProgramController.openProgram());
+		mainStage.getLoadButtonToolbar().onActionProperty().bind(mainStage.getOpenEditorMenuItem().onActionProperty());
+
+		mainStage.getSaveEditorMenuItem().setOnAction(e -> {
+			mainStage.getProgram().save(mainStage.getTextArea().getText());
+			mainStage.setTitle(Messages.getString("Main.title") + ": " + mainStage.getProgram().getName());
+		});
+		mainStage.getSaveButtonToolbar().onActionProperty().bind(mainStage.getSaveEditorMenuItem().onActionProperty());
+
+		mainStage.getCompileEditorMenuItem().setOnAction(e -> {
+			Program program = mainStage.getProgram();
+			program.save(mainStage.getTextArea().getText());
+			mainStage.setTitle(Messages.getString("Main.title") + ": " + program.getName());
+			ProgramController.compile(program);
+		});
+		mainStage.getCompileButtonToolbar().onActionProperty()
+				.bind(mainStage.getCompileEditorMenuItem().onActionProperty());
+
+		mainStage.getQuitEditorMenuItem().setOnAction(e -> {
+			Program program = mainStage.getProgram();
+			logger.info("exiting " + program.getName());
+			program.save(mainStage.getTextArea().getText());
+			ProgramController.close(program.getName());
+			mainStage.close();
+		});
+
+		mainStage.getChangeSizeTerritoryMenuItem()
+				.setOnAction(new ChangeTerritorySizeHandler(mainStage.getTerritory()));
+		mainStage.getChangeSizeButtonToolbar().onActionProperty()
+				.bind(mainStage.getChangeSizeTerritoryMenuItem().onActionProperty());
+
 		// set radio button actions
 		mainStage.getPlaceRobbiTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuRobbiImage, ButtonState.ROBBI));
@@ -133,6 +174,15 @@ public class MainStageController {
 			}
 		});
 
+		// content Panel
+		mainStage.getTextArea().textProperty().addListener((observalble, oldVal, newVal) -> {
+			Program program = mainStage.getProgram();
+			boolean before = program.isEdited();
+			program.setEdited(!newVal.equals(program.getEditorContent()));
+			if (before != program.isEdited())
+				mainStage.setTitle(
+						Messages.getString("Main.title") + ": " + program.getName() + (program.isEdited() ? "*" : ""));
+		});
 	}
 
 	private void showWarning(RobbiException ex) {

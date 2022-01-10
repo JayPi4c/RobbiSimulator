@@ -4,10 +4,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
-import com.JayPi4c.RobbiSimulator.controller.ChangeTerritorySizeHandler;
 import com.JayPi4c.RobbiSimulator.controller.MainStageController;
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
+import com.JayPi4c.RobbiSimulator.controller.simulation.SimulationController;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
@@ -48,6 +48,11 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 
 	private ButtonState buttonState;
 	private MainStageController mainStageController;
+
+	// private SimulationController simController;
+
+	private static final int MIN_SPEED_VALUE = 100;
+	private static final int MAX_SPEED_VALUE = 2500;
 
 	private Program program;
 
@@ -108,6 +113,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	private MenuItem englishLanguageMenuItem;
 	private MenuItem germanLanguageMenuItem;
 	private CheckMenuItem changeCursorMenuItem;
+	private CheckMenuItem darkModeMenuItem;
 	private Menu windowMenu;
 
 	private MenuBar menubar;
@@ -194,6 +200,9 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		var vBox = new VBox(menubar, toolbar, splitPane, messageLabel);
 
 		mainStageController = new MainStageController(this, buttonState);
+		// var simController =
+		new SimulationController(this, territory);
+
 		scene = new Scene(vBox);
 
 		setMinHeight(200);
@@ -223,6 +232,38 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * awtAppClassNameField.setAccessible(true); awtAppClassNameField.set(xToolkit,
 	 * "MyApp"); } catch (Exception ignored) { } } }
 	 */
+
+	public Program getProgram() {
+		return this.program;
+	}
+
+	public MenuItem getStartMenuItem() {
+		return startMenuItem;
+	}
+
+	public MenuItem getPauseMenuItem() {
+		return pauseMenuItem;
+	}
+
+	public MenuItem getStopMenuItem() {
+		return stopMenuItem;
+	}
+
+	public ToggleButton getStartToggleButtonToolbar() {
+		return startToggleButtonToolbar;
+	}
+
+	public ToggleButton getPauseToggleButtonToolbar() {
+		return pauseToggleButtonToolbar;
+	}
+
+	public ToggleButton getStopToggleButtonToolbar() {
+		return stopToggleButtonToolbar;
+	}
+
+	public Slider getSpeedSliderToolbar() {
+		return speedSliderToolbar;
+	}
 
 	public Territory getTerritory() {
 		return territory;
@@ -348,6 +389,46 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		return takeMenuItem;
 	}
 
+	public TextArea getTextArea() {
+		return textArea;
+	}
+
+	public ScrollPane getTerritoryScrollPane() {
+		return territoryScrollPane;
+	}
+
+	public MenuItem getNewEditorMenuItem() {
+		return newEditorMenuItem;
+	}
+
+	public MenuItem getOpenEditorMenuItem() {
+		return openEditorMenuItem;
+	}
+
+	public MenuItem getCompileEditorMenuItem() {
+		return compileEditorMenuItem;
+	}
+
+	public MenuItem getChangeSizeTerritoryMenuItem() {
+		return changeSizeTerritoryMenuItem;
+	}
+
+	public Button getNewButtonToolbar() {
+		return newButtonToolbar;
+	}
+
+	public Button getLoadButtonToolbar() {
+		return loadButtonToolbar;
+	}
+
+	public Button getCompileButtonToolbar() {
+		return compileButtonToolbar;
+	}
+
+	public Button getChangeSizeButtonToolbar() {
+		return changeSizeButtonToolbar;
+	}
+
 	public static void loadImages() {
 		newImage = new Image("img/New24.gif");
 		saveImage = new Image("img/Save24.gif");
@@ -383,31 +464,20 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		newEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 		newEditorMenuItem.setMnemonicParsing(true);
 		newEditorMenuItem.setGraphic(new ImageView(newImage));
-		newEditorMenuItem.setOnAction(e -> ProgramController.createAndShow());
 		saveEditorMenuItem = new MenuItem(Messages.getString("Menu.editor.save"));
 		saveEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 		saveEditorMenuItem.setGraphic(new ImageView(saveImage));
-		saveEditorMenuItem.setOnAction(e -> {
-			program.save(textArea.getText());
-			setTitle(Messages.getString("Main.title") + ": " + program.getName());
-		});
 		openEditorMenuItem = new MenuItem(Messages.getString("Menu.editor.open"));
 		openEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
 		openEditorMenuItem.setGraphic(new ImageView(openImage));
-		openEditorMenuItem.setOnAction(e -> ProgramController.openProgram());
 		compileEditorMenuItem = new MenuItem(Messages.getString("Menu.editor.compile"));
 		compileEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN));
 		compileEditorMenuItem.setGraphic(new ImageView(compileImage));
+
 		printEditorMenuItem = new MenuItem(Messages.getString("Menu.editor.print"));
 		printEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
 		printEditorMenuItem.setGraphic(new ImageView(printImage));
 		quitEditorMenuItem = new MenuItem(Messages.getString("Menu.editor.quit"));
-		quitEditorMenuItem.setOnAction(e -> {
-			logger.info("exiting " + program.getName());
-			program.save(textArea.getText());
-			ProgramController.close(program.getName());
-			close();
-		});
 		quitEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
 		editorMenu = new Menu(Messages.getString("Menu.editor"), null, newEditorMenuItem, openEditorMenuItem,
 				saveEditorMenuItem, new SeparatorMenuItem(), compileEditorMenuItem, printEditorMenuItem,
@@ -435,7 +505,6 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		saveAsPicMenuItem = new MenuItem(Messages.getString("Menu.territory.saveAsPic"));
 		printTerritoryMenuItem = new MenuItem(Messages.getString("Menu.territory.print"));
 		changeSizeTerritoryMenuItem = new MenuItem(Messages.getString("Menu.territory.size"));
-		changeSizeTerritoryMenuItem.setOnAction(new ChangeTerritorySizeHandler(territory));
 
 		placeGroupTerritoryMenu = new ToggleGroup();
 
@@ -536,7 +605,17 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 			if (!changeCursorMenuItem.isSelected())
 				scene.setCursor(Cursor.DEFAULT);
 		});
-		windowMenu = new Menu(Messages.getString("Menu.window"), null, languageMenu, changeCursorMenuItem);
+
+		// https://stackoverflow.com/a/49159612/13670629
+		darkModeMenuItem = new CheckMenuItem("Darkmode");
+		darkModeMenuItem.selectedProperty().addListener((obs, oldVal, newVal) -> {
+			if (newVal) {
+				scene.getStylesheets().add("css/dark-theme.css");
+			} else
+				scene.getStylesheets().remove("css/dark-theme.css");
+		});
+		windowMenu = new Menu(Messages.getString("Menu.window"), null, languageMenu, changeCursorMenuItem,
+				darkModeMenuItem);
 	}
 
 	/**
@@ -562,29 +641,18 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 
 		newButtonToolbar = new Button(null, new ImageView(newImage));
 		newButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.control.new")));
-		newButtonToolbar.setOnAction(e -> ProgramController.createAndShow());
 
 		loadButtonToolbar = new Button(null, new ImageView(openImage));
 		loadButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.control.load")));
-		loadButtonToolbar.setOnAction(e -> ProgramController.openProgram());
 
 		saveButtonToolbar = new Button(null, new ImageView(saveImage));
 		saveButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.control.save")));
-		saveButtonToolbar.setOnAction(e -> {
-			program.save(textArea.getText());
-			setTitle(Messages.getString("Main.title") + ": " + program.getName());
-		});
 
 		compileButtonToolbar = new Button(null, new ImageView(compileImage));
 		compileButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.control.compile")));
-		compileButtonToolbar.setOnAction(e -> {
-			program.save(textArea.getText());
-			ProgramController.compile(program);
-		});
 
 		changeSizeButtonToolbar = new Button(null, new ImageView(terrainImage));
 		changeSizeButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.size")));
-		changeSizeButtonToolbar.setOnAction(new ChangeTerritorySizeHandler(territory));
 
 		var placeGroupToolbar = new ToggleGroup();
 
@@ -667,7 +735,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		stopToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
 		stopToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.stop")));
 
-		speedSliderToolbar = new Slider(0, 100, 50);
+		speedSliderToolbar = new Slider(MIN_SPEED_VALUE, MAX_SPEED_VALUE, (MIN_SPEED_VALUE + MAX_SPEED_VALUE) / 2);
 		speedSliderToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.speed")));
 
 		toolbar = new ToolBar(newButtonToolbar, loadButtonToolbar, new Separator(), saveButtonToolbar,
@@ -687,12 +755,6 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		logger.log(Level.INFO, "Create content panel");
 
 		textArea = new TextArea(program.getEditorContent());
-		textArea.textProperty().addListener((observalble, oldVal, newVal) -> {
-			boolean before = program.isEdited();
-			program.setEdited(!newVal.equals(program.getEditorContent()));
-			if (before != program.isEdited())
-				setTitle(Messages.getString("Main.title") + ": " + program.getName() + (program.isEdited() ? "*" : ""));
-		});
 		textArea.setMinWidth(250);
 
 		territoryPanel = new TerritoryPanel(this.territory, this.buttonState);
@@ -717,7 +779,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	@Override
 	public void onLanguageChanged() {
 		// Add multilanguage support
-		setTitle(Messages.getString("Main.title") + ": " + program.getName());
+		setTitle(Messages.getString("Main.title") + ": " + program.getName() + (program.isEdited() ? "*" : ""));
 
 		newEditorMenuItem.setText(Messages.getString("Menu.editor.new"));
 		saveEditorMenuItem.setText(Messages.getString("Menu.editor.save"));
