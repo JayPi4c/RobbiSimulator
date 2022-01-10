@@ -16,11 +16,23 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
+/**
+ * This EventHandler combines all the code needed to change the territory size
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 
 	Dialog<Dimension> dialog;
 	Territory territory;
 
+	/**
+	 * Creates a new ChangeTerritorySizeHandler and sets up a new Dialog, which can
+	 * be invoked in the handle method
+	 * 
+	 * @param territory The territory, which size should be changed
+	 */
 	public ChangeTerritorySizeHandler(Territory territory) {
 		this.territory = territory;
 
@@ -48,6 +60,12 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 
 	}
 
+	/**
+	 * Checks if the given String is between 1 and 100.
+	 * 
+	 * @param s the String which represents the user-input
+	 * @return true if the s is > 0 and <= 100, false otherwise
+	 */
 	private boolean isValid(String s) {
 		try {
 			int val = Integer.parseInt(s);

@@ -1,10 +1,12 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author Jonas Pohl
  *
  */
-public abstract class Item {
+public interface Item extends Serializable {
 
 }

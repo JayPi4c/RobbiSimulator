@@ -17,11 +17,24 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
+/**
+ * MethodHandler to handle a methods invocation
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class MethodHandler implements EventHandler<ActionEvent> {
 
 	private Method method;
 	private Territory territory;
 
+	/**
+	 * Creates a new MethodHandler with the method and the territory the message is
+	 * for. With the handle method, the handler will be invoked.
+	 * 
+	 * @param method    the method for this handler
+	 * @param territory the territory to invoke this method in
+	 */
 	public MethodHandler(Method method, Territory territory) {
 		this.method = method;
 		this.territory = territory;

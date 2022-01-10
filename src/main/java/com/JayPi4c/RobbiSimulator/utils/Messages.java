@@ -34,6 +34,9 @@ public class Messages {
 
 	private static ArrayList<ILanguageChangeListener> listeners = new ArrayList<>();
 
+	private Messages() {
+	}
+
 	/**
 	 * Returns the String according to the key provided as parameter. If the key can
 	 * not be mapped to a String, the method will return the key enclosed with two

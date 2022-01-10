@@ -1,7 +1,6 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.Serializable;
 
 /**
  * 
@@ -10,8 +9,10 @@ import java.util.logging.Logger;
  * 
  * @author Jonas Pohl
  */
-public class Robbi {
-	private Logger logger = Logger.getLogger(Robbi.class.getName());
+public class Robbi implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	private Territory territory;
 
 	private volatile int x;
@@ -29,7 +30,6 @@ public class Robbi {
 	}
 
 	Robbi(Territory t) {
-		this.logger.setLevel(Level.WARNING);
 		this.territory = t;
 		this.x = 0;
 		this.y = 0;
@@ -75,6 +75,18 @@ public class Robbi {
 
 	DIRECTION getFacing() {
 		return this.direction;
+	}
+
+	Item getItem() {
+		synchronized (territory) {
+			return inBag;
+		}
+	}
+
+	void setItem(Item item) {
+		synchronized (territory) {
+			this.inBag = item;
+		}
 	}
 
 	void setTerritory(Territory t) {
@@ -320,7 +332,6 @@ public class Robbi {
 			default:
 				yield y;
 			};
-			logger.info(dx + " " + dy);
 			return territory.getTile(dx, dy) instanceof PileOfScrap;
 		}
 	}
