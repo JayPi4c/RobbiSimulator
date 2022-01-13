@@ -61,6 +61,33 @@ public class Territory extends Observable implements Serializable {
 	// ============ HELPER =========
 
 	/**
+	 * Saves the Territory in a TerritoryState in order to allow to restore it
+	 * later.
+	 * 
+	 * @return a Memento Object of the territory
+	 */
+	public synchronized TerritoryState save() {
+		return new TerritoryState(NUMBER_OF_COLUMNS, NUMBER_OF_ROWS, tiles, robbi);
+	}
+
+	/**
+	 * Restores the territory from a memento object.
+	 * 
+	 * @param state the Memento object of the state the territory should restore to.
+	 */
+	public synchronized void restore(TerritoryState state) {
+		NUMBER_OF_COLUMNS = state.getNumberOfColumns();
+		NUMBER_OF_ROWS = state.getNumberOfRows();
+		RobbiState robbiState = state.getRobbiState();
+		this.robbi.setPosition(robbiState.getX(), robbiState.getY());
+		this.robbi.setItem(robbiState.getItem());
+		this.robbi.setFacing(robbiState.getFacing());
+		this.tiles = state.getTiles();
+		setChanged();
+		notifyAllObservers();
+	}
+
+	/**
 	 * Calculates the tile for the given x and y coordinates.
 	 * 
 	 * @param x tiles x ordinate
