@@ -126,6 +126,7 @@ public class MainStage extends Stage {
 	private Menu robbiMenu;
 
 	// simulation Menu
+	private MenuItem resetMenuItem;
 	private MenuItem startMenuItem;
 	private MenuItem pauseMenuItem;
 	private MenuItem stopMenuItem;
@@ -165,6 +166,7 @@ public class MainStage extends Stage {
 	private Button robbiPutButtonToolbar;
 	private Button robbiTakeButtonToolbar;
 
+	private Button resetButtonToolbar;
 	private ToggleButton startToggleButtonToolbar;
 	private ToggleButton pauseToggleButtonToolbar;
 	private ToggleButton stopToggleButtonToolbar;
@@ -242,6 +244,10 @@ public class MainStage extends Stage {
 	 */
 	public static Image menuDeleteImage;
 
+	/**
+	 * Constant Image for reset icon.
+	 */
+	public static Image resetImage;
 	/**
 	 * Constant Image for simulation start/resume icon.
 	 */
@@ -340,6 +346,7 @@ public class MainStage extends Stage {
 		menuNutImage = new Image("img/Nut24.png");
 		menuDeleteImage = new Image("img/Delete24.gif");
 
+		resetImage = new Image("img/reset24.png");
 		menuStartImage = new Image("img/Play24.gif");
 		menuPauseImage = new Image("img/Pause24.gif");
 		menuStopImage = new Image("img/Stop24.gif");
@@ -477,6 +484,8 @@ public class MainStage extends Stage {
 	private void createSimulation() {
 		logger.debug("Create simulation entry for menubar");
 
+		resetMenuItem = new MenuItem(Messages.getString("Menu.simulation.reset"));
+		resetMenuItem.setGraphic(new ImageView(resetImage));
 		startMenuItem = new MenuItem(Messages.getString("Menu.simulation.start"));
 		startMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F11, KeyCombination.CONTROL_DOWN));
 		startMenuItem.setGraphic(new ImageView(menuStartImage));
@@ -485,8 +494,8 @@ public class MainStage extends Stage {
 		stopMenuItem = new MenuItem(Messages.getString("Menu.simulation.stop"));
 		stopMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F12, KeyCombination.CONTROL_DOWN));
 		stopMenuItem.setGraphic(new ImageView(menuStopImage));
-		simulationMenu = new Menu(Messages.getString("Menu.simulation"), null, startMenuItem, pauseMenuItem,
-				stopMenuItem);
+		simulationMenu = new Menu(Messages.getString("Menu.simulation"), null, resetMenuItem, startMenuItem,
+				pauseMenuItem, stopMenuItem);
 		simulationMenu.setMnemonicParsing(true);
 	}
 
@@ -638,6 +647,9 @@ public class MainStage extends Stage {
 		robbiTakeButtonToolbar = new Button(null, new ImageView(robbiTake));
 		robbiTakeButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.take")));
 
+		resetButtonToolbar = new Button(null, new ImageView(resetImage));
+		resetButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.reset")));
+
 		var simulationGroupToolbar = new ToggleGroup();
 		startToggleButtonToolbar = new ToggleButton(null, new ImageView(menuStartImage));
 		startToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
@@ -659,8 +671,9 @@ public class MainStage extends Stage {
 				placeHollowToggleButtonToolbar, placePileOfScrapToggleButtonToolbar, placeStockpileToggleButtonToolbar,
 				placeAccuToggleButtonToolbar, placeScrewToggleButtonToolbar, placeNutToggleButtonToolbar,
 				deleteFieldToggleButtonToolbar, new Separator(), robbiMoveButtonToolbar, robbiTurnLeftButtonToolbar,
-				robbiPutButtonToolbar, robbiTakeButtonToolbar, new Separator(), startToggleButtonToolbar,
-				pauseToggleButtonToolbar, stopToggleButtonToolbar, new Separator(), speedSliderToolbar);
+				robbiPutButtonToolbar, robbiTakeButtonToolbar, new Separator(), resetButtonToolbar,
+				startToggleButtonToolbar, pauseToggleButtonToolbar, stopToggleButtonToolbar, new Separator(),
+				speedSliderToolbar);
 	}
 
 	/**
@@ -708,6 +721,15 @@ public class MainStage extends Stage {
 	}
 
 	/**
+	 * Getter for the resetMenuItem.
+	 * 
+	 * @return the resetMenuItem for this stage
+	 */
+	public MenuItem getResetMenuItem() {
+		return resetMenuItem;
+	}
+
+	/**
 	 * Getter for the startMenuItem.
 	 * 
 	 * @return the startMenuItem for this stage
@@ -732,6 +754,15 @@ public class MainStage extends Stage {
 	 */
 	public MenuItem getStopMenuItem() {
 		return stopMenuItem;
+	}
+
+	/**
+	 * Getter for the resetButtonToolbar.
+	 * 
+	 * @return the resetButtonToolbar for this stage
+	 */
+	public Button getResetButtonToolbar() {
+		return resetButtonToolbar;
 	}
 
 	/**

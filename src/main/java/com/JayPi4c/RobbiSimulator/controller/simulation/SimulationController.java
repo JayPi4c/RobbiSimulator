@@ -4,9 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.model.Territory;
+import com.JayPi4c.RobbiSimulator.model.TerritoryState;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.application.Platform;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
 
@@ -30,12 +32,17 @@ public class SimulationController {
 
 	private volatile int speed;
 
+	private MenuItem resetMenuItem;
+	private Button resetToolbar;
+
 	private MenuItem pauseMenuItem;
 	private ToggleButton pauseToolbar;
 	private MenuItem startMenuItem;
 	private ToggleButton startToolbar;
 	private MenuItem stopMenuItem;
 	private ToggleButton stopToolbar;
+
+	private TerritoryState territoryState;
 
 	/**
 	 * Constructor to create a new SimulationController, which adds all actions to
@@ -48,9 +55,15 @@ public class SimulationController {
 		this.stage = stage;
 		this.territory = territory;
 		speed = (int) stage.getSpeedSliderToolbar().getValue();
+
+		resetToolbar = this.stage.getResetButtonToolbar();
+		resetToolbar.setOnAction(e -> reset());
+		resetMenuItem = this.stage.getResetMenuItem();
+		resetMenuItem.onActionProperty().bind(resetToolbar.onActionProperty());
+
 		startToolbar = this.stage.getStartToggleButtonToolbar();
 		startToolbar.setOnAction(e -> {
-			if (simulation == null || simulation.getStop())
+			if (!isSimulationRunning())
 				start();
 			else
 				resume();
@@ -83,6 +96,7 @@ public class SimulationController {
 	 */
 	private void start() {
 		logger.debug("Starting new simulation");
+		territoryState = territory.save();
 		simulation = new Simulation(territory, this, stage);
 		simulation.setDaemon(true); // program should exit even if simulation is running
 		simulation.start();
@@ -121,6 +135,28 @@ public class SimulationController {
 		synchronized (simulation) {
 			simulation.notify();
 		}
+	}
+
+	/**
+	 * Helper to reset the territory to the state at the beginning of the
+	 * simulation.
+	 */
+	private void reset() {
+		logger.debug("Resetting the simulation");
+		if (isSimulationRunning())
+			stop();
+
+		if (territoryState != null)
+			territory.restore(territoryState);
+	}
+
+	/**
+	 * Helper to check if the simulation is currently running
+	 * 
+	 * @return true if the simulation is not null or not stopped
+	 */
+	private boolean isSimulationRunning() {
+		return !(simulation == null || simulation.getStop());
 	}
 
 	/**
