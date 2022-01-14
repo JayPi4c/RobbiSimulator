@@ -4,14 +4,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,11 +32,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.model.Robbi;
+import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -41,7 +46,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /**
  * This controller contains all functionality to initialize the application,
@@ -49,22 +56,40 @@ import javafx.stage.Stage;
  * stage, if a new Program is loaded, or it loads the DefaultProgram on the
  * Application start
  * 
- * FIXME Compile on program load
- * 
  * @author Jonas Pohl
  *
  */
 public class ProgramController {
 
 	private static final Logger logger = LogManager.getLogger(ProgramController.class);
-
+	/**
+	 * Constant String with the Path name for the programs directory.
+	 */
 	public static final String PATH_TO_PROGRAMS = "programs";
+	/**
+	 * Constant String for the Default Robbi File name.
+	 */
 	public static final String DEFAULT_ROBBI_FILE_NAME = "DefaultRobbi";
+	/**
+	 * Constant String for the default file extension name.
+	 */
 	public static final String DEFAULT_FILE_EXTENSION = ".java";
-
+	/**
+	 * Constant String for the default content of the editor when the file is newly
+	 * created.
+	 */
 	public static final String DEFAULT_CONTENT = "void main(){" + System.lineSeparator() + "\t// place your code here"
 			+ System.lineSeparator() + "}";
+	/**
+	 * Constant String for the editor prefix which is needed to compile the class
+	 * and load into the simulator. This String will not be shown in the editor
+	 * content.
+	 */
 	public static final String PREFIX_TEMPLATE = "import com.JayPi4c.RobbiSimulator.utils.annotations.*;public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{public ";
+	/**
+	 * Constant String for the editor postfix, to close the class and make it
+	 * compilable. This postfix will not be shown in the editor content.
+	 */
 	public static final String POSTFIX_TEMPLATE = "}";
 
 	// private static final String VALID_IDENTIFIER_REGEX =
@@ -114,12 +139,14 @@ public class ProgramController {
 	 * Creates a Dialog and asks the user to for the name of the new program.
 	 * Afterwards, it initiates the creation of a new stage for the program.
 	 * 
+	 * @param parent the parent window to show alerts relative to the parent window
 	 * @see ProgramController#createAndShow(String)
 	 */
-	public static void createAndShow() {
+	public static void createAndShow(Window parent) {
 		Dialog<String> dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("New.dialog.title"));
 		dialog.setHeaderText(Messages.getString("New.dialog.header"));
+		dialog.initOwner(parent);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 		TextField nameField = new TextField();
@@ -160,16 +187,15 @@ public class ProgramController {
 	 * creates a program and a new Stage. Finally, it compiles the code and loads
 	 * the Robbi instance into the simulation
 	 * 
-	 * @param programName
+	 * @param programName the name of the program to create
 	 */
 	public static void createAndShow(String programName) {
 		String content = createTemplate(programName, DEFAULT_CONTENT);
 		File f = new File(PATH_TO_PROGRAMS + File.separatorChar + programName + DEFAULT_FILE_EXTENSION);
 		if (!f.exists()) {
 			try {
-				if (!f.createNewFile()) {
-					// to something on fail
-				}
+				if (!f.createNewFile())
+					logger.debug("Could not create file '{}'", f.getAbsolutePath());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -183,8 +209,7 @@ public class ProgramController {
 		Program program = new Program(f, programName);
 		Stage stage = new MainStage(program);
 		programs.put(programName, stage);
-		ProgramController.compile(program, false);
-
+		ProgramController.compile(program, false, stage);
 	}
 
 	/**
@@ -219,20 +244,20 @@ public class ProgramController {
 	}
 
 	/**
-	 * TODO restrict fileManager to load only files from programs folder
-	 * 
 	 * Opens a FileChooser and loads the selected file. If the file is already
 	 * loaded, the ProgramController requests the focus for the loaded program.
 	 * Otherwise it creates a new program and a new stage.
+	 * 
+	 * @param parent the window to open the chooser relative to the calling window
 	 */
-	public static void openProgram() {
+	public static void openProgram(Window parent) {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("open Program"); // TODO change internationalization
+		fileChooser.setTitle(Messages.getString("Open.dialog.title"));
 		fileChooser.setInitialDirectory(new File(PATH_TO_PROGRAMS));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(Messages.getString("Open.dialog.filter"),
 				"*" + DEFAULT_FILE_EXTENSION));
 
-		File file = fileChooser.showOpenDialog(null);
+		File file = fileChooser.showOpenDialog(parent);
 		if (file != null) {
 			String name = file.getName().replaceFirst(DEFAULT_FILE_EXTENSION, "");
 			if (!programs.containsKey(name)) {
@@ -240,6 +265,7 @@ public class ProgramController {
 				Program program = new Program(file, name);
 				Stage stage = new MainStage(program);
 				programs.put(name, stage);
+				compile(program, false, parent);
 			} else {
 				logger.debug("File is already loaded! Requesting focus...");
 				programs.get(name).requestFocus();
@@ -250,105 +276,264 @@ public class ProgramController {
 
 	/**
 	 * Compiles the given Program and shows an error Alert if the Compilation failed
-	 * otherwise it shows an success alert
+	 * otherwise it shows an success alert. If the compilation finished
+	 * successfully, the new Robbi will be loaded into the territory.
 	 * 
-	 * @param program
+	 * @param program the program to compile
+	 * @param parent  the calling window to show alerts relative to the calling
+	 *                window
 	 */
-	public static void compile(Program program) {
-		compile(program, true);
+	public static void compile(Program program, Window parent) {
+		compile(program, true, parent);
 	}
 
 	/**
-	 * Compiles the given program and shows alerts, if they are activated
+	 * Compiles the given Program and shows an error Alert if the Compilation failed
+	 * otherwise it shows an success alert. If the compilation finished
+	 * successfully, the new Robbi will be loaded into the territory. Before it does
+	 * this, it checks if the Annotations are set correctly and if the main-Method
+	 * is overwritten. An error with this post-compile check will be visualized with
+	 * an Alert.
 	 * 
 	 * @param program    the program to compile
 	 * @param showAlerts flag to determine if the alerts need to be shown or not
+	 * @param parent     the window calling the method in order to show the alerts
+	 *                   relative to it
 	 */
-	public static void compile(Program program, boolean showAlerts) {
-		// TODO make sure Default annotations have correct value in String
+	public static void compile(Program program, boolean showAlerts, Window parent) {
+		// TODO compile program with independent method and attribute order
 		JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
 		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-		StandardJavaFileManager manager = javac.getStandardFileManager(diagnostics, null, null);
-		Iterable<? extends JavaFileObject> units = manager
-				.getJavaFileObjectsFromFiles(Arrays.asList(program.getFile()));
-		CompilationTask task = javac.getTask(null, manager, diagnostics, null, null, units);
-		boolean success = task.call();
-		try {
-			manager.close();
+
+		try (StandardJavaFileManager manager = javac.getStandardFileManager(diagnostics, null, null)) {
+			Iterable<? extends JavaFileObject> units = manager
+					.getJavaFileObjectsFromFiles(Arrays.asList(program.getFile()));
+			CompilationTask task = javac.getTask(null, manager, diagnostics, null, null, units);
+
+			if (!task.call()) {
+				boolean showedAlert = false; // flag to indicate that only one alert is shown
+				diagnostics.toString();
+				logger.error("Compilation failed");
+				for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
+					diagnostic.toString();
+
+					logger.error("Kind: {}", diagnostic.getKind());
+					logger.error("Quelle: {}", diagnostic.getSource());
+					logger.error("Code und Nachricht: {}: {}", diagnostic.getCode(), diagnostic.getMessage(null));
+					logger.error("Zeile: {}", diagnostic.getLineNumber());
+					logger.error("Position/Spalte: {}/{}", diagnostic.getPosition(), diagnostic.getColumnNumber());
+					logger.error("Startpostion/Endposition: {}/{}", diagnostic.getStartPosition(),
+							diagnostic.getEndPosition());
+					if (showAlerts && !showedAlert) {
+						StringBuilder bobTheBuilder = new StringBuilder();
+						bobTheBuilder.append(
+								String.format(Messages.getString("Compilation.diagnostic.kind"), diagnostic.getKind()));
+						// bobTheBuilder.append(String.format("Quelle: %s%n", diagnostic.getSource()));
+						bobTheBuilder.append(String.format(Messages.getString("Compilation.diagnostic.CodeAndMessage"),
+								diagnostic.getCode(), diagnostic.getMessage(null)));
+						bobTheBuilder.append(String.format(Messages.getString("Compilation.diagnostic.row"),
+								diagnostic.getLineNumber()));
+						// bobTheBuilder.append(
+						// String.format("Position/Spalte: %s/%s%n", diagnostic.getPosition(),
+						// diagnostic.getColumnNumber()));
+						// bobTheBuilder.append(String.format("Startpostion/Endposition: %s/%s%n",
+						// diagnostic.getStartPosition(),
+						// diagnostic.getEndPosition()));
+
+						AlertHelper.showAlertAndWait(AlertType.ERROR, bobTheBuilder.toString(), parent,
+								Modality.WINDOW_MODAL, Messages.getString("Compilation.diagnostic.title"),
+								diagnostic.getKind().toString());
+						showedAlert = true;
+					}
+				}
+			} else {// compilation successful
+				logger.info("Compilation successful");
+				Optional<Robbi> robbi = loadNewRobbi(program.getName());
+
+				robbi.ifPresentOrElse(r -> {
+					Diagnostics diag = new Diagnostics();
+					if (!hasValidAnnotations(r, diag)) {
+						List<Diagnostics.Diagnostic> diags = diag.getDiagnostics();
+						String val = null, type = null;
+						if (diags.size() > 0) {
+							Diagnostics.Diagnostic diagnostic = diags.get(0);
+							val = diagnostic.value();
+							type = diagnostic.type();
+							logger.error("[Annotation Error]: {} is not applicable for {}", val, type);
+						} else
+							logger.error("[Annotation Error]: Error has been found but could not be diagnosed.");
+						if (showAlerts) {
+							String msg = Messages.getString("Compilation.annotations.msg.default");
+							if (val != null && type != null) {
+								msg = String.format(Messages.getString("Compilation.annotations.msg.info"), val, type);
+							}
+							AlertHelper.showAlertAndWait(AlertType.WARNING, msg, parent, Modality.WINDOW_MODAL,
+									Messages.getString("Compilation.annotations.title"),
+									Messages.getString("Compilation.annotations.header"));
+						}
+					} else {
+						if (overwritesMainMethod(r)) {
+							// set new Robbi in territory
+							MainStage s = (MainStage) programs.get(program.getName());
+							s.getTerritory().setRobbi(r);
+							if (showAlerts) {
+								AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+										String.format(Messages.getString("Compilation.success.message"),
+												program.getName()),
+										parent, Modality.WINDOW_MODAL, Messages.getString("Compilation.success.title"),
+										Messages.getString("Compilation.success.header"));
+							}
+						} else {
+							AlertHelper.showAlertAndWait(AlertType.ERROR,
+									Messages.getString("Compilation.diagnostic.override"), parent);
+							logger.error("The custom Robbi class does not overwrite the main-Method");
+						}
+					}
+				}, () -> logger.error("Failed to load new Robbi instance..."));
+
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		if (!success) {
-			boolean showedAlert = false; // flag to indicate that only one alert is shown
-			diagnostics.toString();
-			logger.error("Compilation failed");
-			for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
-				diagnostic.toString();
+	}
 
-				logger.error("Kind: {}", diagnostic.getKind());
-				logger.error("Quelle: {}", diagnostic.getSource());
-				logger.error("Code und Nachricht: {}: {}", diagnostic.getCode(), diagnostic.getMessage(null));
-				logger.error("Zeile: {}", diagnostic.getLineNumber());
-				logger.error("Position/Spalte: {}/{}", diagnostic.getPosition(), diagnostic.getColumnNumber());
-				logger.error("Startpostion/Endposition: {}/{}", diagnostic.getStartPosition(),
-						diagnostic.getEndPosition());
-				if (showAlerts && !showedAlert) {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("Compilation Error");
-					alert.setHeaderText(diagnostic.getKind().toString());
-					StringBuilder bobTheBuilder = new StringBuilder();
-					bobTheBuilder.append(
-							String.format(Messages.getString("Compilation.diagnostic.kind"), diagnostic.getKind()));
-					// bobTheBuilder.append(String.format("Quelle: %s%n", diagnostic.getSource()));
-					bobTheBuilder.append(String.format(Messages.getString("Compilation.diagnostic.CodeAndMessage"),
-							diagnostic.getCode(), diagnostic.getMessage(null)));
-					bobTheBuilder.append(String.format(Messages.getString("Compilation.diagnostic.row"),
-							diagnostic.getLineNumber()));
-					// bobTheBuilder.append(
-					// String.format("Position/Spalte: %s/%s%n", diagnostic.getPosition(),
-					// diagnostic.getColumnNumber()));
-					// bobTheBuilder.append(String.format("Startpostion/Endposition: %s/%s%n",
-					// diagnostic.getStartPosition(),
-					// diagnostic.getEndPosition()));
-					alert.setContentText(bobTheBuilder.toString());
-					alert.showAndWait();
-					showedAlert = true;
-				}
-			}
-		} else {// compilation successful
-			logger.info("Compilation successful");
-			// set new Robbi in territory
-			MainStage s = (MainStage) programs.get(program.getName());
-			s.getTerritory().setRobbi(loadNewRobbi(program.getName()));
-			if (showAlerts) {
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle(Messages.getString("Compilation.success.title"));
-				alert.setHeaderText(Messages.getString("Compilation.success.header"));
-				alert.setContentText(
-						String.format(Messages.getString("Compilation.success.message"), program.getName()));
-				alert.showAndWait();
+	private static boolean overwritesMainMethod(Robbi robbi) {
+		if (Robbi.class == robbi.getClass()) {
+			return true; // Default Robbi always has main-Method overwritten
+		}
+		for (Method m : robbi.getClass().getDeclaredMethods()) {
+			if (m.getName().equals("main")) {
+				return true;
 			}
 		}
+		return false;
+	}
+
+	/**
+	 * Checks if the given robbi has valid annotations set. Currently it checks if
+	 * the default Annotation has values matching its parameter
+	 * 
+	 * @param robbi Instance of the users robbi implementation to check
+	 * @return true if the annotions are valid, false otherwise
+	 */
+	private static boolean hasValidAnnotations(Robbi robbi, Diagnostics diag) {
+		Method methods[] = getCustomMethods(robbi);
+		boolean result = true;
+		for (Method method : methods) {
+			if (!hasValidDefaultAnnotation(method, diag)) {
+				result = false;
+				// return false;
+				// use return to fasten things up. Following annotation errors are ignored
+			}
+		}
+		return result; // return true;
+	}
+
+	/**
+	 * Checks if the method has Default annotations matching the type of its
+	 * parameter
+	 * 
+	 * @param method the method to check the annotations for
+	 * @return true if and only if all Default annotations match their parameter
+	 *         type, false otherwise
+	 */
+	private static boolean hasValidDefaultAnnotation(Method method, Diagnostics diag) {
+		boolean result = true;
+		for (Parameter parameter : method.getParameters()) {
+			Annotation annotations[] = parameter.getAnnotations();
+			for (Annotation annotation : annotations) {
+				if (annotation instanceof Default) {
+					if (!valueAcceptable(parameter, (Default) annotation, diag))
+						result = false;
+					// return false;
+				}
+			}
+		}
+		return result; // return true;
+	}
+
+	/**
+	 * Checks if the parameter and the Default Annotation match types. This is done
+	 * by checking, if the value of the Default annotation can be parsed to the type
+	 * of the parameter. If it fails, this method returns false.
+	 * 
+	 * @param parameter  The parameter to check the type of
+	 * @param annotation The annotation whose value has to be checked against the
+	 *                   parameter type
+	 * @return true if the annotation value matches the parameter type, false
+	 *         otherwise
+	 */
+	private static boolean valueAcceptable(Parameter parameter, Default annotation, Diagnostics diag) {
+		String val = annotation.value();
+		String type = parameter.getType().getName();
+		try {
+			switch (type) {
+			case "int":
+				Integer.parseInt(val);
+				return true;
+			case "boolean":
+				return val.equalsIgnoreCase("true") || val.equalsIgnoreCase("false");
+			case "char":
+				val.subSequence(0, 1);
+				return true;
+			case "double":
+				Double.parseDouble(val);
+				return true;
+			case "float":
+				Float.parseFloat(val);
+				return true;
+			case "long":
+				Long.parseLong(val);
+				return true;
+			case "String":
+			default:
+				return true;
+			}
+		} catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+			diag.add(new Diagnostics.Diagnostic(type, val));
+			return false;
+		}
+
+	}
+
+	/**
+	 * Returns all methods, that are not part of the default robbi implementation,
+	 * i.e. returns all methods the user has implemented
+	 * 
+	 * @param robbi the new robbi instance
+	 * @return an ArrayList of all new methods of the robbi
+	 */
+	private static Method[] getCustomMethods(Robbi robbi) {
+		List<Method> methods = new ArrayList<>();
+		// if robbi is custom class
+		if (Robbi.class != robbi.getClass()) {
+			for (Method m : robbi.getClass().getDeclaredMethods()) {
+				methods.add(m);
+			}
+		}
+		return methods.toArray(new Method[0]);
 	}
 
 	/**
 	 * Loads a new Robbi by the name of the class
 	 * 
 	 * @param name the name of the class
-	 * @return an instance of the class given by the name
+	 * @return an Optional of the given robbi class
 	 */
-	private static Robbi loadNewRobbi(String name) {
+	private static Optional<Robbi> loadNewRobbi(String name) {
+		Optional<Robbi> robbi;
 		try (URLClassLoader classLoader = new URLClassLoader(
 				new URL[] { new File(PATH_TO_PROGRAMS).toURI().toURL() })) {
 			Constructor<?> c = classLoader.loadClass(name).getConstructor();
 			Robbi r = (Robbi) c.newInstance();
-			return r;
+			robbi = Optional.ofNullable(r);
 		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | ClassNotFoundException
 				| NoSuchMethodException | SecurityException | IOException e) {
-			e.printStackTrace();
+			logger.error("Could not load class of '{}'. Message: {}", name, e.getMessage());
+			robbi = Optional.ofNullable(null);
 		}
-		return null;
+		return robbi;
 	}
 
 	/**

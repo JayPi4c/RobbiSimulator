@@ -15,6 +15,8 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
+import javafx.stage.Window;
 
 /**
  * This EventHandler combines all the code needed to change the territory size
@@ -24,17 +26,21 @@ import javafx.scene.layout.GridPane;
  */
 public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 
-	Dialog<Dimension> dialog;
-	Territory territory;
+	private Dialog<Dimension> dialog;
+	private Territory territory;
+	// private Window parent;
 
 	/**
 	 * Creates a new ChangeTerritorySizeHandler and sets up a new Dialog, which can
 	 * be invoked in the handle method
 	 * 
 	 * @param territory The territory, which size should be changed
+	 * @param parent    The parent window in order to set the dialog relative to the
+	 *                  current window
 	 */
-	public ChangeTerritorySizeHandler(Territory territory) {
+	public ChangeTerritorySizeHandler(Window parent, Territory territory) {
 		this.territory = territory;
+		// this.parent = parent;
 
 		dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("ChangeSize.dialog.title"));
@@ -57,7 +63,8 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 		dialog.setResultConverter(button -> button == ButtonType.OK
 				? new Dimension(Integer.parseInt(colField.getText()), Integer.parseInt(rowField.getText()))
 				: null);
-
+		dialog.initModality(Modality.WINDOW_MODAL);
+		dialog.initOwner(parent);
 	}
 
 	/**

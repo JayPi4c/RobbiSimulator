@@ -1,0 +1,38 @@
+<!ELEMENT territory ((tile| hollow | pileofscrap | stockpile)*, robbi, (tile | hollow | pileofscrap | stockpile)*)>
+<!ATTLIST territory
+    rows CDATA #REQUIRED
+    cols CDATA #REQUIRED
+>
+<!ELEMENT hollow EMPTY>
+<!ATTLIST hollow
+    row CDATA #REQUIRED
+    col CDATA #REQUIRED
+>
+<!ELEMENT pileofscrap EMPTY>
+<!ATTLIST pileofscrap
+    row CDATA #REQUIRED
+    col CDATA #REQUIRED
+>
+<!ELEMENT stockpile (item*)>
+<!ATTLIST stockpile
+    row CDATA #REQUIRED
+    col CDATA #REQUIRED
+>
+<!ELEMENT tile (item?)>
+<!ATTLIST tile
+    row CDATA #REQUIRED
+    col CDATA #REQUIRED
+>
+<!ELEMENT item EMPTY>
+<!ATTLIST item 
+	type CDATA #REQUIRED
+>
+<!ELEMENT facing EMPTY>
+<!ATTLIST facing 
+	direction CDATA #REQUIRED
+>
+<!ELEMENT robbi (item?, facing)>
+<!ATTLIST robbi
+    row CDATA #REQUIRED
+    col CDATA #REQUIRED
+>

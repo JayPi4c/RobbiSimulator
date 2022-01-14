@@ -21,10 +21,27 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
+import javafx.stage.Window;
 
+/**
+ * Class to for the ContextMenu which opens, when clicked on robbi in the
+ * simulator.
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class RobbiContextMenu extends ContextMenu {
 
-	public RobbiContextMenu(Territory territory) {
+	/**
+	 * Constructor to create a new RobbiContextMenu. It fills itself with all
+	 * methods that are provided by robbi and allows to run a particular method on
+	 * its own.
+	 * 
+	 * @param territory the territory this contextMenu is for
+	 * @param parent    the parent window in order to display the alerts relative to
+	 *                  the calling window
+	 */
+	public RobbiContextMenu(Territory territory, Window parent) {
 
 		for (Method method : getDefaultMethods(territory.getRobbi())) {
 			MenuItem item = getMenuItem(method);
@@ -34,7 +51,7 @@ public class RobbiContextMenu extends ContextMenu {
 				item.setDisable(true);
 			else
 				// get Annotation parameters
-				item.setOnAction(new MethodHandler(method, territory));
+				item.setOnAction(new MethodHandler(method, territory, parent));
 
 			getItems().add(item);
 		}
@@ -53,7 +70,7 @@ public class RobbiContextMenu extends ContextMenu {
 					Tooltip.install(item.getContent(), tooltip);
 
 				} else
-					item.setOnAction(new MethodHandler(method, territory));
+					item.setOnAction(new MethodHandler(method, territory, parent));
 
 				getItems().add(item);
 			}
@@ -61,6 +78,13 @@ public class RobbiContextMenu extends ContextMenu {
 
 	}
 
+	/**
+	 * This method checks if the given method m has the @Default annotation for all
+	 * parameters set.
+	 * 
+	 * @param m the method to check for
+	 * @return true if all parameters have the default Annotation, false otherwise
+	 */
 	private boolean hasCorrectDefaultAnnotations(Method m) {
 		if (m.getParameterCount() != m.getAnnotatedParameterTypes().length)
 			return false;
@@ -79,6 +103,15 @@ public class RobbiContextMenu extends ContextMenu {
 		return true;
 	}
 
+	/**
+	 * Creates the MenuItem for the given Method. <br>
+	 * MenuItems will look like this: <br>
+	 * foo(int, int) <br>
+	 * bar(long = 7, int = 3)
+	 * 
+	 * @param m the method to make a menuItem from
+	 * @return a CustomMenuItem with the correct text
+	 */
 	private CustomMenuItem getMenuItem(Method m) {
 		StringBuilder bobTheBuilder = new StringBuilder();
 		bobTheBuilder.append(m.getReturnType().toString());
@@ -104,6 +137,13 @@ public class RobbiContextMenu extends ContextMenu {
 		return item;
 	}
 
+	/**
+	 * Get all methods that are part of the default implementation, that are
+	 * visibile to the user.
+	 * 
+	 * @param robbi the robbi instance to get the default methods from
+	 * @return all methods that are part of the default implementation
+	 */
 	private Method[] getDefaultMethods(Robbi robbi) {
 		List<Method> methods = new ArrayList<>();
 
@@ -114,6 +154,13 @@ public class RobbiContextMenu extends ContextMenu {
 		return methods.toArray(new Method[0]);
 	}
 
+	/**
+	 * Get all methods that are implemented by the user and are not part of the
+	 * default implementation of robbi.
+	 * 
+	 * @param robbi the Robbi instance to get the custom methods from
+	 * @return all methods that are not part of the default implementation
+	 */
 	private Method[] getCustomMethods(Robbi robbi) {
 		List<Method> methods = new ArrayList<>();
 		// if robbi is custom class
@@ -131,6 +178,12 @@ public class RobbiContextMenu extends ContextMenu {
 		return methods.toArray(new Method[0]);
 	}
 
+	/**
+	 * Checks if a method has the invisible annotation.
+	 * 
+	 * @param m the method to check for
+	 * @return true if the Invisible annotation is set, false otherwise
+	 */
 	private boolean isInvisible(Method m) {
 		for (Annotation anno : m.getAnnotations())
 			if (anno instanceof Invisible)
@@ -138,6 +191,12 @@ public class RobbiContextMenu extends ContextMenu {
 		return false;
 	}
 
+	/**
+	 * Checks if the method is the main-Method.
+	 * 
+	 * @param m method to check
+	 * @return true if the name of the method equals "main", false otherwise
+	 */
 	private boolean isMainMethod(Method m) {
 		return m.getName().equals("main");
 	}

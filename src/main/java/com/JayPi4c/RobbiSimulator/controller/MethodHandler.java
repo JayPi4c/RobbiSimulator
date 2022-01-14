@@ -9,13 +9,14 @@ import java.util.List;
 
 import com.JayPi4c.RobbiSimulator.model.RobbiException;
 import com.JayPi4c.RobbiSimulator.model.Territory;
+import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Window;
 
 /**
  * MethodHandler to handle a methods invocation
@@ -27,6 +28,7 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 
 	private Method method;
 	private Territory territory;
+	private Window parent;
 
 	/**
 	 * Creates a new MethodHandler with the method and the territory the message is
@@ -34,10 +36,13 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 	 * 
 	 * @param method    the method for this handler
 	 * @param territory the territory to invoke this method in
+	 * @param parent    the parent window, in order to place alerts relative to the
+	 *                  window
 	 */
-	public MethodHandler(Method method, Territory territory) {
+	public MethodHandler(Method method, Territory territory, Window parent) {
 		this.method = method;
 		this.territory = territory;
+		this.parent = parent;
 	}
 
 	@Override
@@ -54,6 +59,9 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 							switch (p.getType().getName()) {
 							case "int":
 								args.add(Integer.parseInt(val));
+								break;
+							case "boolean":
+								args.add(Boolean.parseBoolean(val));
 								break;
 							case "char":
 								args.add(val.subSequence(0, 1));
@@ -73,10 +81,10 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 
 							}
 						} catch (IllegalArgumentException e) {
-							Alert alert = new Alert(AlertType.ERROR);
-							alert.setContentText(String.format(Messages.getString("Editor.contextMenu.executionError"),
-									val, method.getName()));
-							alert.showAndWait();
+							AlertHelper.showAlertAndWait(AlertType.ERROR,
+									String.format(Messages.getString("Editor.contextMenu.executionError"), val,
+											method.getName()),
+									parent);
 							return;
 						}
 						break;
@@ -87,22 +95,17 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 			Object result = this.method.invoke(this.territory.getRobbi(), arr);
 
 			if (result != null) {
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setContentText(Messages.getString("Execution.information.result") + result.toString());
-				alert.showAndWait();
+				AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+						Messages.getString("Execution.information.result") + result.toString(), parent);
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			if (e.getCause().getClass() != ThreadDeath.class) {
 				if (e.getCause() instanceof RobbiException) {
-					Alert alert = new Alert(AlertType.WARNING);
-					alert.setContentText(e.getCause().getMessage());
-					alert.showAndWait();
+					AlertHelper.showAlertAndWait(AlertType.WARNING, e.getCause().getMessage(), parent);
 				} else {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setContentText(e.getCause().getMessage());
-					alert.showAndWait();
+					AlertHelper.showAlertAndWait(AlertType.ERROR, e.getCause().getMessage(), parent);
 				}
 			}
 		} finally {

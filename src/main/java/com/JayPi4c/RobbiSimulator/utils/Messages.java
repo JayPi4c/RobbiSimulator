@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
  *
  */
 public class Messages {
-	private static String BUNDLE_NAME = "lang.messages_de_DE";
+	private static String BUNDLE_NAME = "lang.messages_de";
 	private static ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	private static ArrayList<ILanguageChangeListener> listeners = new ArrayList<>();
@@ -57,7 +57,7 @@ public class Messages {
 	 * Add a LanguageListener to the list of elements which need to be informed
 	 * about a change of language.
 	 * 
-	 * @param l
+	 * @param l the listener to register to the list of listeners
 	 */
 	public static void registerListener(ILanguageChangeListener l) {
 		listeners.add(l);
@@ -66,7 +66,7 @@ public class Messages {
 	/**
 	 * Remove a LanguageListener from the list.
 	 * 
-	 * @param l
+	 * @param l the listener to remove from the list of listeners
 	 */
 	public static void removeListener(ILanguageChangeListener l) {
 		listeners.remove(l);

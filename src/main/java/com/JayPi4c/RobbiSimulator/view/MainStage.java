@@ -2,19 +2,20 @@ package com.JayPi4c.RobbiSimulator.view;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Layout;
 
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.MainStageController;
 import com.JayPi4c.RobbiSimulator.controller.TerritorySaveController;
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
-import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.controller.simulation.SimulationController;
 import com.JayPi4c.RobbiSimulator.model.Territory;
-import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
+import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
 
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
@@ -40,18 +41,36 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class MainStage extends Stage implements ILanguageChangeListener {
+/**
+ * This class is the mainStage of the application and holds all GUI elements
+ * that are visible to the user.
+ * 
+ * @author Jonas Pohl
+ *
+ */
+public class MainStage extends Stage {
 	private static final Logger logger = LogManager.getLogger(MainStage.class);
 
 	private Territory territory;
 
 	private ButtonState buttonState;
-	private MainStageController mainStageController;
 
-	private static final int MIN_SPEED_VALUE = 100;
-	private static final int MAX_SPEED_VALUE = 2500;
+	// controllers
+	private MainStageController mainStageController;
+	private SimulationController simController;
+	private TerritorySaveController territorySaveController;
+
+	/**
+	 * Constant for the minimum value for the speed slider.
+	 */
+	public static final int MIN_SPEED_VALUE = 1;
+	/**
+	 * Constant for the maximum value for the speed slider.
+	 */
+	public static final int MAX_SPEED_VALUE = 100;
 
 	private Program program;
 
@@ -107,6 +126,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	private Menu robbiMenu;
 
 	// simulation Menu
+	private MenuItem resetMenuItem;
 	private MenuItem startMenuItem;
 	private MenuItem pauseMenuItem;
 	private MenuItem stopMenuItem;
@@ -118,6 +138,8 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	private MenuItem germanLanguageMenuItem;
 	private CheckMenuItem changeCursorMenuItem;
 	private CheckMenuItem darkModeMenuItem;
+	private MenuItem infoMenuItem;
+	private MenuItem libraryMenuItem;
 	private Menu windowMenu;
 
 	private MenuBar menubar;
@@ -144,6 +166,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	private Button robbiPutButtonToolbar;
 	private Button robbiTakeButtonToolbar;
 
+	private Button resetButtonToolbar;
 	private ToggleButton startToggleButtonToolbar;
 	private ToggleButton pauseToggleButtonToolbar;
 	private ToggleButton stopToggleButtonToolbar;
@@ -163,34 +186,107 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 
 	private Scene scene;
 
+	/**
+	 * Constant Image for open icon.
+	 */
 	public static Image openImage;
+	/**
+	 * Constant Image for new icon.
+	 */
 	public static Image newImage;
+	/**
+	 * Constant Image for save icon.
+	 */
 	public static Image saveImage;
+	/**
+	 * Constant Image for compile icon.
+	 */
 	public static Image compileImage;
+	/**
+	 * Constant Image for print icon.
+	 */
 	public static Image printImage;
+	/**
+	 * Constant Image for terrain icon. (Used for changeSize button)
+	 */
 	public static Image terrainImage;
 
+	/**
+	 * Constant Image for robbi icon.
+	 */
 	public static Image menuRobbiImage;
+	/**
+	 * Constant Image for hollow icon.
+	 */
 	public static Image menuHollowImage;
+	/**
+	 * Constant Image for pileOfScrap icon.
+	 */
 	public static Image menuPileOfScrapImage;
+	/**
+	 * Constant Image for stockpile icon.
+	 */
 	public static Image menuStockpileImage;
+	/**
+	 * Constant Image for accu icon.
+	 */
 	public static Image menuAccuImage;
+	/**
+	 * Constant Image for screw icon.
+	 */
 	public static Image menuScrewImage;
+	/**
+	 * Constant Image for nut icon.
+	 */
 	public static Image menuNutImage;
+	/**
+	 * Constant Image for delete icon.
+	 */
 	public static Image menuDeleteImage;
 
+	/**
+	 * Constant Image for reset icon.
+	 */
+	public static Image resetImage;
+	/**
+	 * Constant Image for simulation start/resume icon.
+	 */
 	public static Image menuStartImage;
+	/**
+	 * Constant Image for simulation pause icon.
+	 */
 	public static Image menuPauseImage;
+	/**
+	 * Constant Image for simulation stop icon.
+	 */
 	public static Image menuStopImage;
 
+	/**
+	 * Constant Image for RobbiMove icon.
+	 */
 	public static Image robbiMove;
+	/**
+	 * Constant Image for RobbiTurnLeft icon.
+	 */
 	public static Image robbiTurnLeft;
+	/**
+	 * Constant Image for RobbiPut icon.
+	 */
 	public static Image robbiPut;
+	/**
+	 * Constant Image for RobbiTake icon.
+	 */
 	public static Image robbiTake;
 
+	/**
+	 * Constructor for the MainStage. It creates a mainStage for the given Program
+	 * and loads and creates all needed Gui elements and controller. <br>
+	 * This is the place, where the territory and the buttonState are created
+	 * 
+	 * @param program the program this mainStage is for
+	 */
 	public MainStage(Program program) {
 		this.program = program;
-		Messages.registerListener(this);
 
 		territory = new Territory();
 		buttonState = new ButtonState();
@@ -203,23 +299,16 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		VBox.setVgrow(splitPane, Priority.ALWAYS);
 		var vBox = new VBox(menubar, toolbar, splitPane, messageLabel);
 
-		mainStageController = new MainStageController(this, buttonState);
-		// var simController =
-		new SimulationController(this, territory);
-		new TerritorySaveController(this);
-
 		scene = new Scene(vBox);
+		setScene(scene);
 
 		setMinHeight(200);
 		setMinWidth(500);
-
-		setScene(scene);
 		getIcons().add(menuRobbiImage);
-		setTitle(Messages.getString("Main.title") + ": " + program.getName());
-		setOnCloseRequest(e -> {
-			program.save(textArea.getText());
-			ProgramController.close(program.getName());
-		});
+
+		mainStageController = new MainStageController(this, buttonState);
+		simController = new SimulationController(this, territory);
+		territorySaveController = new TerritorySaveController(this);
 
 		show();
 		textArea.requestFocus();
@@ -237,230 +326,10 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	 * "MyApp"); } catch (Exception ignored) { } } }
 	 */
 
-	public Program getProgram() {
-		return this.program;
-	}
-
-	public MenuItem getStartMenuItem() {
-		return startMenuItem;
-	}
-
-	public MenuItem getPauseMenuItem() {
-		return pauseMenuItem;
-	}
-
-	public MenuItem getStopMenuItem() {
-		return stopMenuItem;
-	}
-
-	public ToggleButton getStartToggleButtonToolbar() {
-		return startToggleButtonToolbar;
-	}
-
-	public ToggleButton getPauseToggleButtonToolbar() {
-		return pauseToggleButtonToolbar;
-	}
-
-	public ToggleButton getStopToggleButtonToolbar() {
-		return stopToggleButtonToolbar;
-	}
-
-	public Slider getSpeedSliderToolbar() {
-		return speedSliderToolbar;
-	}
-
-	public Territory getTerritory() {
-		return territory;
-	}
-
-	public MenuItem getSaveEditorMenuItem() {
-		return saveEditorMenuItem;
-	}
-
-	public MenuItem getQuitEditorMenuItem() {
-		return quitEditorMenuItem;
-	}
-
-	public RadioMenuItem getPlaceRobbiTerritoryRadioMenuItem() {
-		return placeRobbiTerritoryRadioMenuItem;
-	}
-
-	public RadioMenuItem getPlaceHollowTerritoryRadioMenuItem() {
-		return placeHollowTerritoryRadioMenuItem;
-	}
-
-	public RadioMenuItem getPlacePileOfScrapTerritoryRadioMenuItem() {
-		return placePileOfScrapTerritoryRadioMenuItem;
-	}
-
-	public RadioMenuItem getPlaceStockpileTerritoryRadioMenuItem() {
-		return placeStockpileTerritoryRadioMenuItem;
-	}
-
-	public RadioMenuItem getPlaceAccuTerritoryRadioMenuItem() {
-		return placeAccuTerritoryRadioMenuItem;
-	}
-
-	public RadioMenuItem getPlaceScrewTerritoryRadioMenuItem() {
-		return placeScrewTerritoryRadioMenuItem;
-	}
-
-	public RadioMenuItem getPlaceNutTerritoryRadioMenuItem() {
-		return placeNutTerritoryRadioMenuItem;
-	}
-
-	public MenuItem getPileOfScrapAheadMenuItem() {
-		return pileOfScrapAheadMenuItem;
-	}
-
-	public Button getSaveButtonToolbar() {
-		return saveButtonToolbar;
-	}
-
-	public ToggleButton getPlaceRobbiToggleButtonToolbar() {
-		return placeRobbiToggleButtonToolbar;
-	}
-
-	public ToggleButton getPlaceHollowToggleButtonToolbar() {
-		return placeHollowToggleButtonToolbar;
-	}
-
-	public ToggleButton getPlacePileOfScrapToggleButtonToolbar() {
-		return placePileOfScrapToggleButtonToolbar;
-	}
-
-	public ToggleButton getPlaceStockpileToggleButtonToolbar() {
-		return placeStockpileToggleButtonToolbar;
-	}
-
-	public ToggleButton getPlaceAccuToggleButtonToolbar() {
-		return placeAccuToggleButtonToolbar;
-	}
-
-	public ToggleButton getPlaceScrewToggleButtonToolbar() {
-		return placeScrewToggleButtonToolbar;
-	}
-
-	public ToggleButton getPlaceNutToggleButtonToolbar() {
-		return placeNutToggleButtonToolbar;
-	}
-
-	public Scene getMainStageScene() {
-		return scene;
-	}
-
-	public RadioMenuItem getDeleteFieldRadioMenuItem() {
-		return deleteFieldRadioMenuItem;
-	}
-
-	public ToggleButton getDeleteFieldToggleButtonToolbar() {
-		return deleteFieldToggleButtonToolbar;
-	}
-
-	public MenuItem getItemPresentMenuItem() {
-		return itemPresentMenuItem;
-	}
-
-	public MenuItem getIsStockpileMenuItem() {
-		return isStockpileMenuItem;
-	}
-
-	public MenuItem getHollowAheadMenuItem() {
-		return hollowAheadMenuItem;
-	}
-
-	public MenuItem getIsBagFullMenuItem() {
-		return isBagFullMenuItem;
-	}
-
-	public MenuItem getPushPileOfScrapMenuItem() {
-		return pushPileOfScrapMenuItem;
-	}
-
-	public MenuItem getMoveMenuItem() {
-		return moveMenuItem;
-	}
-
-	public MenuItem getTurnLeftMenuItem() {
-		return turnLeftMenuItem;
-	}
-
-	public MenuItem getPutMenuItem() {
-		return putMenuItem;
-	}
-
-	public MenuItem getTakeMenuItem() {
-		return takeMenuItem;
-	}
-
-	public TextArea getTextArea() {
-		return textArea;
-	}
-
-	public ScrollPane getTerritoryScrollPane() {
-		return territoryScrollPane;
-	}
-
-	public MenuItem getNewEditorMenuItem() {
-		return newEditorMenuItem;
-	}
-
-	public MenuItem getOpenEditorMenuItem() {
-		return openEditorMenuItem;
-	}
-
-	public MenuItem getCompileEditorMenuItem() {
-		return compileEditorMenuItem;
-	}
-
-	public MenuItem getChangeSizeTerritoryMenuItem() {
-		return changeSizeTerritoryMenuItem;
-	}
-
-	public Button getNewButtonToolbar() {
-		return newButtonToolbar;
-	}
-
-	public Button getLoadButtonToolbar() {
-		return loadButtonToolbar;
-	}
-
-	public Button getCompileButtonToolbar() {
-		return compileButtonToolbar;
-	}
-
-	public Button getChangeSizeButtonToolbar() {
-		return changeSizeButtonToolbar;
-	}
-
-	public MenuItem getSaveSerialTerritoryMenuItem() {
-		return saveSerialTerritoryMenuItem;
-	}
-
-	public MenuItem getLoadSerialTerritoryMenuItem() {
-		return loadSerialTerritoryMenuItem;
-	}
-
-	public MenuItem getPrintEditorMenuItem() {
-		return printEditorMenuItem;
-	}
-
-	public TerritoryPanel getTerritoryPanel() {
-		return territoryPanel;
-	}
-
-	public MenuItem getPrintTerritoryMenuItem() {
-		return printTerritoryMenuItem;
-	}
-
-	public MenuItem getSaveAsPNGMenuItem() {
-		return saveAsPNGMenuItem;
-	}
-
-	public MenuItem getSaveAsGifMenuItem() {
-		return saveAsGifMenuItem;
-	}
-
+	/**
+	 * Loads all images that are presented in the toolbar. This method must be
+	 * called before the first mainStage is created.
+	 */
 	public static void loadImages() {
 		newImage = new Image("img/New24.gif");
 		saveImage = new Image("img/Save24.gif");
@@ -477,6 +346,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		menuNutImage = new Image("img/Nut24.png");
 		menuDeleteImage = new Image("img/Delete24.gif");
 
+		resetImage = new Image("img/reset24.png");
 		menuStartImage = new Image("img/Play24.gif");
 		menuPauseImage = new Image("img/Pause24.gif");
 		menuStopImage = new Image("img/Stop24.gif");
@@ -488,7 +358,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	}
 
 	/**
-	 * Erstelle den Editoreintrag für die Menubar
+	 * Creates the editor-related menu-bar elements.
 	 */
 	private void createEditor() {
 		logger.debug("Create editor entry for menubar");
@@ -518,8 +388,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	}
 
 	/**
-	 * 
-	 * Erstelle den Territoriumseintrag für die Menubar
+	 * Creates the territory-related menu-bar elements.
 	 */
 	private void createTerritory() {
 		logger.debug("Create territory entry for menubar");
@@ -579,7 +448,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	}
 
 	/**
-	 * Erstelle den Robbieintrag für die Menubar
+	 * Creates the robbi-related menu-bar elements.
 	 */
 	private void createRobbi() {
 		logger.debug("Create Robbi entry for menubar");
@@ -610,11 +479,13 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	}
 
 	/**
-	 * Erstelle den Simulationseintrag für die Menubar
+	 * Creates the simulation-related menu-bar elements.
 	 */
 	private void createSimulation() {
 		logger.debug("Create simulation entry for menubar");
 
+		resetMenuItem = new MenuItem(Messages.getString("Menu.simulation.reset"));
+		resetMenuItem.setGraphic(new ImageView(resetImage));
 		startMenuItem = new MenuItem(Messages.getString("Menu.simulation.start"));
 		startMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F11, KeyCombination.CONTROL_DOWN));
 		startMenuItem.setGraphic(new ImageView(menuStartImage));
@@ -623,16 +494,19 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		stopMenuItem = new MenuItem(Messages.getString("Menu.simulation.stop"));
 		stopMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F12, KeyCombination.CONTROL_DOWN));
 		stopMenuItem.setGraphic(new ImageView(menuStopImage));
-		simulationMenu = new Menu(Messages.getString("Menu.simulation"), null, startMenuItem, pauseMenuItem,
-				stopMenuItem);
+		simulationMenu = new Menu(Messages.getString("Menu.simulation"), null, resetMenuItem, startMenuItem,
+				pauseMenuItem, stopMenuItem);
 		simulationMenu.setMnemonicParsing(true);
 	}
 
+	/**
+	 * Creates the window-related menu-bar elements.
+	 */
 	private void createWindowMenu() {
 		englishLanguageMenuItem = new MenuItem(Messages.getString("Menu.window.language.english"));
-		englishLanguageMenuItem.setOnAction(e -> Messages.changeBundle("lang.messages_en_US"));
+		englishLanguageMenuItem.setOnAction(e -> Messages.changeBundle("lang.messages_en"));
 		germanLanguageMenuItem = new MenuItem(Messages.getString("Menu.window.language.german"));
-		germanLanguageMenuItem.setOnAction(e -> Messages.changeBundle("lang.messages_de_DE"));
+		germanLanguageMenuItem.setOnAction(e -> Messages.changeBundle("lang.messages_de"));
 
 		languageMenu = new Menu(Messages.getString("Menu.window.language"), null, englishLanguageMenuItem,
 				germanLanguageMenuItem);
@@ -651,12 +525,31 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 			} else
 				scene.getStylesheets().remove("css/dark-theme.css");
 		});
+
+		infoMenuItem = new MenuItem(Messages.getString("Menu.window.info"));
+		infoMenuItem.setOnAction(e -> {
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION, Messages.getString("Menu.window.info.content"), this,
+					Modality.WINDOW_MODAL, Messages.getString("Menu.window.info.title"),
+					Messages.getString("Menu.window.info.header"));
+		});
+
+		libraryMenuItem = new MenuItem(Messages.getString("Menu.window.libraries"));
+		libraryMenuItem.setOnAction(e -> {
+			String javaFxVersion = System.getProperty("javafx.version");
+			String javaVersion = System.getProperty("java.version");
+			String log4JVersion = Layout.class.getPackage().getImplementationVersion();
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+					String.format(Messages.getString("Menu.window.libraries.content"), javaVersion, javaFxVersion,
+							log4JVersion),
+					this, Modality.WINDOW_MODAL, Messages.getString("Menu.window.libraries.title"),
+					Messages.getString("Menu.window.libraries.header"));
+		});
 		windowMenu = new Menu(Messages.getString("Menu.window"), null, languageMenu, changeCursorMenuItem,
-				darkModeMenuItem);
+				darkModeMenuItem, new SeparatorMenuItem(), infoMenuItem, libraryMenuItem);
 	}
 
 	/**
-	 * Erstelle die gesamte Menubar mit allen Einträgen
+	 * Creates the entire menuBar.
 	 */
 	private void createMenuBar() {
 		logger.debug("Create menubar");
@@ -670,8 +563,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	}
 
 	/**
-	 * Erstelle die Toolbar mit den wichtigsten Funktionalitäten als direkt zu
-	 * erreichende Buttons
+	 * Creates a toolbar for direct-access to the most important features.
 	 */
 	private void createToolbar() {
 		logger.debug("Create toolbar");
@@ -745,19 +637,18 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 
 		robbiMoveButtonToolbar = new Button(null, new ImageView(robbiMove));
 		robbiMoveButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.move")));
-		robbiMoveButtonToolbar.setOnAction(e -> territory.getRobbi().vor());
 
 		robbiTurnLeftButtonToolbar = new Button(null, new ImageView(robbiTurnLeft));
 		robbiTurnLeftButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.turnLeft")));
-		robbiTurnLeftButtonToolbar.setOnAction(e -> territory.getRobbi().linksUm());
 
 		robbiPutButtonToolbar = new Button(null, new ImageView(robbiPut));
 		robbiPutButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.put")));
-		robbiPutButtonToolbar.setOnAction(e -> territory.getRobbi().legeAb());
 
 		robbiTakeButtonToolbar = new Button(null, new ImageView(robbiTake));
 		robbiTakeButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.take")));
-		robbiTakeButtonToolbar.setOnAction(e -> territory.getRobbi().nehmeAuf());
+
+		resetButtonToolbar = new Button(null, new ImageView(resetImage));
+		resetButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.reset")));
 
 		var simulationGroupToolbar = new ToggleGroup();
 		startToggleButtonToolbar = new ToggleButton(null, new ImageView(menuStartImage));
@@ -780,13 +671,14 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 				placeHollowToggleButtonToolbar, placePileOfScrapToggleButtonToolbar, placeStockpileToggleButtonToolbar,
 				placeAccuToggleButtonToolbar, placeScrewToggleButtonToolbar, placeNutToggleButtonToolbar,
 				deleteFieldToggleButtonToolbar, new Separator(), robbiMoveButtonToolbar, robbiTurnLeftButtonToolbar,
-				robbiPutButtonToolbar, robbiTakeButtonToolbar, new Separator(), startToggleButtonToolbar,
-				pauseToggleButtonToolbar, stopToggleButtonToolbar, new Separator(), speedSliderToolbar);
+				robbiPutButtonToolbar, robbiTakeButtonToolbar, new Separator(), resetButtonToolbar,
+				startToggleButtonToolbar, pauseToggleButtonToolbar, stopToggleButtonToolbar, new Separator(),
+				speedSliderToolbar);
 	}
 
 	/**
-	 * Erstelle eine ContentPane, in der ein Texteditor und die Bühne für die MPW zu
-	 * finden sind.
+	 * Creates the contentPane in which the text-editor and the territoryPanel take
+	 * place.
 	 */
 	private void createContentPane() {
 		logger.debug("Create content panel");
@@ -794,7 +686,7 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 		textArea = new TextArea(program.getEditorContent());
 		textArea.setMinWidth(250);
 
-		territoryPanel = new TerritoryPanel(this.territory, this.buttonState);
+		territoryPanel = new TerritoryPanel(this.territory, this.buttonState, this);
 
 		territoryScrollPane = new ScrollPane(territoryPanel);
 		territoryScrollPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
@@ -806,103 +698,746 @@ public class MainStage extends Stage implements ILanguageChangeListener {
 	}
 
 	/**
-	 * Erstelle ein label, welches dem Benutzer zusätzliches Feedback geben kann
+	 * Create a bottom label to give additional information.
 	 */
 	private void createMessageLabel() {
 		logger.debug("Create message label");
 		messageLabel = new Label(Messages.getString("Messages.label.greeting"));
 	}
 
-	@Override
-	public void onLanguageChanged() {
-		// Add multilanguage support
-		setTitle(Messages.getString("Main.title") + ": " + program.getName() + (program.isEdited() ? "*" : ""));
+	// ==================================================================== //
+	// ==================================================================== //
+	// ============================== GETTER ============================== //
+	// ==================================================================== //
+	// ==================================================================== //
 
-		newEditorMenuItem.setText(Messages.getString("Menu.editor.new"));
-		saveEditorMenuItem.setText(Messages.getString("Menu.editor.save"));
-		openEditorMenuItem.setText(Messages.getString("Menu.editor.open"));
-		compileEditorMenuItem.setText(Messages.getString("Menu.editor.compile"));
-		printEditorMenuItem.setText(Messages.getString("Menu.editor.print"));
-		quitEditorMenuItem.setText(Messages.getString("Menu.editor.quit"));
-		editorMenu.setText(Messages.getString("Menu.editor"));
+	/**
+	 * Getter for the program
+	 * 
+	 * @return the program, this stage is for
+	 */
+	public Program getProgram() {
+		return this.program;
+	}
 
-		// territory Menu
-		saveXMLTerritoryMenuItem.setText(Messages.getString("Menu.territory.save.xml"));
-		saveJAXBTerritoryMenuItem.setText(Messages.getString("Menu.territory.save.jaxb"));
-		saveSerialTerritoryMenuItem.setText(Messages.getString("Menu.territory.save.serialize"));
-		saveTerritoryMenu.setText(Messages.getString("Menu.territory.save"));
-		loadXMLTerritoryMenuItem.setText(Messages.getString("Menu.territory.load.xml"));
-		loadJAXBTerritoryMenuItem.setText(Messages.getString("Menu.territory.load.jaxb"));
-		loadSerialTerritoryMenuItem.setText(Messages.getString("Menu.territory.load.deserialize"));
-		loadTerritoryMenu.setText(Messages.getString("Menu.territory.load"));
-		saveAsPNGMenuItem.setText(Messages.getString("Menu.territory.saveAsPic.png"));
-		saveAsGifMenuItem.setText(Messages.getString("Menu.territory.saveAsPic.gif"));
-		saveAsPicMenu.setText(Messages.getString("Menu.territory.saveAsPic"));
-		printTerritoryMenuItem.setText(Messages.getString("Menu.territory.print"));
+	/**
+	 * Getter for the resetMenuItem.
+	 * 
+	 * @return the resetMenuItem for this stage
+	 */
+	public MenuItem getResetMenuItem() {
+		return resetMenuItem;
+	}
 
-		changeSizeTerritoryMenuItem.setText(Messages.getString("Menu.territory.size"));
-		placeRobbiTerritoryRadioMenuItem.setText(Messages.getString("Menu.territory.place.robbi"));
-		placeHollowTerritoryRadioMenuItem.setText(Messages.getString("Menu.territory.place.hollow"));
-		placePileOfScrapTerritoryRadioMenuItem.setText(Messages.getString("Menu.territory.place.pileOfScrap"));
-		placeStockpileTerritoryRadioMenuItem.setText(Messages.getString("Menu.territory.place.stockpile"));
-		placeAccuTerritoryRadioMenuItem.setText(Messages.getString("Menu.territory.place.accu"));
-		placeScrewTerritoryRadioMenuItem.setText(Messages.getString("Menu.territory.place.screw"));
-		placeNutTerritoryRadioMenuItem.setText(Messages.getString("Menu.territory.place.nut"));
-		deleteFieldRadioMenuItem.setText(Messages.getString("Menu.territory.delete"));
-		territoryMenu.setText(Messages.getString("Menu.territory"));
-		// robbi Menu
-		itemPresentMenuItem.setText(Messages.getString("Menu.robbi.itemPresent"));
-		isStockpileMenuItem.setText(Messages.getString("Menu.robbi.isStockpile"));
-		hollowAheadMenuItem.setText(Messages.getString("Menu.robbi.hollowAhead"));
-		pileOfScrapAheadMenuItem.setText(Messages.getString("Menu.robbi.pileOfScrapAhead"));
-		isBagFullMenuItem.setText(Messages.getString("Menu.robbi.isBagFull"));
-		pushPileOfScrapMenuItem.setText(Messages.getString("Menu.robbi.pushPileOfScrap"));
-		moveMenuItem.setText(Messages.getString("Menu.robbi.move"));
-		turnLeftMenuItem.setText(Messages.getString("Menu.robbi.turnLeft"));
-		putMenuItem.setText(Messages.getString("Menu.robbi.put"));
-		takeMenuItem.setText(Messages.getString("Menu.robbi.take"));
-		robbiMenu.setText(Messages.getString("Menu.robbi"));
-		// simulation Menu
-		startMenuItem.setText(Messages.getString("Menu.simulation.start"));
-		pauseMenuItem.setText(Messages.getString("Menu.simulation.pause"));
-		stopMenuItem.setText(Messages.getString("Menu.simulation.stop"));
-		simulationMenu.setText(Messages.getString("Menu.simulation"));
-		// window Meun
-		languageMenu.setText(Messages.getString("Menu.window.language"));
-		englishLanguageMenuItem.setText(Messages.getString("Menu.window.language.english"));
-		germanLanguageMenuItem.setText(Messages.getString("Menu.window.language.german"));
-		changeCursorMenuItem.setText(Messages.getString("Menu.window.changeCursor"));
-		windowMenu.setText(Messages.getString("Menu.window"));
+	/**
+	 * Getter for the startMenuItem.
+	 * 
+	 * @return the startMenuItem for this stage
+	 */
+	public MenuItem getStartMenuItem() {
+		return startMenuItem;
+	}
 
-		// Tool bar
-		newButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.control.new")));
-		loadButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.control.load")));
-		saveButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.control.save")));
-		compileButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.control.compile")));
+	/**
+	 * Getter for the pauseMenuItem.
+	 * 
+	 * @return the pauseMenuItem for this stage
+	 */
+	public MenuItem getPauseMenuItem() {
+		return pauseMenuItem;
+	}
 
-		changeSizeButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.size")));
-		placeRobbiToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeRobbi")));
-		placeHollowToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeHollow")));
-		placePileOfScrapToggleButtonToolbar
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placePileOfScrap")));
-		placeStockpileToggleButtonToolbar
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeStockpile")));
-		placeAccuToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeAccu")));
-		placeScrewToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeScrew")));
-		placeNutToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeNut")));
-		deleteFieldToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.delete")));
+	/**
+	 * Getter for the stopMenuItem.
+	 * 
+	 * @return the stopMenuItem for this stage
+	 */
+	public MenuItem getStopMenuItem() {
+		return stopMenuItem;
+	}
 
-		robbiTurnLeftButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.turnLeft")));
-		robbiMoveButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.move")));
-		robbiPutButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.put")));
-		robbiTakeButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.take")));
+	/**
+	 * Getter for the resetButtonToolbar.
+	 * 
+	 * @return the resetButtonToolbar for this stage
+	 */
+	public Button getResetButtonToolbar() {
+		return resetButtonToolbar;
+	}
 
-		startToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.start")));
-		pauseToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.pause")));
-		stopToggleButtonToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.stop")));
-		speedSliderToolbar.setTooltip(new Tooltip(Messages.getString("Toolbar.action.speed")));
+	/**
+	 * Getter for the startToggleButtonToolbar.
+	 * 
+	 * @return the startToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getStartToggleButtonToolbar() {
+		return startToggleButtonToolbar;
+	}
 
-		messageLabel.setText(Messages.getString("Messages.label.greeting"));
+	/**
+	 * Getter for the pauseToggleButtonToolbar.
+	 * 
+	 * @return the pauseToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getPauseToggleButtonToolbar() {
+		return pauseToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the stopToggleButtonToolbar.
+	 * 
+	 * @return the stopToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getStopToggleButtonToolbar() {
+		return stopToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the speedSliderToolbar.
+	 * 
+	 * @return the speedSliderToolbar for this stage
+	 */
+	public Slider getSpeedSliderToolbar() {
+		return speedSliderToolbar;
+	}
+
+	/**
+	 * Getter for the territory.
+	 * 
+	 * @return the territory for this stage
+	 */
+	public Territory getTerritory() {
+		return territory;
+	}
+
+	/**
+	 * Getter for the saveEditorMenuItem.
+	 * 
+	 * @return the saveEditorMenuItem for this stage
+	 */
+	public MenuItem getSaveEditorMenuItem() {
+		return saveEditorMenuItem;
+	}
+
+	/**
+	 * Getter for the QuitEditorMenuItem.
+	 * 
+	 * @return the QuitEditorMenuItem for this stage
+	 */
+	public MenuItem getQuitEditorMenuItem() {
+		return quitEditorMenuItem;
+	}
+
+	/**
+	 * Getter for the placeRobbiTerritoryRadioMenuItem.
+	 * 
+	 * @return the placeRobbiTerritoryRadioMenuItem for this stage
+	 */
+	public RadioMenuItem getPlaceRobbiTerritoryRadioMenuItem() {
+		return placeRobbiTerritoryRadioMenuItem;
+	}
+
+	/**
+	 * Getter for the placeHollowTerritoryRadioMenuItem.
+	 * 
+	 * @return the placeHollowTerritoryRadioMenuItem for this stage
+	 */
+	public RadioMenuItem getPlaceHollowTerritoryRadioMenuItem() {
+		return placeHollowTerritoryRadioMenuItem;
+	}
+
+	/**
+	 * Getter for the placePileOfScrapTerritoryRadioMenuItem.
+	 * 
+	 * @return the placePileOFScrapTerritoryRadioMenuItem for this stage
+	 */
+	public RadioMenuItem getPlacePileOfScrapTerritoryRadioMenuItem() {
+		return placePileOfScrapTerritoryRadioMenuItem;
+	}
+
+	/**
+	 * Getter for the placeStockpileTerritoryRadioMenuItem.
+	 * 
+	 * @return the placeStockpileTerritoryRadioMenuItem for this stage
+	 */
+	public RadioMenuItem getPlaceStockpileTerritoryRadioMenuItem() {
+		return placeStockpileTerritoryRadioMenuItem;
+	}
+
+	/**
+	 * Getter for the placeAccuTerritoryRadioMenuItem.
+	 * 
+	 * @return the placeAccuTerritoryRadioMenuItem for this stage
+	 */
+	public RadioMenuItem getPlaceAccuTerritoryRadioMenuItem() {
+		return placeAccuTerritoryRadioMenuItem;
+	}
+
+	/**
+	 * Getter for the placeScrewTerritoryRadioMenuItem.
+	 * 
+	 * @return the placeScrewTerritoryRadioMenuItem for this stage
+	 */
+	public RadioMenuItem getPlaceScrewTerritoryRadioMenuItem() {
+		return placeScrewTerritoryRadioMenuItem;
+	}
+
+	/**
+	 * Getter for the placeNutTerritoryRadioMenuItem.
+	 * 
+	 * @return the placeNutTerritoryRadioMenuItem for this stage
+	 */
+	public RadioMenuItem getPlaceNutTerritoryRadioMenuItem() {
+		return placeNutTerritoryRadioMenuItem;
+	}
+
+	/**
+	 * Getter for the pileOfScrapAheadMenuItem.
+	 * 
+	 * @return the pileOfScrapAheadMenuItem for this stage
+	 */
+	public MenuItem getPileOfScrapAheadMenuItem() {
+		return pileOfScrapAheadMenuItem;
+	}
+
+	/**
+	 * Getter for the saveButtonToolbar.
+	 * 
+	 * @return the saveButtonToolbar for this stage
+	 */
+	public Button getSaveButtonToolbar() {
+		return saveButtonToolbar;
+	}
+
+	/**
+	 * Getter for the placeRobbiToggleButtonToolbar.
+	 * 
+	 * @return the placeRobbiToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getPlaceRobbiToggleButtonToolbar() {
+		return placeRobbiToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the placeHollowToggleButtonToolbar.
+	 * 
+	 * @return the placeHollowToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getPlaceHollowToggleButtonToolbar() {
+		return placeHollowToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the placePileOfScrapToggleButtonToolbar.
+	 * 
+	 * @return the placePileOfScrapToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getPlacePileOfScrapToggleButtonToolbar() {
+		return placePileOfScrapToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the placeStockpileToggleButtonToolbar.
+	 * 
+	 * @return the placeStockpileToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getPlaceStockpileToggleButtonToolbar() {
+		return placeStockpileToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the placeAccuToggleButtonToolbar.
+	 * 
+	 * @return the placeAccuToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getPlaceAccuToggleButtonToolbar() {
+		return placeAccuToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the placeScrewToggleButtonToolbar.
+	 * 
+	 * @return the placeScrewToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getPlaceScrewToggleButtonToolbar() {
+		return placeScrewToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the placeNutToggleButtonToolbar.
+	 * 
+	 * @return the placeNutToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getPlaceNutToggleButtonToolbar() {
+		return placeNutToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the MainStageScene.
+	 * 
+	 * @return the scene for this stage
+	 */
+	public Scene getMainStageScene() {
+		return scene;
+	}
+
+	/**
+	 * Getter for the deleteFieldRadioMenuItem.
+	 * 
+	 * @return the deleteFieldRadioMenuItem for this stage
+	 */
+	public RadioMenuItem getDeleteFieldRadioMenuItem() {
+		return deleteFieldRadioMenuItem;
+	}
+
+	/**
+	 * Getter for the deleteFieldToggleButtonToolbar.
+	 * 
+	 * @return the deleteFieldToggleButtonToolbar for this stage
+	 */
+	public ToggleButton getDeleteFieldToggleButtonToolbar() {
+		return deleteFieldToggleButtonToolbar;
+	}
+
+	/**
+	 * Getter for the itemPresentMenuItem.
+	 * 
+	 * @return the itemPresentMenuItem for this stage
+	 */
+	public MenuItem getItemPresentMenuItem() {
+		return itemPresentMenuItem;
+	}
+
+	/**
+	 * Getter for the isStockpileMenuItem.
+	 * 
+	 * @return the isStockpileMenuItem for this stage
+	 */
+	public MenuItem getIsStockpileMenuItem() {
+		return isStockpileMenuItem;
+	}
+
+	/**
+	 * Getter for the hollowAheadMenuItem.
+	 * 
+	 * @return the hollowAheadMenuItem for this stage
+	 */
+	public MenuItem getHollowAheadMenuItem() {
+		return hollowAheadMenuItem;
+	}
+
+	/**
+	 * Getter for the isBagFullMenuItem.
+	 * 
+	 * @return the isBagFullMenuItem for this stage
+	 */
+	public MenuItem getIsBagFullMenuItem() {
+		return isBagFullMenuItem;
+	}
+
+	/**
+	 * Getter for the pushPileOfScrapMenuItem.
+	 * 
+	 * @return the pushPileOfScrapMenuItem for this stage
+	 */
+	public MenuItem getPushPileOfScrapMenuItem() {
+		return pushPileOfScrapMenuItem;
+	}
+
+	/**
+	 * Getter for the moveMenuItem.
+	 * 
+	 * @return the moveMenuItem for this stage
+	 */
+	public MenuItem getMoveMenuItem() {
+		return moveMenuItem;
+	}
+
+	/**
+	 * Getter for the turnLeftMenuItem.
+	 * 
+	 * @return the turnLeftMenuItem for this stage
+	 */
+	public MenuItem getTurnLeftMenuItem() {
+		return turnLeftMenuItem;
+	}
+
+	/**
+	 * Getter for the putMenuItem.
+	 * 
+	 * @return the putMenuItem for this stage
+	 */
+	public MenuItem getPutMenuItem() {
+		return putMenuItem;
+	}
+
+	/**
+	 * Getter for the takeMenuItem.
+	 * 
+	 * @return the takeMenuItem for this stage
+	 */
+	public MenuItem getTakeMenuItem() {
+		return takeMenuItem;
+	}
+
+	/**
+	 * Getter for the textArea.
+	 * 
+	 * @return the textArea for this stage
+	 */
+	public TextArea getTextArea() {
+		return textArea;
+	}
+
+	/**
+	 * Getter for the territoryScrollPane.
+	 * 
+	 * @return the territoryScrollPane for this stage
+	 */
+	public ScrollPane getTerritoryScrollPane() {
+		return territoryScrollPane;
+	}
+
+	/**
+	 * Getter for the newEditorMenuItem.
+	 * 
+	 * @return the newEditorMenuItem for this stage
+	 */
+	public MenuItem getNewEditorMenuItem() {
+		return newEditorMenuItem;
+	}
+
+	/**
+	 * Getter for the openEditorMenuItem.
+	 * 
+	 * @return the openEditorMenuItem for this stage
+	 */
+	public MenuItem getOpenEditorMenuItem() {
+		return openEditorMenuItem;
+	}
+
+	/**
+	 * Getter for the compileEditorMenuItem.
+	 * 
+	 * @return the compileEditorMenuItem for this stage
+	 */
+	public MenuItem getCompileEditorMenuItem() {
+		return compileEditorMenuItem;
+	}
+
+	/**
+	 * Getter for the changeSizeTerritoryMenuItem.
+	 * 
+	 * @return the itemPresentMenuItem for this stage
+	 */
+	public MenuItem getChangeSizeTerritoryMenuItem() {
+		return changeSizeTerritoryMenuItem;
+	}
+
+	/**
+	 * Getter for the newButtonToolbar.
+	 * 
+	 * @return the newButtonToolbar for this stage
+	 */
+	public Button getNewButtonToolbar() {
+		return newButtonToolbar;
+	}
+
+	/**
+	 * Getter for the loadButtonToolbar.
+	 * 
+	 * @return the loadButtonToolbar for this stage
+	 */
+	public Button getLoadButtonToolbar() {
+		return loadButtonToolbar;
+	}
+
+	/**
+	 * Getter for the compileButtonToolbar.
+	 * 
+	 * @return the compileButtonToolbar for this stage
+	 */
+	public Button getCompileButtonToolbar() {
+		return compileButtonToolbar;
+	}
+
+	/**
+	 * Getter for the changeSizeButtonToolbar.
+	 * 
+	 * @return the changeSizeButtonToolbar for this stage
+	 */
+	public Button getChangeSizeButtonToolbar() {
+		return changeSizeButtonToolbar;
+	}
+
+	/**
+	 * Getter for the saveSerialTerritoryMenuItem.
+	 * 
+	 * @return the saveSerialTerritoryMenuItem for this stage
+	 */
+	public MenuItem getSaveSerialTerritoryMenuItem() {
+		return saveSerialTerritoryMenuItem;
+	}
+
+	/**
+	 * Getter for the loadSerialTerritoryMenuItem.
+	 * 
+	 * @return the loadSerialTerritoryMenuItem for this stage
+	 */
+	public MenuItem getLoadSerialTerritoryMenuItem() {
+		return loadSerialTerritoryMenuItem;
+	}
+
+	/**
+	 * Getter for the printEditorMenuItem.
+	 * 
+	 * @return the printEditorMenuItem for this stage
+	 */
+	public MenuItem getPrintEditorMenuItem() {
+		return printEditorMenuItem;
+	}
+
+	/**
+	 * Getter for the territoryPanel.
+	 * 
+	 * @return the territoryPanel for this stage
+	 */
+	public TerritoryPanel getTerritoryPanel() {
+		return territoryPanel;
+	}
+
+	/**
+	 * Getter for the printTerritoryMenuItem.
+	 * 
+	 * @return the printTerritoryMenuItem for this stage
+	 */
+	public MenuItem getPrintTerritoryMenuItem() {
+		return printTerritoryMenuItem;
+	}
+
+	/**
+	 * Getter for the saveAsPNGMenuItem.
+	 * 
+	 * @return the saveAsPNGMenuItem for this stage
+	 */
+	public MenuItem getSaveAsPNGMenuItem() {
+		return saveAsPNGMenuItem;
+	}
+
+	/**
+	 * Getter for the saveAsGifMenuItem.
+	 * 
+	 * @return the saveAsGifMenuItem for this stage
+	 */
+	public MenuItem getSaveAsGifMenuItem() {
+		return saveAsGifMenuItem;
+	}
+
+	/**
+	 * Getter for the robbiTurnLeftButtonToolbar.
+	 * 
+	 * @return the robbiTurnLeftButtonToolbar for this stage
+	 */
+	public Button getRobbiTurnLeftButtonToolbar() {
+		return robbiTurnLeftButtonToolbar;
+	}
+
+	/**
+	 * Getter for the robbiMoveButtonToolbar.
+	 * 
+	 * @return the robbiMoveButtonToolbar for this stage
+	 */
+	public Button getRobbiMoveButtonToolbar() {
+		return robbiMoveButtonToolbar;
+	}
+
+	/**
+	 * Getter for the robbiPutButtonToolbar.
+	 * 
+	 * @return the robbiPutButtonToolbar for this stage
+	 */
+	public Button getRobbiPutButtonToolbar() {
+		return robbiPutButtonToolbar;
+	}
+
+	/**
+	 * Getter for the robbiTakeButtonToolbar.
+	 * 
+	 * @return the robbiTakeButtonToolbar for this stage
+	 */
+	public Button getRobbiTakeButtonToolbar() {
+		return robbiTakeButtonToolbar;
+	}
+
+	/**
+	 * Getter for the territorySaveController.
+	 * 
+	 * @return the territorySaveController for this stage
+	 */
+	public TerritorySaveController getTerritorySaveController() {
+		return territorySaveController;
+	}
+
+	/**
+	 * Getter for the simulationController.
+	 * 
+	 * @return the simulationController for this stage
+	 */
+	public SimulationController getSimulationController() {
+		return simController;
+	}
+
+	/**
+	 * Getter for the editorMenu.
+	 * 
+	 * @return the editorMenu for this stage
+	 */
+	public Menu getEditorMenu() {
+		return editorMenu;
+	}
+
+	/**
+	 * Getter for the saveXMLTerritoryMenuItem.
+	 * 
+	 * @return the saveXMLTerritoryMenuItem for this stage
+	 */
+	public MenuItem getSaveXMLTerritoryMenuItem() {
+		return saveXMLTerritoryMenuItem;
+	}
+
+	/**
+	 * Getter for the saveJAXBTerritoryMenuItem.
+	 * 
+	 * @return the saveJAXBTerritoryMenuItem for this stage
+	 */
+	public MenuItem getSaveJAXBTerritoryMenuItem() {
+		return saveJAXBTerritoryMenuItem;
+	}
+
+	/**
+	 * Getter for the saveTerritoryMenu.
+	 * 
+	 * @return the saveTerritoryMenu for this stage
+	 */
+	public Menu getSaveTerritoryMenu() {
+		return saveTerritoryMenu;
+	}
+
+	/**
+	 * Getter for the loadXMLTerritoryMenuItem.
+	 * 
+	 * @return the loadXMLTerritoryMenuItem for this stage
+	 */
+	public MenuItem getLoadXMLTerritoryMenuItem() {
+		return loadXMLTerritoryMenuItem;
+	}
+
+	/**
+	 * Getter for the loadJAXBTerritoryMenuItem.
+	 * 
+	 * @return the loadJAXBTerritoryMenuItem for this stage
+	 */
+	public MenuItem getLoadJAXBTerritoryMenuItem() {
+		return loadJAXBTerritoryMenuItem;
+	}
+
+	/**
+	 * Getter for the loadTerritoryMenuItem.
+	 * 
+	 * @return the loadTerritoryMenuItem for this stage
+	 */
+	public Menu getLoadTerritoryMenu() {
+		return loadTerritoryMenu;
+	}
+
+	/**
+	 * Getter for the saveAsPicMenu.
+	 * 
+	 * @return the saveAsPicMenu for this stage
+	 */
+	public Menu getSaveAsPicMenu() {
+		return saveAsPicMenu;
+	}
+
+	/**
+	 * Getter for the territoryMenu.
+	 * 
+	 * @return the territoryMenufor this stage
+	 */
+	public Menu getTerritoryMenu() {
+		return territoryMenu;
+	}
+
+	/**
+	 * Getter for the robbiMenu.
+	 * 
+	 * @return the robbiMenu for this stage
+	 */
+	public Menu getRobbiMenu() {
+		return robbiMenu;
+	}
+
+	/**
+	 * Getter for the simulationMenu.
+	 * 
+	 * @return the simulationMenu for this stage
+	 */
+	public Menu getSimulationMenu() {
+		return simulationMenu;
+	}
+
+	/**
+	 * Getter for the languageMenu.
+	 * 
+	 * @return the languageMenu for this stage
+	 */
+	public Menu getLanguageMenu() {
+		return languageMenu;
+	}
+
+	/**
+	 * Getter for the englishLanguageMenuItem.
+	 * 
+	 * @return the englishLanguageMenuItem for this stage
+	 */
+	public MenuItem getEnglishLanguageMenuItem() {
+		return englishLanguageMenuItem;
+	}
+
+	/**
+	 * Getter for the germanLanguageMenuItem.
+	 * 
+	 * @return the germanLanguageMenuItem for this stage
+	 */
+	public MenuItem getGermanLanguageMenuItem() {
+		return germanLanguageMenuItem;
+	}
+
+	/**
+	 * Getter for the changeCursorMenuItem.
+	 * 
+	 * @return the changeCursorMenuItem for this stage
+	 */
+	public MenuItem getChangeCursorMenuItem() {
+		return changeCursorMenuItem;
+	}
+
+	/**
+	 * Getter for the windowMenu.
+	 * 
+	 * @return the windowMenu for this stage
+	 */
+	public Menu getWindowMenu() {
+		return windowMenu;
+	}
+
+	/**
+	 * Getter for the messageLabel.
+	 * 
+	 * @return the messageLabel for this stage
+	 */
+	public Label getMessageLabel() {
+		return messageLabel;
 	}
 
 }
