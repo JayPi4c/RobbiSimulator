@@ -1,12 +1,15 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Optional;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -50,47 +53,6 @@ public class TerritorySaveController {
 
 	private static final String DEFAULT_SERIALISATION_FILE_EXTENSION = ".ter";
 	private static final String DEFAULT_XML_FILE_EXTENSION = ".rsxml";
-
-	private static final String DTD = """
-						<!ELEMENT territory ((tile| hollow | pileofscrap | stockpile)*, robbi, (tile | hollow | pileofscrap | stockpile)*)>
-						<!ATTLIST territory
-						    rows CDATA #REQUIRED
-						    cols CDATA #REQUIRED
-						>
-						<!ELEMENT hollow EMPTY>
-						<!ATTLIST hollow
-						    row CDATA #REQUIRED
-						    col CDATA #REQUIRED
-						>
-						<!ELEMENT pileofscrap EMPTY>
-						<!ATTLIST pileofscrap
-						    row CDATA #REQUIRED
-						    col CDATA #REQUIRED
-						>
-						<!ELEMENT stockpile (item*)>
-						<!ATTLIST stockpile
-						    row CDATA #REQUIRED
-						    col CDATA #REQUIRED
-						>
-						<!ELEMENT tile (item?)>
-						<!ATTLIST tile
-						    row CDATA #REQUIRED
-						    col CDATA #REQUIRED
-						>
-						<!ELEMENT item EMPTY>
-						<!ATTLIST item
-							type CDATA #REQUIRED
-						>
-						<!ELEMENT facing EMPTY>
-						<!ATTLIST facing
-							direction CDATA #REQUIRED
-						>
-						<!ELEMENT robbi (item?, facing)>
-						<!ATTLIST robbi
-						    row CDATA #REQUIRED
-						    col CDATA #REQUIRED
-						>
-			""";
 
 	private MainStage mainStage;
 
@@ -195,10 +157,18 @@ public class TerritorySaveController {
 		File file = chooser.showSaveDialog(mainStage);
 
 		if (!file.getName().endsWith(DEFAULT_XML_FILE_EXTENSION)) {
-			File f = new File(file.getAbsolutePath() + DEFAULT_XML_FILE_EXTENSION);
-			if (!file.renameTo(f))
-				logger.warn("Could not rename xmlfile from '{}' to '{}'", file.getName(), f.getName());
-			file = f;
+			file = new File(file.getAbsolutePath() + DEFAULT_XML_FILE_EXTENSION);
+		}
+
+		// load the dtd from resources
+		String dtd;
+		Optional<String> dtdOpt = getDTD();
+		if (dtdOpt.isPresent()) {
+			dtd = dtdOpt.get();
+		} else {
+			logger.warn("Could not load dtd");
+			AlertHelper.showAlertAndWait(AlertType.ERROR, Messages.getString("Territory.xml.error.dtd"), mainStage);
+			return;
 		}
 
 		if (file != null) {
@@ -208,9 +178,10 @@ public class TerritorySaveController {
 				XMLStreamWriter writer = factory.createXMLStreamWriter(new FileOutputStream(file.getAbsolutePath()),
 						"utf-8");
 
-				writer.writeStartDocument("utf-8", "1.0"); // start Document
+				writer.writeStartDocument("utf-8", "1.0");
 				writer.writeCharacters("\n");
-				writer.writeDTD("<!DOCTYPE territory [" + DTD + "]>");
+
+				writer.writeDTD("<!DOCTYPE territory [" + dtd + "]>");
 				writer.writeCharacters("\n");
 				// writer.writeDTD("<!DOCTYPE territory SYSTEM \"xml/simulator.dtd\">");
 				synchronized (mainStage.getTerritory()) {
@@ -405,6 +376,30 @@ public class TerritorySaveController {
 		}
 		return null;
 	}
+
+	/**
+	 * Loads the dtd needed to save the territory as a xml-File from the resources
+	 * folder
+	 * 
+	 * @return the dtd String defined in resources/xml/simulator.dtd
+	 */
+	private Optional<String> getDTD() {
+		try (BufferedReader reader = new BufferedReader(
+				new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("xml/simulator.dtd")))) {
+
+			StringBuilder builder = new StringBuilder();
+			String s;
+			while ((s = reader.readLine()) != null) {
+				builder.append(s);
+				builder.append(System.lineSeparator());
+			}
+			return Optional.of(builder.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return Optional.empty();
+	}
+
 	/*
 	 * /** Loads a territory by a filename using JAXB
 	 * 
@@ -413,9 +408,12 @@ public class TerritorySaveController {
 	 * @return true if the territory was loaded successfully, false otherwise
 	 */
 	/*
-	 * private boolean loadJAXB(String filename) { // TODO investigate JAXB try {
-	 * JAXBContext context = JAXBContext.newInstance(Territory.class); Unmarshaller
-	 * um = context.createUnmarshaller(); Territory ter = (Territory)
+	 * private boolean loadJAXB(String filename) {
+	 * 
+	 * // TODO investigate JAXB
+	 * 
+	 * try { JAXBContext context = JAXBContext.newInstance(Territory.class);
+	 * Unmarshaller um = context.createUnmarshaller(); Territory ter = (Territory)
 	 * um.unmarshal(new FileReader(new File(filename))); ter.print();
 	 * mainStage.getTerritory().update(ter, ter.getRobbiItem(), ter.getRobbiX(),
 	 * ter.getRobbiY(), ter.getRobbiDirection()); return true; } catch (IOException

@@ -40,7 +40,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * This controller contains all the settings for the mainStage
@@ -218,7 +217,7 @@ public class MainStageController implements ILanguageChangeListener {
 		mainStage.getRobbiTakeButtonToolbar().onActionProperty().bind(mainStage.getTakeMenuItem().onActionProperty());
 
 		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
-			String extension = "png";
+			String extension = ".png";
 			File file = getFile(Messages.getString("Menu.territory.saveAsPic.png.description"), extension);
 			if (file == null)
 				return;
@@ -230,7 +229,7 @@ public class MainStageController implements ILanguageChangeListener {
 		});
 
 		mainStage.getSaveAsGifMenuItem().setOnAction(e -> {
-			String extension = "gif";
+			String extension = ".gif";
 			File file = getFile(Messages.getString("Menu.territory.saveAsPic.gif.description"), extension);
 			if (file == null)
 				return;
@@ -303,13 +302,19 @@ public class MainStageController implements ILanguageChangeListener {
 
 	/**
 	 * Saves the current territoryPanel in the given file with the given extension.
+	 * If the file does not have the correct extension, the given extension will be
+	 * appended to the files name.
 	 * 
 	 * @param file      The file the image should be written into
 	 * @param extension The image extension
 	 * @return false, if the creation failed, true otherwise
 	 */
 	private boolean saveAsImage(File file, String extension) {
-		// TODO check if file has correct extension
+
+		if (!file.getName().endsWith(extension)) {
+			file = new File(file.getAbsolutePath() + extension);
+		}
+
 		TerritoryPanel tPanel = mainStage.getTerritoryPanel();
 		WritableImage snapshot = tPanel.snapshot(new SnapshotParameters(), null);
 
@@ -319,9 +324,7 @@ public class MainStageController implements ILanguageChangeListener {
 		BufferedImage image = SwingFXUtils.fromFXImage(snapshot, bufferedImage);
 		try {
 			logger.info("Saving territory to {}", file);
-			// Graphics2D gd = (Graphics2D) image.getGraphics();
-			// gd.translate(tPanel.getWidth(), tPanel.getHeight());
-			if (!ImageIO.write(image, extension, file))
+			if (!ImageIO.write(image, extension.substring(1), file))
 				logger.debug("Failed to find appropiate ImageWriter");
 
 		} catch (IOException e) {
@@ -342,7 +345,7 @@ public class MainStageController implements ILanguageChangeListener {
 	private File getFile(String description, String extension) {
 		FileChooser chooser = new FileChooser();
 		chooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
-		chooser.setSelectedExtensionFilter(new ExtensionFilter(description, extension));
+		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(description, "*" + extension));
 		return chooser.showSaveDialog(mainStage);
 	}
 
