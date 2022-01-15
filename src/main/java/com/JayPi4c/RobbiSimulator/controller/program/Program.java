@@ -44,10 +44,8 @@ public class Program {
 
 			editorContent = content.replace(ProgramController.createPrefix(name), "");
 			int endIndex = editorContent.lastIndexOf('}');
-			int startIndex = editorContent.lastIndexOf('}', endIndex - 1);
-			// if(index >= 0) // not needed since we know for sure, that a closed curly
-			// bracket is in the string.
-			editorContent = new StringBuilder(editorContent).delete(startIndex + 1, endIndex + 1).toString();
+			bobTheBuilder.setLength(0);
+			editorContent = bobTheBuilder.append(editorContent).deleteCharAt(endIndex).toString().trim();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
