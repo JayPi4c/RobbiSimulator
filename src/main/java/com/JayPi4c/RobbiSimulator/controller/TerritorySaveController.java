@@ -225,8 +225,8 @@ public class TerritorySaveController {
 						}
 					}
 					writer.writeStartElement("robbi");
-					writer.writeAttribute("col", Integer.toString(territory.getRobbiY()));
-					writer.writeAttribute("row", Integer.toString(territory.getRobbiX()));
+					writer.writeAttribute("col", Integer.toString(territory.getRobbiX()));
+					writer.writeAttribute("row", Integer.toString(territory.getRobbiY()));
 					writer.writeCharacters("\n");
 					writer.writeStartElement("facing");
 					writer.writeAttribute("facing", territory.getRobbiDirection().toString());
@@ -300,6 +300,11 @@ public class TerritorySaveController {
 						break;
 					case XMLStreamConstants.START_ELEMENT:
 						switch (parser.getLocalName()) {
+						case "territory":
+							int cols = Integer.parseInt(parser.getAttributeValue(null, "col"));
+							int rows = Integer.parseInt(parser.getAttributeValue(null, "row"));
+							territory.changeSize(cols, rows);
+							break;
 						case "pileofscrap":
 							x = Integer.parseInt(parser.getAttributeValue(null, "col"));
 							y = Integer.parseInt(parser.getAttributeValue(null, "row"));
