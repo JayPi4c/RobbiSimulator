@@ -512,8 +512,8 @@ public class MainStage extends Stage {
 	 */
 	private void createExamplesMenu() {
 		saveExampleMenuItem = new MenuItem(Messages.getString("Menu.examples.save"));
-		loadExampleMenuItem = new MenuItem(Messages.getString("Menu.exmaples.load"));
-		examplesMenu = new Menu(Messages.getString("Menu.exmaples"), null, saveExampleMenuItem, loadExampleMenuItem);
+		loadExampleMenuItem = new MenuItem(Messages.getString("Menu.examples.load"));
+		examplesMenu = new Menu(Messages.getString("Menu.examples"), null, saveExampleMenuItem, loadExampleMenuItem);
 	}
 
 	/**

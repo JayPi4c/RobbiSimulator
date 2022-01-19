@@ -76,6 +76,15 @@ public class Program {
 	}
 
 	/**
+	 * Sets the new editor content.
+	 * 
+	 * @param content the content to replace the editor with.
+	 */
+	public void setEditorContent(String content) {
+		this.editorContent = content;
+	}
+
+	/**
 	 * saves the text of the editor-content into the corresponding file It does only
 	 * save the given text, if the changes were made
 	 * 

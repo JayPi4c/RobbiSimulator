@@ -7,13 +7,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.JayPi4c.RobbiSimulator.controller.program.Program;
-import com.JayPi4c.RobbiSimulator.model.Territory;
+import javafx.util.Pair;
 
 public class DatabaseManager {
 	private static final Logger logger = LogManager.getLogger(DatabaseManager.class);
@@ -24,7 +26,7 @@ public class DatabaseManager {
 
 	private static final String EXAMPLES_TABLE_NAME = "EXAMPLES";
 	private static final String CREATE_EXMAPLES_TABLE = "CREATE TABLE " + EXAMPLES_TABLE_NAME
-			+ " (ex_id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY, name VARCHAR(255), code VARCHAR(255), territory VARCHAR(255))";
+			+ " (ex_id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY, name VARCHAR(255), code VARCHAR(10000), territory VARCHAR(15000))";
 	private static final String INSERT_EXAMPLE = "INSERT INTO " + EXAMPLES_TABLE_NAME
 			+ " (name, code, territory) VALUES (?, ?, ?)";
 
@@ -44,16 +46,16 @@ public class DatabaseManager {
 
 	}
 
-	public boolean store(Program program, Territory territory, String tags[]) {
+	public boolean store(String programName, String editorContent, String territoryXML, String tags[]) {
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
 			Connection conn = connection.get();
 			logger.info("storing data in database");
 			try {
 				PreparedStatement stmt = conn.prepareStatement(INSERT_EXAMPLE, PreparedStatement.RETURN_GENERATED_KEYS);
-				stmt.setString(1, "example1");
-				stmt.setString(2, "some Code");
-				stmt.setString(3, "territory code");
+				stmt.setString(1, programName);
+				stmt.setString(2, editorContent);
+				stmt.setString(3, territoryXML);
 
 				stmt.execute();
 				ResultSet resultSet = stmt.getGeneratedKeys();
@@ -87,34 +89,75 @@ public class DatabaseManager {
 		return true;
 	}
 
-	public boolean query(String tag) {
+	// TODO close exception handling
+	public List<Pair<Integer, String>> query(String tag) {
 		if (!initialized)
-			return false;
+			return null;
 
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
 			Connection conn = connection.get();
-			logger.info("loading data from exmaples");
+			logger.info("Loading Examples by tag {}", tag);
 			try {
+				ArrayList<Pair<Integer, String>> programs = new ArrayList<>();
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt
 						.executeQuery("SELECT ex_id FROM " + TAGS_TABLE_NAME + " WHERE tagname='" + tag + "'");
 				while (rs.next()) {
 					int id = rs.getInt("ex_id");
-					logger.info("found: {}", id);
 
 					Statement s = conn.createStatement();
 					ResultSet resultSet = s
-							.executeQuery("SELECT * FROM " + EXAMPLES_TABLE_NAME + " WHERE ex_id=" + id + "");
+							.executeQuery("SELECT name FROM " + EXAMPLES_TABLE_NAME + " WHERE ex_id=" + id + "");
+
 					while (resultSet.next()) {
 						String name = resultSet.getString("name");
-						String code = resultSet.getString("code");
-						String territory = resultSet.getString("territory");
-						logger.info("found {}, {}, {}", name, code, territory);
+						programs.add(new Pair<Integer, String>(id, name));
 					}
 					resultSet.close();
 					s.close();
 
+				}
+				rs.close();
+				stmt.close();
+				return programs;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return null;
+			} finally {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+
+				}
+			}
+
+		} else
+			return null;
+	}
+
+	public boolean loadExample(int id) {
+		if (!initialized)
+			return false;
+		Optional<Connection> connection = getConnection();
+		if (connection.isPresent()) {
+			Connection conn = connection.get();
+			logger.debug("loading example from database");
+			try {
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(
+						"SELECT name, code, territory FROM " + EXAMPLES_TABLE_NAME + " WHERE ex_id=" + id);
+				Example ex = null;
+				while (rs.next()) {
+					String name = rs.getString("name");
+					String code = rs.getString("code");
+					String territory = rs.getString("territory");
+					ex = new Example(name, code, territory);
+				}
+				if (ex != null)
+					ex.load();
+				else {
+					logger.debug("no example found");
 				}
 				rs.close();
 				stmt.close();
@@ -126,12 +169,43 @@ public class DatabaseManager {
 				try {
 					conn.close();
 				} catch (SQLException e) {
-
+					e.printStackTrace();
 				}
 			}
+		}
+		return false;
+	}
 
-		} else
-			return false;
+	public List<String> getAllTags() {
+		if (!initialized)
+			return null;
+		Optional<Connection> connection = getConnection();
+		if (connection.isPresent()) {
+			Connection conn = connection.get();
+			logger.debug("loading distinct tags from database");
+			try {
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt
+						.executeQuery("SELECT DISTINCT tagname FROM " + TAGS_TABLE_NAME + " ORDER BY tagname");
+				ArrayList<String> tags = new ArrayList<>();
+				while (rs.next()) {
+					String tag = rs.getString("tagname");
+					tags.add(tag);
+				}
+				rs.close();
+				stmt.close();
+				return tags;
+			} catch (SQLException e) {
+				return null;
+			} finally {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
 	}
 
 	private Optional<Connection> getConnection() {
@@ -147,8 +221,9 @@ public class DatabaseManager {
 	public boolean initialize() {
 		logger.debug("initialize database");
 		try {
-			Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-		} catch (ClassNotFoundException e) {
+			// Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+			DriverManager.registerDriver(new EmbeddedDriver());
+		} catch (SQLException e) {
 			return false;
 		}
 		try {

@@ -1,6 +1,7 @@
 package com.JayPi4c.RobbiSimulator.controller.program;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -208,6 +209,31 @@ public class ProgramController {
 
 		Program program = new Program(f, programName);
 		Stage stage = new MainStage(program);
+		programs.put(programName, stage);
+		ProgramController.compile(program, false, stage);
+	}
+
+	public static void createAndShow(String programName, String programCode, String territoryXML) {
+		String content = createTemplate(programName, DEFAULT_CONTENT);
+		File f = new File(PATH_TO_PROGRAMS + File.separatorChar + programName + DEFAULT_FILE_EXTENSION);
+		if (!f.exists()) {
+			try {
+				if (!f.createNewFile())
+					logger.debug("Could not create file '{}'", f.getAbsolutePath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))) {
+				writer.write(content);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Program program = new Program(f, programName);
+		program.setEditorContent(programCode);
+		Stage stage = new MainStage(program);
+		((MainStage) stage).getTerritory().fromXML(new ByteArrayInputStream(territoryXML.getBytes()));
 		programs.put(programName, stage);
 		ProgramController.compile(program, false, stage);
 	}
