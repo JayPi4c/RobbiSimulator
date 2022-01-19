@@ -34,6 +34,12 @@ public class DatabaseManager {
 	private static final String CREATE_TAGS_TABLE = "CREATE TABLE " + TAGS_TABLE_NAME
 			+ " (ex_id INTEGER NOT NULL, tagname VARCHAR(20))";
 	private static final String INSERT_TAG = "INSERT INTO " + TAGS_TABLE_NAME + " (ex_id, tagname) VALUES (?, ?)";
+	private static final String SELECT_DISTINCT_TAGS = "SELECT DISTINCT tagname FROM " + TAGS_TABLE_NAME
+			+ " ORDER BY tagname";
+	private static final String SELECT_IDS_BY_TAG = "SELECT ex_id FROM " + TAGS_TABLE_NAME + " WHERE tagname=?";
+	private static final String SELECT_NAME_BY_ID = "SELECT name FROM " + EXAMPLES_TABLE_NAME + " WHERE ex_id=?";
+	private static final String SELECT_PROGRAM_BY_ID = "SELECT name, code, territory FROM " + EXAMPLES_TABLE_NAME
+			+ " WHERE ex_id=?";
 
 	public static DatabaseManager getDatabaseManager() {
 		if (dbManager == null) {
@@ -50,67 +56,101 @@ public class DatabaseManager {
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
 			Connection conn = connection.get();
+			ResultSet resultSet = null;
+			PreparedStatement stmt = null;
+			PreparedStatement s = null;
 			logger.info("storing data in database");
 			try {
-				PreparedStatement stmt = conn.prepareStatement(INSERT_EXAMPLE, PreparedStatement.RETURN_GENERATED_KEYS);
+				conn.setAutoCommit(false);
+				stmt = conn.prepareStatement(INSERT_EXAMPLE, PreparedStatement.RETURN_GENERATED_KEYS);
 				stmt.setString(1, programName);
 				stmt.setString(2, editorContent);
 				stmt.setString(3, territoryXML);
 
 				stmt.execute();
-				ResultSet resultSet = stmt.getGeneratedKeys();
+				resultSet = stmt.getGeneratedKeys();
 				int exampleKey = 0;
 				if (resultSet.next()) {
 					exampleKey = resultSet.getInt(1);
 				}
 				logger.debug("Examplekey is {}", exampleKey);
+
 				for (String tag : tags) {
-					PreparedStatement s = conn.prepareStatement(INSERT_TAG);
+					s = conn.prepareStatement(INSERT_TAG);
 					s.setInt(1, exampleKey);
 					s.setString(2, tag);
 					s.execute();
 					s.close();
 				}
-				resultSet.close();
-				stmt.close();
-
+				conn.commit();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				try {
+					conn.rollback();
+				} catch (SQLException ignore) {
+				}
+				logger.debug("Could not store example in database");
 				return false;
 			} finally {
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				if (s != null) { // if s.execute throws exception, s is not closed
+					try {
+						s.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (resultSet != null)
+					try {
+						resultSet.close();
+					} catch (SQLException ignore) {
+					}
+				if (stmt != null) {
+					try {
+						stmt.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (conn != null) {
+					try {
+						conn.setAutoCommit(true);
+					} catch (SQLException ignore) {
+					}
+				}
+				if (conn != null) {
+					try {
+						conn.close();
+					} catch (SQLException ignore) {
+					}
 				}
 			}
 		}
-
 		return true;
 	}
 
-	// TODO close exception handling
-	public List<Pair<Integer, String>> query(String tag) {
+	public Optional<List<Pair<Integer, String>>> query(String tag) {
 		if (!initialized)
-			return null;
+			return Optional.empty();
 
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
 			Connection conn = connection.get();
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			PreparedStatement s = null;
+			ResultSet resultSet = null;
+
 			logger.info("Loading Examples by tag {}", tag);
 			try {
 				ArrayList<Pair<Integer, String>> programs = new ArrayList<>();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt
-						.executeQuery("SELECT ex_id FROM " + TAGS_TABLE_NAME + " WHERE tagname='" + tag + "'");
+				stmt = conn.prepareStatement(SELECT_IDS_BY_TAG);
+				stmt.setString(1, tag);
+				rs = stmt.executeQuery();
 				while (rs.next()) {
 					int id = rs.getInt("ex_id");
 
-					Statement s = conn.createStatement();
-					ResultSet resultSet = s
-							.executeQuery("SELECT name FROM " + EXAMPLES_TABLE_NAME + " WHERE ex_id=" + id + "");
+					s = conn.prepareStatement(SELECT_NAME_BY_ID);
+					s.setInt(1, id);
+					resultSet = s.executeQuery();
 
-					while (resultSet.next()) {
+					if (resultSet.next()) { // ids are unique -> only one result
 						String name = resultSet.getString("name");
 						programs.add(new Pair<Integer, String>(id, name));
 					}
@@ -118,35 +158,61 @@ public class DatabaseManager {
 					s.close();
 
 				}
-				rs.close();
-				stmt.close();
-				return programs;
+				return Optional.of(programs);
 			} catch (SQLException e) {
 				e.printStackTrace();
-				return null;
+				return Optional.empty();
 			} finally {
-				try {
-					conn.close();
-				} catch (SQLException e) {
-
+				if (resultSet != null) {
+					try {
+						resultSet.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (s != null) {
+					try {
+						s.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (rs != null) {
+					try {
+						rs.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (stmt != null) {
+					try {
+						stmt.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (conn != null) {
+					try {
+						conn.close();
+					} catch (SQLException ignore) {
+					}
 				}
 			}
 
 		} else
-			return null;
+			return Optional.empty();
 	}
 
-	public boolean loadExample(int id) {
+	public Optional<Example> loadExample(int id) {
 		if (!initialized)
-			return false;
+			return Optional.empty();
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
 			Connection conn = connection.get();
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+
 			logger.debug("loading example from database");
 			try {
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(
-						"SELECT name, code, territory FROM " + EXAMPLES_TABLE_NAME + " WHERE ex_id=" + id);
+				stmt = conn.prepareStatement(SELECT_PROGRAM_BY_ID);
+				stmt.setInt(1, id);
+				rs = stmt.executeQuery();
 				Example ex = null;
 				while (rs.next()) {
 					String name = rs.getString("name");
@@ -154,58 +220,78 @@ public class DatabaseManager {
 					String territory = rs.getString("territory");
 					ex = new Example(name, code, territory);
 				}
-				if (ex != null)
-					ex.load();
-				else {
-					logger.debug("no example found");
-				}
-				rs.close();
-				stmt.close();
-				return true;
+				return Optional.ofNullable(ex);
 			} catch (SQLException e) {
 				e.printStackTrace();
-				return false;
+				return Optional.empty();
 			} finally {
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				if (rs != null) {
+					try {
+						rs.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (stmt != null) {
+					try {
+						stmt.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (conn != null) {
+					try {
+						conn.close();
+					} catch (SQLException ignore) {
+					}
 				}
 			}
 		}
-		return false;
+		return Optional.empty();
 	}
 
-	public List<String> getAllTags() {
+	public Optional<List<String>> getAllTags() {
 		if (!initialized)
-			return null;
+			return Optional.empty();
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
 			Connection conn = connection.get();
+			Statement stmt = null;
+			ResultSet rs = null;
+
 			logger.debug("loading distinct tags from database");
 			try {
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt
-						.executeQuery("SELECT DISTINCT tagname FROM " + TAGS_TABLE_NAME + " ORDER BY tagname");
+				stmt = conn.createStatement();
+				rs = stmt.executeQuery(SELECT_DISTINCT_TAGS);
 				ArrayList<String> tags = new ArrayList<>();
 				while (rs.next()) {
 					String tag = rs.getString("tagname");
 					tags.add(tag);
 				}
-				rs.close();
-				stmt.close();
-				return tags;
+
+				return Optional.ofNullable(tags);
 			} catch (SQLException e) {
-				return null;
+				return Optional.empty();
 			} finally {
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
+				if (rs != null) {
+					try {
+						rs.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (stmt != null) {
+					try {
+						stmt.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (conn != null) {
+					try {
+						conn.close();
+					} catch (SQLException ignore) {
+					}
 				}
 			}
 		}
-		return null;
+		return Optional.empty();
 	}
 
 	private Optional<Connection> getConnection() {
@@ -226,47 +312,88 @@ public class DatabaseManager {
 		} catch (SQLException e) {
 			return false;
 		}
+
+		Connection conn = null;
+		ResultSet rs = null;
+		Statement stmt = null;
 		try {
 
 			// dropAllTables();
-			Connection conn = DriverManager.getConnection("jdbc:derby:" + DB_NAME + ";create=true");
+			conn = DriverManager.getConnection("jdbc:derby:" + DB_NAME + ";create=true");
 
 			// check if the database has the table already. Create if not
 			DatabaseMetaData dmd = conn.getMetaData();
-			ResultSet rs = dmd.getTables(null, null, EXAMPLES_TABLE_NAME, null);
+			rs = dmd.getTables(null, null, EXAMPLES_TABLE_NAME, null);
 			if (!rs.next()) {
 				logger.debug("creating Examples table");
-				Statement stmt = conn.createStatement();
+				stmt = conn.createStatement();
 				stmt.executeUpdate(CREATE_EXMAPLES_TABLE);
+				stmt.close();
 			}
+			rs.close();
 			rs = dmd.getTables(null, null, TAGS_TABLE_NAME, null);
 			if (!rs.next()) {
 				logger.debug("creating Tags table");
-				Statement stmt = conn.createStatement();
+				stmt = conn.createStatement();
 				stmt.executeUpdate(CREATE_TAGS_TABLE);
+				stmt.close();
 			}
 
 			initialized = true;
 			return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
 			return false;
+		} finally {
+			if (stmt != null) {
+				try {
+					stmt.close();
+				} catch (SQLException ignore) {
+				}
+			}
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException ignore) {
+				}
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException ignore) {
+				}
+			}
 		}
 
 	}
 
-	private static void dropAllTables() {
+	public static void dropAllTables() {
 		Optional<Connection> connection = DatabaseManager.getDatabaseManager().getConnection();
 		connection.ifPresent(conn -> {
+			Statement s = null;
 			try {
-				Statement s = conn.createStatement();
+				s = conn.createStatement();
 				int result = s.executeUpdate("DROP TABLE " + EXAMPLES_TABLE_NAME);
+				s.close();
 				logger.info("Deletion result {}", result);
 				s = conn.createStatement();
 				result = s.executeUpdate("DROP TABLE " + TAGS_TABLE_NAME);
+				s.close();
 				logger.info("Deletion result {}", result);
 			} catch (SQLException e) {
 				e.printStackTrace();
+			} finally {
+				if (s != null) {
+					try {
+						s.close();
+					} catch (SQLException ignore) {
+					}
+				}
+				if (conn != null) {
+					try {
+						conn.close();
+					} catch (SQLException ignore) {
+					}
+				}
 			}
 		});
 	}

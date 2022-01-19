@@ -46,22 +46,27 @@ public class ExamplesController implements ILanguageChangeListener {
 			Optional<String[]> tags = enterTags();
 			tags.ifPresentOrElse(ts -> {
 				String territoryXML = stage.getTerritory().toXML().toString();
-				DatabaseManager.getDatabaseManager().store(stage.getProgram().getName(),
-						stage.getProgram().getEditorContent(), territoryXML, ts);
-			}, () -> {
-				logger.debug("No tags were entered");
-			});
+				if (!DatabaseManager.getDatabaseManager().store(stage.getProgram().getName(),
+						stage.getProgram().getEditorContent(), territoryXML, ts))
+					logger.debug("Could not save example in database");
+			}, () -> logger.debug("No tags were entered"));
 		});
 
 		stage.getLoadExampleMenuItem().setOnAction(e -> {
-			Optional<List<String>> tagsOpt = getAllDistinctTags();
+			Optional<List<String>> tagsOpt = DatabaseManager.getDatabaseManager().getAllTags();
 			tagsOpt.ifPresentOrElse(tags -> {
 				Optional<String> s = showTagSelection(tags);
 				s.ifPresentOrElse(selectedTag -> {
-					List<Pair<Integer, String>> programs = DatabaseManager.getDatabaseManager().query(selectedTag);
-					Optional<Integer> idOpt = showProgramSelection(programs);
-					idOpt.ifPresentOrElse(id -> DatabaseManager.getDatabaseManager().loadExample(id),
-							() -> logger.debug("no example selected"));
+					Optional<List<Pair<Integer, String>>> programsOpt = DatabaseManager.getDatabaseManager()
+							.query(selectedTag);
+					if (programsOpt.isPresent()) {
+						Optional<Integer> idOpt = showProgramSelection(programsOpt.get());
+						idOpt.ifPresentOrElse(id -> {
+							Optional<Example> exOpt = DatabaseManager.getDatabaseManager().loadExample(id);
+							exOpt.ifPresentOrElse(example -> example.load(),
+									() -> logger.debug("Could not load example from database"));
+						}, () -> logger.debug("No example selected"));
+					}
 				}, () -> logger.debug("No tag selected"));
 			}, () -> {
 				logger.info("No tags are stored in database");
@@ -112,17 +117,6 @@ public class ExamplesController implements ILanguageChangeListener {
 		return result;
 	}
 
-	@Override
-	public void onLanguageChanged() {
-		stage.getExamplesMenu().setText(Messages.getString("Menu.examples"));
-		stage.getLoadExampleMenuItem().setText(Messages.getString("Menu.examples.load"));
-		stage.getSaveExampleMenuItem().setText(Messages.getString("Menu.examples.save"));
-	}
-
-	private Optional<List<String>> getAllDistinctTags() {
-		return Optional.ofNullable(DatabaseManager.getDatabaseManager().getAllTags());
-	}
-
 	private Optional<String[]> enterTags() {
 		Dialog<String> dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("Examples.save.tags.title"));
@@ -156,6 +150,13 @@ public class ExamplesController implements ILanguageChangeListener {
 		} else
 			return Optional.empty();
 
+	}
+
+	@Override
+	public void onLanguageChanged() {
+		stage.getExamplesMenu().setText(Messages.getString("Menu.examples"));
+		stage.getLoadExampleMenuItem().setText(Messages.getString("Menu.examples.load"));
+		stage.getSaveExampleMenuItem().setText(Messages.getString("Menu.examples.save"));
 	}
 
 	private static class HideableItem<T> {
