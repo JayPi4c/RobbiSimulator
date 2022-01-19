@@ -66,7 +66,7 @@ public class ProgramController {
 	/**
 	 * Constant String with the Path name for the programs directory.
 	 */
-	public static final String PATH_TO_PROGRAMS = "programs";
+	public static final String PATH_TO_PROGRAMS = "programs"; // TODO make path relative to jar directory
 	/**
 	 * Constant String for the Default Robbi File name.
 	 */
@@ -214,6 +214,11 @@ public class ProgramController {
 	}
 
 	public static void createAndShow(String programName, String programCode, String territoryXML) {
+		if (programs.containsKey(programName)) {
+			// TODO warn user that old simulator will be overwritten
+			programs.remove(programName).close();
+		}
+
 		String content = createTemplate(programName, DEFAULT_CONTENT);
 		File f = new File(PATH_TO_PROGRAMS + File.separatorChar + programName + DEFAULT_FILE_EXTENSION);
 		if (!f.exists()) {
@@ -231,7 +236,8 @@ public class ProgramController {
 		}
 
 		Program program = new Program(f, programName);
-		program.setEditorContent(programCode);
+		program.setEdited(true);
+		program.save(programCode);
 		Stage stage = new MainStage(program);
 		((MainStage) stage).getTerritory().fromXML(new ByteArrayInputStream(territoryXML.getBytes()));
 		programs.put(programName, stage);

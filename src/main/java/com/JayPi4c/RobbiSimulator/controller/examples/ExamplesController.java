@@ -1,5 +1,6 @@
 package com.JayPi4c.RobbiSimulator.controller.examples;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -43,7 +44,7 @@ public class ExamplesController implements ILanguageChangeListener {
 		this.stage = stage;
 
 		stage.getSaveExampleMenuItem().setOnAction(e -> {
-			Optional<String[]> tags = enterTags();
+			Optional<List<String>> tags = enterTags();
 			tags.ifPresentOrElse(ts -> {
 				String territoryXML = stage.getTerritory().toXML().toString();
 				if (!DatabaseManager.getDatabaseManager().store(stage.getProgram().getName(),
@@ -117,7 +118,7 @@ public class ExamplesController implements ILanguageChangeListener {
 		return result;
 	}
 
-	private Optional<String[]> enterTags() {
+	private Optional<List<String>> enterTags() {
 		Dialog<String> dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("Examples.save.tags.title"));
 		dialog.setHeaderText(Messages.getString("Examples.save.tags.header"));
@@ -141,15 +142,15 @@ public class ExamplesController implements ILanguageChangeListener {
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()) {
 			StringTokenizer tokenizer = new StringTokenizer(result.get());
-			String tags[] = new String[tokenizer.countTokens()];
-			int i = 0;
+			List<String> tags = new ArrayList<>();
 			while (tokenizer.hasMoreTokens()) {
-				tags[i++] = tokenizer.nextToken();
+				String token = tokenizer.nextToken();
+				if (!tags.contains(token))
+					tags.add(token);
 			}
 			return Optional.of(tags);
 		} else
 			return Optional.empty();
-
 	}
 
 	@Override

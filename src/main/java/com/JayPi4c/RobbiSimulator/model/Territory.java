@@ -281,7 +281,7 @@ public class Territory extends Observable implements Serializable {
 	public synchronized void update(Territory territory, Item item, int x, int y, DIRECTION facing) {
 		// TODO don't update if territory invalid
 		this.tiles = territory.tiles;
-		this.sizeChanged = territory.sizeChanged;
+		this.sizeChanged = true;
 		this.NUMBER_OF_COLUMNS = territory.NUMBER_OF_COLUMNS;
 		this.NUMBER_OF_ROWS = territory.NUMBER_OF_ROWS;
 		this.robbi.setPosition(x, y);

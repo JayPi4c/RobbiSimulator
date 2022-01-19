@@ -74,6 +74,24 @@ public class MainStage extends Stage {
 	 */
 	public static final int MAX_SPEED_VALUE = 100;
 
+	/**
+	 * Constant for the minimum width of the stage.
+	 */
+	public static final int MIN_WIDTH = 500;
+	/**
+	 * Constant for the minimum height of the stage.
+	 */
+	public static final int MIN_HEIGHT = 200;
+	/**
+	 * Constant for the default width of the stage. <br>
+	 * Currently not in use.
+	 */
+	public static final int WIDTH = 1200;
+	/**
+	 * Constant for the default height of the stage.
+	 */
+	public static final int HEIGHT = 450;
+
 	private Program program;
 
 	// Menu Bar
@@ -309,8 +327,10 @@ public class MainStage extends Stage {
 		scene = new Scene(vBox);
 		setScene(scene);
 
-		setMinHeight(200);
-		setMinWidth(500);
+		setMinWidth(MIN_WIDTH);
+		setMinHeight(MIN_HEIGHT);
+		// setWidth(WIDTH);
+		setHeight(HEIGHT);
 		getIcons().add(menuRobbiImage);
 
 		mainStageController = new MainStageController(this, buttonState);

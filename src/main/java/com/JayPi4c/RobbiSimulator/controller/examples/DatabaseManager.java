@@ -52,7 +52,7 @@ public class DatabaseManager {
 
 	}
 
-	public boolean store(String programName, String editorContent, String territoryXML, String tags[]) {
+	public boolean store(String programName, String editorContent, String territoryXML, List<String> tags) {
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
 			Connection conn = connection.get();
