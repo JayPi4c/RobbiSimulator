@@ -3,6 +3,7 @@ package com.JayPi4c.RobbiSimulator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
@@ -57,6 +58,12 @@ public class App extends Application {
 		}
 		logger.debug("loading Program Controller successfully");
 
+		logger.debug("Connecting to Database");
+		if (DatabaseManager.getDatabaseManager().initialize())
+			logger.debug("Connecting to Database successfully");
+		else
+			logger.debug("Connecting to Database failed");
+
 		logger.debug("Loading images");
 		MainStage.loadImages();
 		TerritoryPanel.loadImages();
@@ -66,7 +73,10 @@ public class App extends Application {
 
 	@Override
 	public void stop() {
-		// do some final serialization
+		logger.debug("Closing Database Connection");
+		DatabaseManager.getDatabaseManager().shutDown();
+		logger.debug("Closing Database Connection successfully");
+
 		logger.info("Quitting application");
 	}
 
