@@ -148,7 +148,7 @@ public class DatabaseManager {
 			logger.info("Loading Examples by tag {}", tag);
 			try (Connection conn = connection.get();
 					PreparedStatement stmt = conn.prepareStatement(SELECT_IDS_BY_TAG)) {
-
+				// TODO combine both statements into one
 				stmt.setString(1, tag);
 				try (ResultSet rs = stmt.executeQuery();
 						PreparedStatement s = conn.prepareStatement(SELECT_NAME_BY_ID)) {
