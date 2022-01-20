@@ -464,6 +464,11 @@ public class Territory extends Observable implements Serializable {
 		}
 	}
 
+	/**
+	 * Updates this territory to the territory encoded as the XML-InputStream.
+	 * 
+	 * @param stream InputStream of the XML-encoded territory
+	 */
 	public void fromXML(InputStream stream) {
 		try {
 			Territory territory = new Territory();
@@ -570,6 +575,11 @@ public class Territory extends Observable implements Serializable {
 		return null;
 	}
 
+	/**
+	 * Creates a ByteArrayOutputStream that contains the territory encoded as XML.
+	 * 
+	 * @return ByteArrayOutputStream with XML-encoded territory.
+	 */
 	public ByteArrayOutputStream toXML() {
 		// load the dtd from resources
 		String dtd;

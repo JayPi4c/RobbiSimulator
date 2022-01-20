@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
@@ -21,6 +22,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
@@ -34,11 +36,22 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
+/**
+ * This controller contains all settings for the examples menus.
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class ExamplesController implements ILanguageChangeListener {
 	private static final Logger logger = LogManager.getLogger(ExamplesController.class);
 
 	private MainStage stage;
 
+	/**
+	 * Constructor to create a new ExamplesController for the mainStage.
+	 * 
+	 * @param stage the mainStage, this controller is for
+	 */
 	public ExamplesController(MainStage stage) {
 		Messages.registerListener(this);
 		this.stage = stage;
@@ -71,12 +84,22 @@ public class ExamplesController implements ILanguageChangeListener {
 				}, () -> logger.debug("No tag selected"));
 			}, () -> {
 				logger.info("No tags are stored in database");
-				// TODO show alert
+				AlertHelper.showAlertAndWait(AlertType.WARNING, Messages.getString("Examples.load.dialog.tags.fail"),
+						stage);
 			});
 
 		});
 	}
 
+	/**
+	 *
+	 * Shows an DialogWindow listing all programNames and its IDs. The user can
+	 * select a program, which will be returned as an Optional containing the id.
+	 * 
+	 * @param programs a list of pairs of IDs and programNames, representing a
+	 *                 program
+	 * @return the id of the selected Program
+	 */
 	public Optional<Integer> showProgramSelection(List<Pair<Integer, String>> programs) {
 		Dialog<Integer> dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("Examples.load.dialog.program.title"));
@@ -98,6 +121,13 @@ public class ExamplesController implements ILanguageChangeListener {
 		return result;
 	}
 
+	/**
+	 * Shows an DialogWindow listing all tags. The user can select a tag, which will
+	 * be returned as an Optional.
+	 * 
+	 * @param tags a list of tags to be shown to the user
+	 * @return the selected tag
+	 */
 	public Optional<String> showTagSelection(List<String> tags) {
 		Dialog<String> dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("Examples.load.dialog.tags.title"));
@@ -118,6 +148,13 @@ public class ExamplesController implements ILanguageChangeListener {
 		return result;
 	}
 
+	/**
+	 * Opens a dialog for the user to enter tags for the example to save them
+	 * by.<br>
+	 * Tags must be entered comma-separated.
+	 * 
+	 * @return a List<String> of tags
+	 */
 	private Optional<List<String>> enterTags() {
 		Dialog<String> dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("Examples.save.tags.title"));
@@ -160,34 +197,78 @@ public class ExamplesController implements ILanguageChangeListener {
 		stage.getSaveExampleMenuItem().setText(Messages.getString("Menu.examples.save"));
 	}
 
+	/**
+	 * Taken from
+	 * <a href="https://stackoverflow.com/a/47933342/13670629">Stackoverflow</a>.
+	 * This class holds information for the entries of the AutocompletionComboBox.
+	 * 
+	 * @author Eng.Fouad
+	 *
+	 * @param <T> Type of the objects stored in the instance
+	 */
 	private static class HideableItem<T> {
 		private final ObjectProperty<T> object = new SimpleObjectProperty<>();
 		private final BooleanProperty hidden = new SimpleBooleanProperty();
 
+		/**
+		 * Constructor to create a new HideableItem.
+		 * 
+		 * @param object Object to be stored in the item.
+		 */
 		private HideableItem(T object) {
 			setObject(object);
 		}
 
+		/**
+		 * Getter for the ObjectProperty attribute
+		 * 
+		 * @return the items objectProperty
+		 */
 		private ObjectProperty<T> objectProperty() {
 			return this.object;
 		}
 
+		/**
+		 * Getter for the value stored in the item.
+		 * 
+		 * @return the items value
+		 */
 		private T getObject() {
 			return this.objectProperty().get();
 		}
 
+		/**
+		 * Setter for the value stored in the item.
+		 * 
+		 * @param object the items new value
+		 */
 		private void setObject(T object) {
 			this.objectProperty().set(object);
 		}
 
+		/**
+		 * Getter for the hiddenProperty attribute
+		 * 
+		 * @return the items hiddenProperty
+		 */
 		private BooleanProperty hiddenProperty() {
 			return this.hidden;
 		}
 
+		/**
+		 * Getter for the hidden value of this item.
+		 * 
+		 * @return true if the item is hidden, false otherwise
+		 */
 		private boolean isHidden() {
 			return this.hiddenProperty().get();
 		}
 
+		/**
+		 * Setter for the hidden value of this item.
+		 * 
+		 * @param hidden the new hidden value
+		 */
 		private void setHidden(boolean hidden) {
 			this.hiddenProperty().set(hidden);
 		}
@@ -199,11 +280,16 @@ public class ExamplesController implements ILanguageChangeListener {
 	}
 
 	/**
-	 * <a href="https://stackoverflow.com/a/47933342/13670629">Stackoverflow</a>
+	 * Taken from
+	 * <a href="https://stackoverflow.com/a/47933342/13670629">Stackoverflow</a>.
+	 * <br>
+	 * In order to allow a quick search over the attributes in the comboBox, this
+	 * comboBox has the option to type in the name of the entry and if it is present
+	 * it will show the entry and select it.
 	 * 
-	 * @param <T>
-	 * @param items
-	 * @return
+	 * @param <T>   Type of the items stored in the comboBox
+	 * @param items the items to store in the ComboBox.
+	 * @return a comboBox, that supports Auto-Completion
 	 */
 	private static <T> ComboBox<HideableItem<T>> createComboBoxWithAutoCompletionSupport(List<T> items) {
 		ObservableList<HideableItem<T>> hideableHideableItems = FXCollections

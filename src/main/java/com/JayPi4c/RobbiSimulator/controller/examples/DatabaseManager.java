@@ -17,6 +17,12 @@ import org.apache.logging.log4j.Logger;
 
 import javafx.util.Pair;
 
+/**
+ * DatabaseManager to manage all database related tasks.
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class DatabaseManager {
 	private static final Logger logger = LogManager.getLogger(DatabaseManager.class);
 	private static DatabaseManager dbManager;
@@ -41,6 +47,11 @@ public class DatabaseManager {
 	private static final String SELECT_PROGRAM_BY_ID = "SELECT name, code, territory FROM " + EXAMPLES_TABLE_NAME
 			+ " WHERE ex_id=?";
 
+	/**
+	 * Getter for the databaseManager to fulfill the singleton pattern.
+	 * 
+	 * @return the instance of the databaseManager
+	 */
 	public static DatabaseManager getDatabaseManager() {
 		if (dbManager == null) {
 			dbManager = new DatabaseManager();
@@ -48,11 +59,25 @@ public class DatabaseManager {
 		return dbManager;
 	}
 
+	/**
+	 * Private constructor to stop other classes of creating another manager
+	 */
 	private DatabaseManager() {
 
 	}
 
+	/**
+	 * Method to store an example with its tags in the database.
+	 * 
+	 * @param programName   the name of the program
+	 * @param editorContent the code in the editor
+	 * @param territoryXML  the territory encoded in XML
+	 * @param tags          the tags related to this example
+	 * @return true if the example was stored successfully, false otherwise
+	 */
 	public boolean store(String programName, String editorContent, String territoryXML, List<String> tags) {
+		if (!initialized)
+			return false;
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
 			Connection conn = connection.get();
@@ -125,6 +150,12 @@ public class DatabaseManager {
 		return true;
 	}
 
+	/**
+	 * Method to get all examples identified by id and programName by their tag.
+	 * 
+	 * @param tag the tag to search the examples for
+	 * @return List of examples as pairs of id and programName
+	 */
 	public Optional<List<Pair<Integer, String>>> query(String tag) {
 		if (!initialized)
 			return Optional.empty();
@@ -158,7 +189,10 @@ public class DatabaseManager {
 					s.close();
 
 				}
-				return Optional.of(programs);
+				if (programs.size() == 0)
+					return Optional.empty();
+				else
+					return Optional.of(programs);
 			} catch (SQLException e) {
 				e.printStackTrace();
 				return Optional.empty();
@@ -199,6 +233,13 @@ public class DatabaseManager {
 			return Optional.empty();
 	}
 
+	/**
+	 * Loads an example from the database by the given id.
+	 * 
+	 * @param id the ID of the example to load
+	 * @return Optional containing the example or an empty Optional if no example
+	 *         could be found
+	 */
 	public Optional<Example> loadExample(int id) {
 		if (!initialized)
 			return Optional.empty();
@@ -248,19 +289,22 @@ public class DatabaseManager {
 		return Optional.empty();
 	}
 
+	/**
+	 * Method to load all distinct tags from the database.
+	 * 
+	 * @return List of all distinct tags stored in the database
+	 */
 	public Optional<List<String>> getAllTags() {
 		if (!initialized)
 			return Optional.empty();
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
-			Connection conn = connection.get();
-			Statement stmt = null;
-			ResultSet rs = null;
 
 			logger.debug("loading distinct tags from database");
-			try {
-				stmt = conn.createStatement();
-				rs = stmt.executeQuery(SELECT_DISTINCT_TAGS);
+			try (Connection conn = connection.get();
+					Statement stmt = conn.createStatement();
+					ResultSet rs = stmt.executeQuery(SELECT_DISTINCT_TAGS)) {
+
 				ArrayList<String> tags = new ArrayList<>();
 				while (rs.next()) {
 					String tag = rs.getString("tagname");
@@ -270,30 +314,16 @@ public class DatabaseManager {
 				return Optional.ofNullable(tags);
 			} catch (SQLException e) {
 				return Optional.empty();
-			} finally {
-				if (rs != null) {
-					try {
-						rs.close();
-					} catch (SQLException ignore) {
-					}
-				}
-				if (stmt != null) {
-					try {
-						stmt.close();
-					} catch (SQLException ignore) {
-					}
-				}
-				if (conn != null) {
-					try {
-						conn.close();
-					} catch (SQLException ignore) {
-					}
-				}
 			}
 		}
 		return Optional.empty();
 	}
 
+	/**
+	 * Getter for a Connection to the database by the defined URL.
+	 * 
+	 * @return a connection to the database
+	 */
 	private Optional<Connection> getConnection() {
 		try {
 			Connection conn = DriverManager.getConnection("jdbc:derby:" + DB_NAME + ";create=false");
@@ -304,6 +334,11 @@ public class DatabaseManager {
 		}
 	}
 
+	/**
+	 * Initializes the database and creates the tables if necessary.
+	 * 
+	 * @return true if the initialization was successful, false otherwise
+	 */
 	public boolean initialize() {
 		logger.debug("initialize database");
 		try {
@@ -366,7 +401,12 @@ public class DatabaseManager {
 
 	}
 
+	/**
+	 * Helper Method to drop all tables to reset the stored examples.
+	 */
 	public static void dropAllTables() {
+		if (!initialized)
+			return;
 		Optional<Connection> connection = DatabaseManager.getDatabaseManager().getConnection();
 		connection.ifPresent(conn -> {
 			Statement s = null;
@@ -398,10 +438,18 @@ public class DatabaseManager {
 		});
 	}
 
+	/**
+	 * Getter to check if the initialization finished successfully.
+	 * 
+	 * @return true if the manager is initialized, false otherwise
+	 */
 	public static boolean isInitialized() {
 		return initialized;
 	}
 
+	/**
+	 * Utility function to shutdown the database connection.
+	 */
 	public void shutDown() {
 		try {
 			DriverManager.getConnection("jdbc:derby:;shutdown=true");

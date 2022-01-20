@@ -213,6 +213,18 @@ public class ProgramController {
 		ProgramController.compile(program, false, stage);
 	}
 
+	/**
+	 * Creates a stage with the given programName, the programCode provided and the
+	 * territory encoded as XML. If the user has already a stage with the same name,
+	 * he will be warned, that his program will be overwritten. Optionally, he can
+	 * save his program and territory under another name. After that a new Stage
+	 * will be created according to the given information. <br>
+	 * This method might only be used to load an example from the database.
+	 * 
+	 * @param programName  name of the program
+	 * @param programCode  code of the program
+	 * @param territoryXML XML-encoded territory
+	 */
 	public static void createAndShow(String programName, String programCode, String territoryXML) {
 		if (programs.containsKey(programName)) {
 			// TODO warn user that old simulator will be overwritten

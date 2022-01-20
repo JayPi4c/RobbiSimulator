@@ -144,8 +144,8 @@ public class TerritorySaveController {
 
 		if (file != null) {
 			logger.debug("save as XML in file {}", file);
-			ByteArrayOutputStream baos = mainStage.getTerritory().toXML();
-			try (OutputStream outputStream = new FileOutputStream(file.getAbsolutePath())) {
+			try (ByteArrayOutputStream baos = mainStage.getTerritory().toXML();
+					OutputStream outputStream = new FileOutputStream(file.getAbsolutePath())) {
 				baos.writeTo(outputStream);
 			} catch (IOException e) {
 				logger.debug("failed");
