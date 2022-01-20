@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.JayPi4c</groupId>
 	<artifactId>RobbiSimulator</artifactId>
-	<version>Aufgaben 9</version>
+	<version>Aufgaben 10</version>
 	<properties>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
@@ -100,6 +100,18 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.17.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<version>10.15.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbytools</artifactId>
+			<version>10.15.2.0</version>
+		</dependency>
+
+
 		<!-- 
 			<dependency>
     			<groupId>com.sun.xml.bind</groupId>

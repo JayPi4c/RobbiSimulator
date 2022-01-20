@@ -1,6 +1,20 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.Optional;
+
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -265,8 +279,9 @@ public class Territory extends Observable implements Serializable {
 	 * @param facing    robbis facing
 	 */
 	public synchronized void update(Territory territory, Item item, int x, int y, DIRECTION facing) {
+		// TODO don't update if territory invalid
 		this.tiles = territory.tiles;
-		this.sizeChanged = territory.sizeChanged;
+		this.sizeChanged = true;
 		this.NUMBER_OF_COLUMNS = territory.NUMBER_OF_COLUMNS;
 		this.NUMBER_OF_ROWS = territory.NUMBER_OF_ROWS;
 		this.robbi.setPosition(x, y);
@@ -449,6 +464,264 @@ public class Territory extends Observable implements Serializable {
 		}
 	}
 
+	/**
+	 * Updates this territory to the territory encoded as the XML-InputStream.
+	 * 
+	 * @param stream InputStream of the XML-encoded territory
+	 */
+	public void fromXML(InputStream stream) {
+		try {
+			Territory territory = new Territory();
+			int robbiX = 0;
+			int robbiY = 0;
+			Item robbiItem = null;
+			DIRECTION robbiDirection = DIRECTION.EAST;
+			int x = 0;
+			int y = 0;
+			XMLInputFactory factory = XMLInputFactory.newInstance();
+			XMLStreamReader parser = factory.createXMLStreamReader(stream);
+			while (parser.hasNext()) {
+				switch (parser.getEventType()) {
+				case XMLStreamConstants.START_DOCUMENT:
+					break;
+				case XMLStreamConstants.END_DOCUMENT:
+					parser.close();
+					break;
+				case XMLStreamConstants.START_ELEMENT:
+					switch (parser.getLocalName()) {
+					case "territory":
+						int cols = Integer.parseInt(parser.getAttributeValue(null, "col"));
+						int rows = Integer.parseInt(parser.getAttributeValue(null, "row"));
+						territory.changeSize(cols, rows);
+						break;
+					case "pileofscrap":
+						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
+						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
+						territory.placePileOfScrap(x, y);
+						break;
+					case "hollow":
+						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
+						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
+						territory.placeHollow(x, y);
+						break;
+					case "stockpile":
+						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
+						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
+						territory.placeStockpile(x, y);
+						break;
+					case "tile":
+						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
+						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
+						break;
+					case "item":
+						Item item = getItemFromParser(parser);
+						if (x < 0 || y < 0) {
+							robbiItem = item;
+						} else {
+							territory.placeItem(item, x, y);
+						}
+						break;
+					case "facing":
+						DIRECTION facing = DIRECTION.valueOf(parser.getAttributeValue(null, "facing"));
+						robbiDirection = facing;
+						break;
+					case "robbi":
+						robbiX = Integer.parseInt(parser.getAttributeValue(null, "col"));
+						robbiY = Integer.parseInt(parser.getAttributeValue(null, "row"));
+						x = -1;
+						y = -1;
+					default:
+						break;
+					}
+				case XMLStreamConstants.CHARACTERS:
+					break;
+				case XMLStreamConstants.END_ELEMENT:
+					break;
+				default:
+					break;
+				}
+				parser.next();
+			}
+			update(territory, robbiItem, robbiX, robbiY, robbiDirection);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Failed to load territory from XML-file");
+		} finally {
+			try {
+				stream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Helper to get the correct item from the parser. <br>
+	 * Only use this method if you know for sure, that the parsers EventType is
+	 * Item.
+	 * 
+	 * @param parser the parser to read the type from
+	 * @return the correct item class for this element
+	 */
+	private Item getItemFromParser(XMLStreamReader parser) {
+		String type = parser.getAttributeValue(null, "type");
+		if (type.equals("Nut")) {
+			return new Nut();
+		} else if (type.equals("Accu")) {
+			return new Accu();
+		} else if (type.equals("Screw")) {
+			return new Screw();
+		}
+		return null;
+	}
+
+	/**
+	 * Creates a ByteArrayOutputStream that contains the territory encoded as XML.
+	 * 
+	 * @return ByteArrayOutputStream with XML-encoded territory.
+	 */
+	public ByteArrayOutputStream toXML() {
+		// load the dtd from resources
+		String dtd;
+		Optional<String> dtdOpt = getDTD();
+		if (dtdOpt.isPresent()) {
+			dtd = dtdOpt.get();
+		} else {
+			logger.warn("Could not load dtd");
+			return null;
+		}
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			XMLOutputFactory factory = XMLOutputFactory.newInstance();
+			XMLStreamWriter writer = factory.createXMLStreamWriter(baos, "utf-8");
+
+			writer.writeStartDocument("utf-8", "1.0");
+			writer.writeCharacters("\n");
+
+			writer.writeDTD("<!DOCTYPE territory [" + dtd + "]>");
+			writer.writeCharacters("\n");
+			// writer.writeDTD("<!DOCTYPE territory SYSTEM \"xml/simulator.dtd\">");
+			synchronized (this) {
+				writer.writeStartElement("territory");
+				writer.writeAttribute("col", Integer.toString(getNumCols()));
+				writer.writeAttribute("row", Integer.toString(getNumRows()));
+				writer.writeCharacters("\n");
+				for (int i = 0; i < getNumCols(); i++) {
+					for (int j = 0; j < getNumRows(); j++) {
+						Tile t = getTile(i, j);
+						if (t instanceof Hollow) {
+							writer.writeStartElement("hollow");
+							writer.writeAttribute("col", Integer.toString(i));
+							writer.writeAttribute("row", Integer.toString(j));
+							writer.writeCharacters("\n");
+						} else if (t instanceof PileOfScrap) {
+							writer.writeStartElement("pileofscrap");
+							writer.writeAttribute("col", Integer.toString(i));
+							writer.writeAttribute("row", Integer.toString(j));
+							writer.writeCharacters("\n");
+						} else if (t instanceof Stockpile) {
+							writer.writeStartElement("stockpile");
+							writer.writeAttribute("col", Integer.toString(i));
+							writer.writeAttribute("row", Integer.toString(j));
+							writer.writeCharacters("\n");
+							for (Item item : ((Stockpile) t).getAllItems()) {
+								writeItem(writer, item);
+							}
+						} else {
+							writer.writeStartElement("tile");
+							writer.writeAttribute("col", Integer.toString(i));
+							writer.writeAttribute("row", Integer.toString(j));
+							writer.writeCharacters("\n");
+							if (t.getItem() != null) {
+								writeItem(writer, t.getItem());
+							}
+						}
+						writer.writeEndElement();
+						writer.writeCharacters("\n");
+					}
+				}
+				writer.writeStartElement("robbi");
+				writer.writeAttribute("col", Integer.toString(getRobbiX()));
+				writer.writeAttribute("row", Integer.toString(getRobbiY()));
+				writer.writeCharacters("\n");
+				writer.writeStartElement("facing");
+				writer.writeAttribute("facing", getRobbiDirection().toString());
+				writer.writeEndElement();
+				writer.writeCharacters("\n");
+				if (getRobbiItem() != null) {
+					writeItem(writer, getRobbiItem());
+				}
+			}
+			writer.writeEndElement();
+			writer.writeCharacters("\n");
+			writer.writeEndElement();
+			writer.writeCharacters("\n");
+			writer.writeEndDocument();
+			writer.close();
+
+			return baos;
+		} catch (FactoryConfigurationError | XMLStreamException e) {
+			e.printStackTrace();
+			logger.error("failed to save as XML.");
+			return null;
+		}
+	}
+
+	/**
+	 * Helper to store an item in an xml-file.
+	 * 
+	 * @param writer the writer, the item needs to be written to
+	 * @param item   the item to write
+	 * @throws XMLStreamException if the item cannot be written
+	 */
+	private void writeItem(XMLStreamWriter writer, Item item) throws XMLStreamException {
+		writer.writeStartElement("item");
+		writer.writeAttribute("type", item.getClass().getSimpleName());
+		writer.writeEndElement();
+		writer.writeCharacters("\n");
+	}
+
+	/**
+	 * Loads the dtd needed to save the territory as a xml-File from the resources
+	 * folder
+	 * 
+	 * @return the dtd String defined in resources/xml/simulator.dtd
+	 */
+	private Optional<String> getDTD() {
+		try (BufferedReader reader = new BufferedReader(
+				new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("xml/simulator.dtd")))) {
+
+			StringBuilder builder = new StringBuilder();
+			String s;
+			while ((s = reader.readLine()) != null) {
+				builder.append(s);
+				builder.append(System.lineSeparator());
+			}
+			return Optional.of(builder.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Getter for Robbis x Position.
+	 * 
+	 * @return robbis x Position
+	 */
+	public synchronized int getRobbiX() {
+		return robbi.getX();
+	}
+
+	/**
+	 * Getter for Robbis y Position.
+	 * 
+	 * @return robbis y Position
+	 */
+	public synchronized int getRobbiY() {
+		return robbi.getY();
+	}
+
 	// ================== DEBUG =======
 	/**
 	 * Debug method to print the territory in the console.
@@ -481,21 +754,4 @@ public class Territory extends Observable implements Serializable {
 		}
 	}
 
-	/**
-	 * Getter for Robbis x Position.
-	 * 
-	 * @return robbis x Position
-	 */
-	public synchronized int getRobbiX() {
-		return robbi.getX();
-	}
-
-	/**
-	 * Getter for Robbis y Position.
-	 * 
-	 * @return robbis y Position
-	 */
-	public synchronized int getRobbiY() {
-		return robbi.getY();
-	}
 }

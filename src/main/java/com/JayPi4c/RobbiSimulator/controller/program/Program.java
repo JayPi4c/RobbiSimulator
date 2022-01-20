@@ -113,4 +113,13 @@ public class Program {
 		return edited;
 	}
 
+	/**
+	 * Setter for the name attribute.
+	 * 
+	 * @param newName the new name for the program
+	 */
+	public void setName(String newName) {
+		this.name = newName;
+	}
+
 }

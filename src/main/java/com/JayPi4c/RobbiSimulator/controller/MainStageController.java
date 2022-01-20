@@ -435,7 +435,7 @@ public class MainStageController implements ILanguageChangeListener {
 	@Override
 	public void onLanguageChanged() {
 		// Add multilanguage support
-		mainStage.setTitle(Messages.getString("Main.title") + ": " + mainStage.getProgram()
+		mainStage.setTitle(Messages.getString("Main.title") + ": " + mainStage.getProgram().getName()
 				+ (mainStage.getProgram().isEdited() ? "*" : ""));
 
 		mainStage.getNewEditorMenuItem().setText(Messages.getString("Menu.editor.new"));
