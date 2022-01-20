@@ -1,7 +1,10 @@
 package com.JayPi4c.RobbiSimulator.controller.program;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -38,6 +41,7 @@ import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -65,7 +69,7 @@ public class ProgramController {
 	/**
 	 * Constant String with the Path name for the programs directory.
 	 */
-	public static final String PATH_TO_PROGRAMS = "programs";
+	public static final String PATH_TO_PROGRAMS = "programs"; // TODO make path relative to jar directory
 	/**
 	 * Constant String for the Default Robbi File name.
 	 */
@@ -136,22 +140,11 @@ public class ProgramController {
 	}
 
 	/**
-	 * Creates a Dialog and asks the user to for the name of the new program.
-	 * Afterwards, it initiates the creation of a new stage for the program.
+	 * Looks into the programs directory and collects all java filenames.
 	 * 
-	 * @param parent the parent window to show alerts relative to the parent window
-	 * @see ProgramController#createAndShow(String)
+	 * @return Collection of java filenames in programs directory
 	 */
-	public static void createAndShow(Window parent) {
-		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(Messages.getString("New.dialog.title"));
-		dialog.setHeaderText(Messages.getString("New.dialog.header"));
-		dialog.initOwner(parent);
-		DialogPane dialogPane = dialog.getDialogPane();
-		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-		TextField nameField = new TextField();
-		nameField.setPromptText(Messages.getString("New.dialog.prompt"));
-
+	private static Collection<String> getFilenamesInDirectory() {
 		// get a list of all files in programs directory that end with .java
 		File[] files = new File(PATH_TO_PROGRAMS)
 				.listFiles(file -> (file.isFile() && file.getName().endsWith(DEFAULT_FILE_EXTENSION)));
@@ -162,6 +155,39 @@ public class ProgramController {
 
 		logger.debug("Found following files in 'programs' directory:");
 		filenamesInDirectory.forEach(f -> logger.debug(f));
+		return filenamesInDirectory;
+	}
+
+	/**
+	 * Creates a Dialog and asks the user to for the name of the new program.
+	 * Afterwards, it initiates the creation of a new stage for the program.
+	 * 
+	 * @param parent the parent window to show alerts relative to the parent window
+	 * @see ProgramController#createAndShow(String)
+	 */
+	public static void createAndShow(Window parent) {
+		Optional<String> result = getNameForProgram(parent);
+		result.ifPresent(ProgramController::createAndShow);
+	}
+
+	/**
+	 * Asks the user to enter a name for the program. It only allows names, that are
+	 * no java identifiers and are not already used in the programs folder
+	 * 
+	 * @param parent window to show the dialog relative to
+	 * @return the new name for the program
+	 */
+	private static Optional<String> getNameForProgram(Window parent) {
+		Dialog<String> dialog = new Dialog<>();
+		dialog.setTitle(Messages.getString("New.dialog.title"));
+		dialog.setHeaderText(Messages.getString("New.dialog.header"));
+		dialog.initOwner(parent);
+		DialogPane dialogPane = dialog.getDialogPane();
+		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+		TextField nameField = new TextField();
+		nameField.setPromptText(Messages.getString("New.dialog.prompt"));
+
+		Collection<String> filenamesInDirectory = getFilenamesInDirectory();
 
 		nameField.textProperty()
 				.addListener((observable, oldVal, newVal) -> dialog.getDialogPane().lookupButton(ButtonType.OK)
@@ -179,7 +205,7 @@ public class ProgramController {
 		dialog.setResultConverter(button -> (button == ButtonType.OK) ? nameField.getText() : null);
 
 		Optional<String> result = dialog.showAndWait();
-		result.ifPresent(ProgramController::createAndShow);
+		return result;
 	}
 
 	/**
@@ -210,6 +236,110 @@ public class ProgramController {
 		Stage stage = new MainStage(program);
 		programs.put(programName, stage);
 		ProgramController.compile(program, false, stage);
+	}
+
+	/**
+	 * Creates a stage with the given programName, the programCode provided and the
+	 * territory encoded as XML. If the user has already a stage with the same name,
+	 * he will be warned, that his program will be overwritten. Optionally, he can
+	 * save his program and territory under another name. After that a new Stage
+	 * will be created according to the given information. <br>
+	 * This method might only be used to load an example from the database.
+	 * 
+	 * @param programName  name of the program
+	 * @param programCode  code of the program
+	 * @param territoryXML XML-encoded territory
+	 */
+	public static void createAndShow(String programName, String programCode, String territoryXML) {
+
+		String content = createTemplate(programName, DEFAULT_CONTENT);
+		File f = new File(PATH_TO_PROGRAMS + File.separatorChar + programName + DEFAULT_FILE_EXTENSION);
+		if (f.exists()) {
+			logger.debug("There is a file with the name of the example");
+			if (programs.containsKey(programName)) {
+				logger.debug("Program is opened: closing...");
+				MainStage stage = (MainStage) programs.get(programName);
+				Program p = stage.getProgram();
+				p.save(p.getEditorContent());
+				stage.close();
+			}
+
+			Alert alert = AlertHelper.createAlert(AlertType.INFORMATION,
+					Messages.getString("Examples.duplication.message"), null);
+			alert.setHeaderText(Messages.getString("Examples.duplication.header"));
+			alert.setTitle(Messages.getString("Examples.duplication.title"));
+			alert.getButtonTypes().remove(ButtonType.OK);
+			alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.isPresent()) {
+				ButtonType button = result.get();
+				if (button.equals(ButtonType.YES)) {
+					Optional<String> newName = getNameForProgram(null);
+					if (newName.isPresent()) {
+						String name = newName.get();
+
+						StringBuilder bobTheBuilder = new StringBuilder();
+						try (BufferedReader reader = new BufferedReader(new FileReader(f))) {
+							String line = null;
+							while ((line = reader.readLine()) != null) {
+								bobTheBuilder.append(line);
+								bobTheBuilder.append(System.lineSeparator());
+							}
+							bobTheBuilder.replace(0, createPrefix(programName).length(), createPrefix(name));
+
+						} catch (IOException e) {
+							logger.debug("Failed to read class contents");
+						}
+						try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))) {
+							writer.write(bobTheBuilder.toString());
+						} catch (IOException e) {
+							logger.debug("Failed to write new classname in file");
+						}
+						if (!renameFile(f, name)) {
+							logger.debug("Failed to rename file");
+						}
+					}
+				}
+			}
+		}
+
+		if (!f.exists()) {
+			try {
+				if (!f.createNewFile())
+					logger.debug("Could not create file '{}'", f.getAbsolutePath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))) {
+				writer.write(content);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Program program = new Program(f, programName);
+		program.setEdited(true);
+		program.save(programCode);
+		MainStage stage = new MainStage(program);
+		stage.getTerritory().fromXML(new ByteArrayInputStream(territoryXML.getBytes()));
+		programs.put(programName, stage);
+		ProgramController.compile(program, false, stage);
+	}
+
+	/**
+	 * Renames a java file in the programs directory to the new name.
+	 * 
+	 * @param f       the file to rename
+	 * @param newName the new name of the file
+	 * @return true if the renaming was successful, false otherwise
+	 */
+	public static boolean renameFile(File f, String newName) {
+		File newFile = new File(PATH_TO_PROGRAMS + File.separatorChar + newName + DEFAULT_FILE_EXTENSION);
+
+		if (newFile.exists())
+			return false;
+		boolean success = f.renameTo(newFile);
+		return success;
 	}
 
 	/**
@@ -398,6 +528,12 @@ public class ProgramController {
 
 	}
 
+	/**
+	 * Checks if the robbi overwrites the Main-Method.
+	 * 
+	 * @param robbi the robbi to check if it overwrites the Main-Method
+	 * @return true if robbi overwrites it, false otherwise
+	 */
 	private static boolean overwritesMainMethod(Robbi robbi) {
 		if (Robbi.class == robbi.getClass()) {
 			return true; // Default Robbi always has main-Method overwritten

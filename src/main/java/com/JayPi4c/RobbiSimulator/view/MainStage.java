@@ -7,6 +7,7 @@ import org.apache.logging.log4j.core.Layout;
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.MainStageController;
 import com.JayPi4c.RobbiSimulator.controller.TerritorySaveController;
+import com.JayPi4c.RobbiSimulator.controller.examples.ExamplesController;
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.simulation.SimulationController;
 import com.JayPi4c.RobbiSimulator.model.Territory;
@@ -62,6 +63,7 @@ public class MainStage extends Stage {
 	private MainStageController mainStageController;
 	private SimulationController simController;
 	private TerritorySaveController territorySaveController;
+	private ExamplesController examplesController;
 
 	/**
 	 * Constant for the minimum value for the speed slider.
@@ -71,6 +73,24 @@ public class MainStage extends Stage {
 	 * Constant for the maximum value for the speed slider.
 	 */
 	public static final int MAX_SPEED_VALUE = 100;
+
+	/**
+	 * Constant for the minimum width of the stage.
+	 */
+	public static final int MIN_WIDTH = 500;
+	/**
+	 * Constant for the minimum height of the stage.
+	 */
+	public static final int MIN_HEIGHT = 200;
+	/**
+	 * Constant for the default width of the stage. <br>
+	 * Currently not in use.
+	 */
+	public static final int WIDTH = 1200;
+	/**
+	 * Constant for the default height of the stage.
+	 */
+	public static final int HEIGHT = 450;
 
 	private Program program;
 
@@ -131,6 +151,11 @@ public class MainStage extends Stage {
 	private MenuItem pauseMenuItem;
 	private MenuItem stopMenuItem;
 	private Menu simulationMenu;
+
+	// examples Menu
+	private MenuItem loadExampleMenuItem;
+	private MenuItem saveExampleMenuItem;
+	private Menu examplesMenu;
 
 	// window Meun
 	private Menu languageMenu;
@@ -302,13 +327,16 @@ public class MainStage extends Stage {
 		scene = new Scene(vBox);
 		setScene(scene);
 
-		setMinHeight(200);
-		setMinWidth(500);
+		setMinWidth(MIN_WIDTH);
+		setMinHeight(MIN_HEIGHT);
+		// setWidth(WIDTH);
+		setHeight(HEIGHT);
 		getIcons().add(menuRobbiImage);
 
 		mainStageController = new MainStageController(this, buttonState);
 		simController = new SimulationController(this, territory);
 		territorySaveController = new TerritorySaveController(this);
+		examplesController = new ExamplesController(this);
 
 		show();
 		textArea.requestFocus();
@@ -500,6 +528,15 @@ public class MainStage extends Stage {
 	}
 
 	/**
+	 * Creates the examples-related menu-bar elements
+	 */
+	private void createExamplesMenu() {
+		saveExampleMenuItem = new MenuItem(Messages.getString("Menu.examples.save"));
+		loadExampleMenuItem = new MenuItem(Messages.getString("Menu.examples.load"));
+		examplesMenu = new Menu(Messages.getString("Menu.examples"), null, saveExampleMenuItem, loadExampleMenuItem);
+	}
+
+	/**
 	 * Creates the window-related menu-bar elements.
 	 */
 	private void createWindowMenu() {
@@ -558,8 +595,9 @@ public class MainStage extends Stage {
 		createTerritory();
 		createRobbi();
 		createSimulation();
+		createExamplesMenu();
 		createWindowMenu();
-		menubar = new MenuBar(editorMenu, territoryMenu, robbiMenu, simulationMenu, windowMenu);
+		menubar = new MenuBar(editorMenu, territoryMenu, robbiMenu, simulationMenu, examplesMenu, windowMenu);
 	}
 
 	/**
@@ -1288,6 +1326,15 @@ public class MainStage extends Stage {
 	}
 
 	/**
+	 * Getter for the exampleController.
+	 * 
+	 * @return the exampleController for this stage.
+	 */
+	public ExamplesController getExampleController() {
+		return examplesController;
+	}
+
+	/**
 	 * Getter for the editorMenu.
 	 * 
 	 * @return the editorMenu for this stage
@@ -1384,6 +1431,33 @@ public class MainStage extends Stage {
 	 */
 	public Menu getSimulationMenu() {
 		return simulationMenu;
+	}
+
+	/**
+	 * Getter for the saveExampleMenuItem.
+	 * 
+	 * @return the exmapleMenuItem for this stage.
+	 */
+	public MenuItem getSaveExampleMenuItem() {
+		return saveExampleMenuItem;
+	}
+
+	/**
+	 * Getter for the loadExampleMenuItem.
+	 * 
+	 * @return the loadMenuItem for this stage.
+	 */
+	public MenuItem getLoadExampleMenuItem() {
+		return loadExampleMenuItem;
+	}
+
+	/**
+	 * Getter for the examplesMenu.
+	 * 
+	 * @return the exmaplesMenu for this stage.
+	 */
+	public Menu getExamplesMenu() {
+		return examplesMenu;
 	}
 
 	/**
