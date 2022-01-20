@@ -104,7 +104,7 @@ public class ExamplesController implements ILanguageChangeListener {
 		Dialog<Integer> dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("Examples.load.dialog.program.title"));
 		dialog.setHeaderText(Messages.getString("Examples.load.dialog.program.header"));
-		// dialog.initOwner(parent);
+		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -132,7 +132,7 @@ public class ExamplesController implements ILanguageChangeListener {
 		Dialog<String> dialog = new Dialog<>();
 		dialog.setTitle(Messages.getString("Examples.load.dialog.tags.title"));
 		dialog.setHeaderText(Messages.getString("Examples.load.dialog.tags.header"));
-		// dialog.initOwner(parent);
+		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
