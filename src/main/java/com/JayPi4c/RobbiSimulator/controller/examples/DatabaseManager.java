@@ -80,34 +80,33 @@ public class DatabaseManager {
 			return false;
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
-			Connection conn = connection.get();
-			ResultSet resultSet = null;
-			PreparedStatement stmt = null;
-			PreparedStatement s = null;
 			logger.info("storing data in database");
+			Connection conn = connection.get();
 			try {
 				conn.setAutoCommit(false);
-				stmt = conn.prepareStatement(INSERT_EXAMPLE, PreparedStatement.RETURN_GENERATED_KEYS);
-				stmt.setString(1, programName);
-				stmt.setString(2, editorContent);
-				stmt.setString(3, territoryXML);
+				try (PreparedStatement stmt = conn.prepareStatement(INSERT_EXAMPLE,
+						PreparedStatement.RETURN_GENERATED_KEYS)) {
+					stmt.setString(1, programName);
+					stmt.setString(2, editorContent);
+					stmt.setString(3, territoryXML);
 
-				stmt.execute();
-				resultSet = stmt.getGeneratedKeys();
-				int exampleKey = 0;
-				if (resultSet.next()) {
-					exampleKey = resultSet.getInt(1);
-				}
-				logger.debug("Examplekey is {}", exampleKey);
+					stmt.execute();
 
-				for (String tag : tags) {
-					s = conn.prepareStatement(INSERT_TAG);
-					s.setInt(1, exampleKey);
-					s.setString(2, tag);
-					s.execute();
-					s.close();
+					try (ResultSet resultSet = stmt.getGeneratedKeys();
+							PreparedStatement s = conn.prepareStatement(INSERT_TAG)) {
+						int exampleKey = 0;
+						if (resultSet.next()) {
+							exampleKey = resultSet.getInt(1);
+						}
+						logger.debug("Examplekey is {}", exampleKey);
+						s.setInt(1, exampleKey);
+						for (String tag : tags) {
+							s.setString(2, tag);
+							s.execute();
+						}
+						conn.commit();
+					}
 				}
-				conn.commit();
 			} catch (SQLException e) {
 				try {
 					conn.rollback();
@@ -116,23 +115,6 @@ public class DatabaseManager {
 				logger.debug("Could not store example in database");
 				return false;
 			} finally {
-				if (s != null) { // if s.execute throws exception, s is not closed
-					try {
-						s.close();
-					} catch (SQLException ignore) {
-					}
-				}
-				if (resultSet != null)
-					try {
-						resultSet.close();
-					} catch (SQLException ignore) {
-					}
-				if (stmt != null) {
-					try {
-						stmt.close();
-					} catch (SQLException ignore) {
-					}
-				}
 				if (conn != null) {
 					try {
 						conn.setAutoCommit(true);
@@ -162,73 +144,34 @@ public class DatabaseManager {
 
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
-			Connection conn = connection.get();
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
-			PreparedStatement s = null;
-			ResultSet resultSet = null;
 
 			logger.info("Loading Examples by tag {}", tag);
-			try {
-				ArrayList<Pair<Integer, String>> programs = new ArrayList<>();
-				stmt = conn.prepareStatement(SELECT_IDS_BY_TAG);
+			try (Connection conn = connection.get();
+					PreparedStatement stmt = conn.prepareStatement(SELECT_IDS_BY_TAG)) {
+
 				stmt.setString(1, tag);
-				rs = stmt.executeQuery();
-				while (rs.next()) {
-					int id = rs.getInt("ex_id");
-
-					s = conn.prepareStatement(SELECT_NAME_BY_ID);
-					s.setInt(1, id);
-					resultSet = s.executeQuery();
-
-					if (resultSet.next()) { // ids are unique -> only one result
-						String name = resultSet.getString("name");
-						programs.add(new Pair<Integer, String>(id, name));
+				try (ResultSet rs = stmt.executeQuery();
+						PreparedStatement s = conn.prepareStatement(SELECT_NAME_BY_ID)) {
+					ArrayList<Pair<Integer, String>> programs = new ArrayList<>();
+					while (rs.next()) {
+						int id = rs.getInt("ex_id");
+						s.setInt(1, id);
+						try (ResultSet resultSet = s.executeQuery()) {
+							if (resultSet.next()) { // ids are unique -> only one result
+								String name = resultSet.getString("name");
+								programs.add(new Pair<Integer, String>(id, name));
+							}
+						}
 					}
-					resultSet.close();
-					s.close();
-
+					if (programs.size() == 0)
+						return Optional.empty();
+					else
+						return Optional.of(programs);
 				}
-				if (programs.size() == 0)
-					return Optional.empty();
-				else
-					return Optional.of(programs);
 			} catch (SQLException e) {
 				e.printStackTrace();
 				return Optional.empty();
-			} finally {
-				if (resultSet != null) {
-					try {
-						resultSet.close();
-					} catch (SQLException ignore) {
-					}
-				}
-				if (s != null) {
-					try {
-						s.close();
-					} catch (SQLException ignore) {
-					}
-				}
-				if (rs != null) {
-					try {
-						rs.close();
-					} catch (SQLException ignore) {
-					}
-				}
-				if (stmt != null) {
-					try {
-						stmt.close();
-					} catch (SQLException ignore) {
-					}
-				}
-				if (conn != null) {
-					try {
-						conn.close();
-					} catch (SQLException ignore) {
-					}
-				}
 			}
-
 		} else
 			return Optional.empty();
 	}
@@ -245,45 +188,23 @@ public class DatabaseManager {
 			return Optional.empty();
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
-			Connection conn = connection.get();
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
-
 			logger.debug("loading example from database");
-			try {
-				stmt = conn.prepareStatement(SELECT_PROGRAM_BY_ID);
+			try (Connection conn = connection.get();
+					PreparedStatement stmt = conn.prepareStatement(SELECT_PROGRAM_BY_ID)) {
 				stmt.setInt(1, id);
-				rs = stmt.executeQuery();
-				Example ex = null;
-				while (rs.next()) {
-					String name = rs.getString("name");
-					String code = rs.getString("code");
-					String territory = rs.getString("territory");
-					ex = new Example(name, code, territory);
+				try (ResultSet rs = stmt.executeQuery()) {
+					Example ex = null;
+					while (rs.next()) {
+						String name = rs.getString("name");
+						String code = rs.getString("code");
+						String territory = rs.getString("territory");
+						ex = new Example(name, code, territory);
+					}
+					return Optional.ofNullable(ex);
 				}
-				return Optional.ofNullable(ex);
 			} catch (SQLException e) {
 				e.printStackTrace();
 				return Optional.empty();
-			} finally {
-				if (rs != null) {
-					try {
-						rs.close();
-					} catch (SQLException ignore) {
-					}
-				}
-				if (stmt != null) {
-					try {
-						stmt.close();
-					} catch (SQLException ignore) {
-					}
-				}
-				if (conn != null) {
-					try {
-						conn.close();
-					} catch (SQLException ignore) {
-					}
-				}
 			}
 		}
 		return Optional.empty();
@@ -405,8 +326,8 @@ public class DatabaseManager {
 	 * Helper Method to drop all tables to reset the stored examples.
 	 */
 	public static void dropAllTables() {
-		if (!initialized)
-			return;
+		// if(!initialized)
+		// return;
 		Optional<Connection> connection = DatabaseManager.getDatabaseManager().getConnection();
 		connection.ifPresent(conn -> {
 			Statement s = null;
