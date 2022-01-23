@@ -105,4 +105,11 @@ public class AlertHelper {
 		alert.initOwner(owner);
 		return alert;
 	}
+
+	/**
+	 * Private constructor to hide the implicit public one.
+	 */
+	private AlertHelper() {
+
+	}
 }

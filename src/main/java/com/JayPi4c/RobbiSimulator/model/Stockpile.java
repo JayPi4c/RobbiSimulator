@@ -1,6 +1,7 @@
 package com.JayPi4c.RobbiSimulator.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class representing a Stockpile tile.
@@ -46,7 +47,7 @@ public class Stockpile extends Tile {
 	 */
 	@Override
 	public Item getItem() {
-		return (items.size() == 0) ? null : items.get(items.size() - 1);
+		return (items.isEmpty()) ? null : items.get(items.size() - 1);
 	}
 
 	/**
@@ -64,7 +65,7 @@ public class Stockpile extends Tile {
 	 * 
 	 * @return the arrayList containing all items on this stockpile
 	 */
-	public ArrayList<Item> getAllItems() {
+	public List<Item> getAllItems() {
 		return items;
 	}
 

@@ -558,7 +558,7 @@ public class MainStage extends Stage {
 		// https://stackoverflow.com/a/49159612/13670629
 		darkModeMenuItem = new CheckMenuItem("Darkmode");
 		darkModeMenuItem.selectedProperty().addListener((obs, oldVal, newVal) -> {
-			if (newVal) {
+			if (Boolean.TRUE.equals(newVal)) {
 				scene.getStylesheets().add("css/dark-theme.css");
 			} else
 				scene.getStylesheets().remove("css/dark-theme.css");

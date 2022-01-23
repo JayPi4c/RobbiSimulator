@@ -154,7 +154,7 @@ public class ProgramController {
 				.collect(Collectors.toCollection(ArrayList::new));
 
 		logger.debug("Found following files in 'programs' directory:");
-		filenamesInDirectory.forEach(f -> logger.debug(f));
+		filenamesInDirectory.forEach(logger::debug);
 		return filenamesInDirectory;
 	}
 
@@ -440,7 +440,7 @@ public class ProgramController {
 					.getJavaFileObjectsFromFiles(Arrays.asList(program.getFile()));
 			CompilationTask task = javac.getTask(null, manager, diagnostics, null, null, units);
 
-			if (!task.call()) {
+			if (Boolean.FALSE.equals(task.call())) {
 				boolean showedAlert = false; // flag to indicate that only one alert is shown
 				diagnostics.toString();
 				logger.error("Compilation failed");
@@ -485,7 +485,7 @@ public class ProgramController {
 					if (!hasValidAnnotations(r, diag)) {
 						List<Diagnostics.Diagnostic> diags = diag.getDiagnostics();
 						String val = null, type = null;
-						if (diags.size() > 0) {
+						if (!diags.isEmpty()) {
 							Diagnostics.Diagnostic diagnostic = diags.get(0);
 							val = diagnostic.value();
 							type = diagnostic.type();
@@ -579,8 +579,8 @@ public class ProgramController {
 		for (Parameter parameter : method.getParameters()) {
 			Annotation annotations[] = parameter.getAnnotations();
 			for (Annotation annotation : annotations) {
-				if (annotation instanceof Default) {
-					if (!valueAcceptable(parameter, (Default) annotation, diag))
+				if (annotation instanceof Default anno) {
+					if (!valueAcceptable(parameter, anno, diag))
 						result = false;
 					// return false;
 				}
@@ -644,9 +644,7 @@ public class ProgramController {
 		List<Method> methods = new ArrayList<>();
 		// if robbi is custom class
 		if (Robbi.class != robbi.getClass()) {
-			for (Method m : robbi.getClass().getDeclaredMethods()) {
-				methods.add(m);
-			}
+			methods.addAll(Arrays.asList(robbi.getClass().getDeclaredMethods()));
 		}
 		return methods.toArray(new Method[0]);
 	}

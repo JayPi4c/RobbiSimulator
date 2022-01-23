@@ -77,7 +77,7 @@ public class ExamplesController implements ILanguageChangeListener {
 						Optional<Integer> idOpt = showProgramSelection(programsOpt.get());
 						idOpt.ifPresentOrElse(id -> {
 							Optional<Example> exOpt = DatabaseManager.getDatabaseManager().loadExample(id);
-							exOpt.ifPresentOrElse(example -> example.load(),
+							exOpt.ifPresentOrElse(Example::load,
 									() -> logger.debug("Could not load example from database"));
 						}, () -> logger.debug("No example selected"));
 					}
@@ -317,7 +317,7 @@ public class ExamplesController implements ILanguageChangeListener {
 		});
 
 		comboBox.showingProperty().addListener((obs, oldVal, newVal) -> {
-			if (newVal) {
+			if (Boolean.TRUE.equals(newVal)) {
 				@SuppressWarnings("unchecked")
 				ListView<HideableItem<T>> lv = (ListView<HideableItem<T>>) ((ComboBoxListViewSkin<?>) comboBox
 						.getSkin()).getPopupContent();

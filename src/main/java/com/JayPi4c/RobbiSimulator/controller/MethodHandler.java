@@ -53,8 +53,8 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 			List<Object> args = new ArrayList<>();
 			for (Parameter p : method.getParameters()) {
 				for (Annotation anno : p.getAnnotations()) {
-					if (anno instanceof Default) {
-						String val = ((Default) anno).value();
+					if (anno instanceof Default a) {
+						String val = a.value();
 						try {
 							switch (p.getType().getName()) {
 							case "int":

@@ -38,13 +38,13 @@ public class TerritoryPanel extends Canvas implements Observer {
 	private static Image itemImages[] = new Image[3];
 	private static Image robbiImage;
 
-	private final static int TILE = 0;
-	private final static int STOCKPILE = 1;
-	private final static int HOLLOW = 2;
-	private final static int PILEOFSCRAP = 3;
-	private final static int NUT = 0;
-	private final static int SCREW = 1;
-	private final static int ACCU = 2;
+	private static final int TILE = 0;
+	private static final int STOCKPILE = 1;
+	private static final int HOLLOW = 2;
+	private static final int PILEOFSCRAP = 3;
+	private static final int NUT = 0;
+	private static final int SCREW = 1;
+	private static final int ACCU = 2;
 
 	private static final int CELLSIZE = 32;
 	private static final int CELLSPACER = 1;
@@ -163,9 +163,8 @@ public class TerritoryPanel extends Canvas implements Observer {
 
 				} else if (t instanceof PileOfScrap) {
 					gc.drawImage(tileImages[PILEOFSCRAP], getPos(i), getPos(j), CELLSIZE, CELLSIZE);
-				} else if (t instanceof Stockpile) {
+				} else if (t instanceof Stockpile stockpile) {
 					gc.drawImage(tileImages[STOCKPILE], getPos(i), getPos(j), CELLSIZE, CELLSIZE);
-					Stockpile stockpile = (Stockpile) t;
 					boolean nutDrawn = false;
 					boolean accuDrawn = false;
 					boolean screwDrawn = false;

@@ -84,8 +84,7 @@ public class DatabaseManager {
 			Connection conn = connection.get();
 			try {
 				conn.setAutoCommit(false);
-				try (PreparedStatement stmt = conn.prepareStatement(INSERT_EXAMPLE,
-						PreparedStatement.RETURN_GENERATED_KEYS)) {
+				try (PreparedStatement stmt = conn.prepareStatement(INSERT_EXAMPLE, Statement.RETURN_GENERATED_KEYS)) {
 					stmt.setString(1, programName);
 					stmt.setString(2, editorContent);
 					stmt.setString(3, territoryXML);
@@ -159,11 +158,11 @@ public class DatabaseManager {
 						try (ResultSet resultSet = s.executeQuery()) {
 							if (resultSet.next()) { // ids are unique -> only one result
 								String name = resultSet.getString("name");
-								programs.add(new Pair<Integer, String>(id, name));
+								programs.add(new Pair<>(id, name));
 							}
 						}
 					}
-					if (programs.size() == 0)
+					if (programs.isEmpty())
 						return Optional.empty();
 					else
 						return Optional.of(programs);
@@ -295,7 +294,7 @@ public class DatabaseManager {
 				stmt.close();
 			}
 
-			initialized = true;
+			DatabaseManager.initialized = true;
 			return true;
 		} catch (SQLException e) {
 			return false;

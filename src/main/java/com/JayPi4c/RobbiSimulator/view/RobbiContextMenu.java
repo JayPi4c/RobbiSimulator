@@ -122,9 +122,9 @@ public class RobbiContextMenu extends ContextMenu {
 			bobTheBuilder.append(parameter.getType());
 			List<Annotation> annos = Arrays.asList(parameter.getAnnotations());
 			for (Annotation anno : annos)
-				if (anno instanceof Default) {
+				if (anno instanceof Default a) {
 					bobTheBuilder.append(" = ");
-					bobTheBuilder.append(((Default) anno).value());
+					bobTheBuilder.append(a.value());
 				}
 			// bobTheBuilder.append(" ");
 			// bobTheBuilder.append(parameter.getName());

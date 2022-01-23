@@ -119,7 +119,7 @@ public class SimulationController {
 		logger.debug("Resuming simulation");
 		simulation.setPause(false);
 		synchronized (simulation) {
-			simulation.notify();
+			simulation.notifyAll();
 		}
 		disableButtonStates(true, false, false);
 	}
@@ -133,7 +133,7 @@ public class SimulationController {
 		simulation.setPause(false);
 		simulation.interrupt();
 		synchronized (simulation) {
-			simulation.notify();
+			simulation.notifyAll();
 		}
 	}
 

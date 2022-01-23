@@ -38,6 +38,8 @@ public class Territory extends Observable implements Serializable {
 
 	private transient Robbi robbi;
 
+	// TODO move setĆhanged and notify out of synchronized.
+
 	/**
 	 * Array-attribute to store the real territory
 	 */
@@ -530,9 +532,11 @@ public class Territory extends Observable implements Serializable {
 						robbiY = Integer.parseInt(parser.getAttributeValue(null, "row"));
 						x = -1;
 						y = -1;
+						break;
 					default:
 						break;
 					}
+					break;
 				case XMLStreamConstants.CHARACTERS:
 					break;
 				case XMLStreamConstants.END_ELEMENT:
@@ -620,12 +624,12 @@ public class Territory extends Observable implements Serializable {
 							writer.writeAttribute("col", Integer.toString(i));
 							writer.writeAttribute("row", Integer.toString(j));
 							writer.writeCharacters("\n");
-						} else if (t instanceof Stockpile) {
+						} else if (t instanceof Stockpile stockpile) {
 							writer.writeStartElement("stockpile");
 							writer.writeAttribute("col", Integer.toString(i));
 							writer.writeAttribute("row", Integer.toString(j));
 							writer.writeCharacters("\n");
-							for (Item item : ((Stockpile) t).getAllItems()) {
+							for (Item item : stockpile.getAllItems()) {
 								writeItem(writer, item);
 							}
 						} else {
