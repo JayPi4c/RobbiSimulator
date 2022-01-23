@@ -1,5 +1,6 @@
 package com.JayPi4c.RobbiSimulator.view;
 
+import org.apache.derby.tools.sysinfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Layout;
@@ -575,9 +576,10 @@ public class MainStage extends Stage {
 			String javaFxVersion = System.getProperty("javafx.version");
 			String javaVersion = System.getProperty("java.version");
 			String log4JVersion = Layout.class.getPackage().getImplementationVersion();
+			String derbyVersion = sysinfo.getVersionString();
 			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 					String.format(Messages.getString("Menu.window.libraries.content"), javaVersion, javaFxVersion,
-							log4JVersion),
+							log4JVersion, derbyVersion),
 					this, Modality.WINDOW_MODAL, Messages.getString("Menu.window.libraries.title"),
 					Messages.getString("Menu.window.libraries.header"));
 		});
