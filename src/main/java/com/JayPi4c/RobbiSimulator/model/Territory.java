@@ -497,17 +497,17 @@ public class Territory extends Observable implements Serializable {
 					case "pileofscrap":
 						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
 						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
-						territory.placePileOfScrap(x, y);
+						territory.tiles[x][y] = new PileOfScrap();
 						break;
 					case "hollow":
 						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
 						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
-						territory.placeHollow(x, y);
+						territory.tiles[x][y] = new Hollow();
 						break;
 					case "stockpile":
 						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
 						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
-						territory.placeStockpile(x, y);
+						territory.tiles[x][y] = new Stockpile();
 						break;
 					case "tile":
 						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
@@ -542,6 +542,7 @@ public class Territory extends Observable implements Serializable {
 				}
 				parser.next();
 			}
+			// TODO: check if the new territory is valid
 			update(territory, robbiItem, robbiX, robbiY, robbiDirection);
 		} catch (Exception e) {
 			e.printStackTrace();
