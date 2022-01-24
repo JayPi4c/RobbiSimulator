@@ -34,9 +34,9 @@ import javax.tools.ToolProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 

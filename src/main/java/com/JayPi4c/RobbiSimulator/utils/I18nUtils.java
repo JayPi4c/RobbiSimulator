@@ -1,4 +1,4 @@
-package com.JayPi4c.RobbiSimulator.controller;
+package com.JayPi4c.RobbiSimulator.utils;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

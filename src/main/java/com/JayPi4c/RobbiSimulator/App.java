@@ -3,10 +3,10 @@ package com.JayPi4c.RobbiSimulator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
 import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 

@@ -2,6 +2,7 @@ package com.JayPi4c.RobbiSimulator.controller;
 
 import java.util.Locale;
 
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.beans.binding.Bindings;

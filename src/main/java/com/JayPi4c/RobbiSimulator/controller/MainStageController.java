@@ -19,6 +19,7 @@ import com.JayPi4c.RobbiSimulator.model.NoPileOfScrapAheadException;
 import com.JayPi4c.RobbiSimulator.model.TileBlockedException;
 import com.JayPi4c.RobbiSimulator.model.TileIsFullException;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 

@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
 import com.JayPi4c.RobbiSimulator.controller.MethodHandler;
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.model.Territory;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Invisible;
 

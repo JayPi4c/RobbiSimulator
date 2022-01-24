@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.JayPi4c.RobbiSimulator.model.Dimension;
 import com.JayPi4c.RobbiSimulator.model.Territory;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;

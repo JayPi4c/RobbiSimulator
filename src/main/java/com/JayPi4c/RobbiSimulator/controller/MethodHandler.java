@@ -10,6 +10,7 @@ import java.util.List;
 import com.JayPi4c.RobbiSimulator.model.RobbiException;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 
 import javafx.event.ActionEvent;

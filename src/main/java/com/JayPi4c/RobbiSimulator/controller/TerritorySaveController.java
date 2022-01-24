@@ -17,6 +17,7 @@ import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.model.DIRECTION;
 import com.JayPi4c.RobbiSimulator.model.Item;
 import com.JayPi4c.RobbiSimulator.model.Territory;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.stage.FileChooser;

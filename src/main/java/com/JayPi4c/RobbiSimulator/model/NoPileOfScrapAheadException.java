@@ -1,6 +1,6 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 
 /**
  * Exception to be thrown if robbi attempts to push a pile of scrap while there

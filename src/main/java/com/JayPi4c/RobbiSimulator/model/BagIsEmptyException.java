@@ -1,6 +1,6 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 
 /**
  * Exception to be thrown if an item is placed down while there is no item in

@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Layout;
 
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
-import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
 import com.JayPi4c.RobbiSimulator.controller.LanguageController;
 import com.JayPi4c.RobbiSimulator.controller.MainStageController;
 import com.JayPi4c.RobbiSimulator.controller.TerritorySaveController;
@@ -14,6 +13,7 @@ import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.simulation.SimulationController;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
