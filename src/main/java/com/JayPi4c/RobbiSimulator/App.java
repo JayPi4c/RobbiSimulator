@@ -5,8 +5,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
+import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
@@ -49,6 +51,8 @@ public class App extends Application {
 	public void init() {
 		logger.info("Initialize application");
 
+		PropertiesLoader.initialize();
+
 		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {
 			logger.error("Failed to load Program Controller");
@@ -64,6 +68,12 @@ public class App extends Application {
 		else
 			logger.debug("Connecting to Database failed");
 
+		if (PropertiesLoader.isTutor()) {
+			logger.debug("Starting Tutor Server");
+			TutorController.initialize();
+			logger.debug("Server started");
+		}
+
 		logger.debug("Loading images");
 		MainStage.loadImages();
 		TerritoryPanel.loadImages();
@@ -76,6 +86,12 @@ public class App extends Application {
 		logger.debug("Closing Database Connection");
 		DatabaseManager.getDatabaseManager().shutDown();
 		logger.debug("Closing Database Connection successfully");
+
+		if (PropertiesLoader.isTutor()) {
+			logger.debug("Stopping Tutor-Server.");
+			TutorController.shutdown();
+			logger.debug("Tutor-Server stopped successfully.");
+		}
 
 		logger.info("Quitting application");
 	}

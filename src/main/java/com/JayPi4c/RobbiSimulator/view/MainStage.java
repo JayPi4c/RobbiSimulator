@@ -11,9 +11,12 @@ import com.JayPi4c.RobbiSimulator.controller.TerritorySaveController;
 import com.JayPi4c.RobbiSimulator.controller.examples.ExamplesController;
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.simulation.SimulationController;
+import com.JayPi4c.RobbiSimulator.controller.tutor.StudentController;
+import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -65,6 +68,8 @@ public class MainStage extends Stage {
 	private SimulationController simController;
 	private TerritorySaveController territorySaveController;
 	private ExamplesController examplesController;
+	private StudentController studenController;
+	private TutorController tutorController;
 
 	/**
 	 * Constant for the minimum value for the speed slider.
@@ -167,6 +172,13 @@ public class MainStage extends Stage {
 	private MenuItem infoMenuItem;
 	private MenuItem libraryMenuItem;
 	private Menu windowMenu;
+
+	// tutor Menu
+	private Menu tutorMenu;
+	private MenuItem sendRequestMenuItem;
+	private MenuItem receiveAnswerMenuItem;
+	private MenuItem loadRequestMenuItem;
+	private MenuItem saveAnswerMenuItem;
 
 	private MenuBar menubar;
 
@@ -338,6 +350,11 @@ public class MainStage extends Stage {
 		simController = new SimulationController(this, territory);
 		territorySaveController = new TerritorySaveController(this);
 		examplesController = new ExamplesController(this);
+
+		if (PropertiesLoader.isTutor())
+			tutorController = new TutorController(this);
+		else
+			studenController = new StudentController(this);
 
 		show();
 		textArea.requestFocus();
@@ -587,6 +604,20 @@ public class MainStage extends Stage {
 				darkModeMenuItem, new SeparatorMenuItem(), infoMenuItem, libraryMenuItem);
 	}
 
+	private void createTutorMenu() {
+		if (PropertiesLoader.isTutor()) {
+			loadRequestMenuItem = new MenuItem(Messages.getString("Menu.tutor.loadRequest"));
+			saveAnswerMenuItem = new MenuItem(Messages.getString("Menu.tutor.saveAnswer"));
+
+			tutorMenu = new Menu(Messages.getString("Menu.tutor"), null, loadRequestMenuItem, saveAnswerMenuItem);
+		} else {
+			sendRequestMenuItem = new MenuItem(Messages.getString("Menu.tutor.sendRequest"));
+			receiveAnswerMenuItem = new MenuItem(Messages.getString("Menu.tutor.receiveAnswer"));
+
+			tutorMenu = new Menu(Messages.getString("Menu.tutor"), null, sendRequestMenuItem, receiveAnswerMenuItem);
+		}
+	}
+
 	/**
 	 * Creates the entire menuBar.
 	 */
@@ -599,7 +630,9 @@ public class MainStage extends Stage {
 		createSimulation();
 		createExamplesMenu();
 		createWindowMenu();
-		menubar = new MenuBar(editorMenu, territoryMenu, robbiMenu, simulationMenu, examplesMenu, windowMenu);
+		createTutorMenu();
+		menubar = new MenuBar(editorMenu, territoryMenu, robbiMenu, simulationMenu, examplesMenu, windowMenu,
+				tutorMenu);
 	}
 
 	/**
@@ -1505,6 +1538,27 @@ public class MainStage extends Stage {
 	 */
 	public Menu getWindowMenu() {
 		return windowMenu;
+	}
+
+	// TODO javaDoc
+	public Menu getTutorMenu() {
+		return tutorMenu;
+	}
+
+	public MenuItem getSendRequestMenuItem() {
+		return sendRequestMenuItem;
+	}
+
+	public MenuItem getReceiveAnswerMenuItem() {
+		return receiveAnswerMenuItem;
+	}
+
+	public MenuItem getSaveAnswerMenuItem() {
+		return saveAnswerMenuItem;
+	}
+
+	public MenuItem getLoadRequestMenuItem() {
+		return loadRequestMenuItem;
 	}
 
 	/**
