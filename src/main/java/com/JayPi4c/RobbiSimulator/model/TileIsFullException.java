@@ -1,6 +1,6 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
 
 /**
  * Exception to be thrown if robbi attempts to place an item on a tile, that has
@@ -17,7 +17,7 @@ public class TileIsFullException extends RobbiException {
 	 * Constructor for a new TileIsFullException with localized message.
 	 */
 	public TileIsFullException() {
-		super(Messages.getString("Exception.TileIsFull"));
+		super(I18nUtils.i18n("Exception.TileIsFull"));
 	}
 
 }

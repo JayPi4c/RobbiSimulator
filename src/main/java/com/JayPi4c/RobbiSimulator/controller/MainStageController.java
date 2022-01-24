@@ -19,8 +19,6 @@ import com.JayPi4c.RobbiSimulator.model.NoPileOfScrapAheadException;
 import com.JayPi4c.RobbiSimulator.model.TileBlockedException;
 import com.JayPi4c.RobbiSimulator.model.TileIsFullException;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
@@ -35,7 +33,6 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.transform.Scale;
@@ -47,7 +44,7 @@ import javafx.stage.FileChooser;
  * @author Jonas Pohl
  *
  */
-public class MainStageController implements ILanguageChangeListener {
+public class MainStageController {
 	private static final Logger logger = LogManager.getLogger(MainStageController.class);
 
 	private ButtonState buttonState;
@@ -69,9 +66,7 @@ public class MainStageController implements ILanguageChangeListener {
 		this.mainStage = mainStage;
 		this.buttonState = buttonState;
 
-		Messages.registerListener(this);
-
-		mainStage.setTitle(Messages.getString("Main.title") + ": " + mainStage.getProgram().getName());
+		mainStage.setTitle(I18nUtils.i18n("Main.title") + ": " + mainStage.getProgram().getName());
 		mainStage.setOnCloseRequest(e -> {
 			mainStage.getProgram().save(mainStage.getTextArea().getText());
 			ProgramController.close(mainStage.getProgram().getName());
@@ -152,28 +147,26 @@ public class MainStageController implements ILanguageChangeListener {
 		// set robbi menuitem actions
 		mainStage.getItemPresentMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						Messages.getString("Execution.information.itemPresent")
+						I18nUtils.i18n("Execution.information.itemPresent")
 								+ mainStage.getTerritory().getRobbi().gegenstandDa(),
 						mainStage));
 
-		mainStage.getIsStockpileMenuItem()
-				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						Messages.getString("Execution.information.stockpile")
-								+ mainStage.getTerritory().getRobbi().istLagerplatz(),
-						mainStage));
+		mainStage.getIsStockpileMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+				I18nUtils.i18n("Execution.information.stockpile") + mainStage.getTerritory().getRobbi().istLagerplatz(),
+				mainStage));
 
 		mainStage.getHollowAheadMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-				Messages.getString("Execution.information.hollow") + mainStage.getTerritory().getRobbi().vornKuhle(),
+				I18nUtils.i18n("Execution.information.hollow") + mainStage.getTerritory().getRobbi().vornKuhle(),
 				mainStage));
 
 		mainStage.getPileOfScrapAheadMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						Messages.getString("Execution.information.pileOfScrap")
+						I18nUtils.i18n("Execution.information.pileOfScrap")
 								+ mainStage.getTerritory().getRobbi().vornSchrotthaufen(),
 						mainStage));
 
 		mainStage.getIsBagFullMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-				Messages.getString("Execution.information.bag") + mainStage.getTerritory().getRobbi().istTascheVoll(),
+				I18nUtils.i18n("Execution.information.bag") + mainStage.getTerritory().getRobbi().istTascheVoll(),
 				mainStage));
 
 		mainStage.getPushPileOfScrapMenuItem().setOnAction(e -> {
@@ -218,24 +211,24 @@ public class MainStageController implements ILanguageChangeListener {
 
 		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
 			String extension = ".png";
-			File file = getFile(Messages.getString("Menu.territory.saveAsPic.png.description"), extension);
+			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.png.description"), extension);
 			if (file == null)
 				return;
 
 			if (!saveAsImage(file, extension)) {
-				AlertHelper.showAlertAndWait(AlertType.ERROR, Messages.getString("Menu.territory.saveAsPic.error"),
+				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
 						mainStage);
 			}
 		});
 
 		mainStage.getSaveAsGifMenuItem().setOnAction(e -> {
 			String extension = ".gif";
-			File file = getFile(Messages.getString("Menu.territory.saveAsPic.gif.description"), extension);
+			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.gif.description"), extension);
 			if (file == null)
 				return;
 
 			if (!saveAsImage(file, extension)) {
-				AlertHelper.showAlertAndWait(AlertType.ERROR, Messages.getString("Menu.territory.saveAsPic.error"),
+				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
 						mainStage);
 			}
 		});
@@ -277,8 +270,7 @@ public class MainStageController implements ILanguageChangeListener {
 				}
 			} else {
 				logger.info("Failed to create printerJob");
-				AlertHelper.showAlertAndWait(AlertType.ERROR, Messages.getString("Menu.territory.print.error"),
-						mainStage);
+				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.print.error"), mainStage);
 			}
 		});
 
@@ -358,7 +350,7 @@ public class MainStageController implements ILanguageChangeListener {
 	 */
 	private String getTitle(Program program) {
 		StringBuilder builder = new StringBuilder();
-		builder.append(Messages.getString("Main.title")).append(": ").append(program.getName())
+		builder.append(I18nUtils.i18n("Main.title")).append(": ").append(program.getName())
 				.append((program.isEdited() ? "*" : ""));
 		return builder.toString();
 	}
@@ -424,112 +416,5 @@ public class MainStageController implements ILanguageChangeListener {
 			}
 
 		};
-	}
-
-	/**
-	 * When the language has changed, update all buttons to the new language.
-	 * 
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void onLanguageChanged() {
-		// Add multilanguage support
-		mainStage.setTitle(Messages.getString("Main.title") + ": " + mainStage.getProgram().getName()
-				+ (mainStage.getProgram().isEdited() ? "*" : ""));
-
-		mainStage.getNewEditorMenuItem().setText(Messages.getString("Menu.editor.new"));
-		mainStage.getSaveEditorMenuItem().setText(Messages.getString("Menu.editor.save"));
-		mainStage.getOpenEditorMenuItem().setText(Messages.getString("Menu.editor.open"));
-		mainStage.getCompileEditorMenuItem().setText(Messages.getString("Menu.editor.compile"));
-		mainStage.getPrintEditorMenuItem().setText(Messages.getString("Menu.editor.print"));
-		mainStage.getQuitEditorMenuItem().setText(Messages.getString("Menu.editor.quit"));
-		mainStage.getEditorMenu().setText(Messages.getString("Menu.editor"));
-
-		// territory Menu
-		mainStage.getSaveXMLTerritoryMenuItem().setText(Messages.getString("Menu.territory.save.xml"));
-		mainStage.getSaveJAXBTerritoryMenuItem().setText(Messages.getString("Menu.territory.save.jaxb"));
-		mainStage.getSaveSerialTerritoryMenuItem().setText(Messages.getString("Menu.territory.save.serialize"));
-		mainStage.getSaveTerritoryMenu().setText(Messages.getString("Menu.territory.save"));
-		mainStage.getLoadXMLTerritoryMenuItem().setText(Messages.getString("Menu.territory.load.xml"));
-		mainStage.getLoadJAXBTerritoryMenuItem().setText(Messages.getString("Menu.territory.load.jaxb"));
-		mainStage.getLoadSerialTerritoryMenuItem().setText(Messages.getString("Menu.territory.load.deserialize"));
-		mainStage.getLoadTerritoryMenu().setText(Messages.getString("Menu.territory.load"));
-		mainStage.getSaveAsPNGMenuItem().setText(Messages.getString("Menu.territory.saveAsPic.png"));
-		mainStage.getSaveAsGifMenuItem().setText(Messages.getString("Menu.territory.saveAsPic.gif"));
-		mainStage.getSaveAsPicMenu().setText(Messages.getString("Menu.territory.saveAsPic"));
-		mainStage.getPrintTerritoryMenuItem().setText(Messages.getString("Menu.territory.print"));
-
-		mainStage.getChangeSizeTerritoryMenuItem().setText(Messages.getString("Menu.territory.size"));
-		mainStage.getPlaceRobbiTerritoryRadioMenuItem().setText(Messages.getString("Menu.territory.place.robbi"));
-		mainStage.getPlaceHollowTerritoryRadioMenuItem().setText(Messages.getString("Menu.territory.place.hollow"));
-		mainStage.getPlacePileOfScrapTerritoryRadioMenuItem()
-				.setText(Messages.getString("Menu.territory.place.pileOfScrap"));
-		mainStage.getPlaceStockpileTerritoryRadioMenuItem()
-				.setText(Messages.getString("Menu.territory.place.stockpile"));
-		mainStage.getPlaceAccuTerritoryRadioMenuItem().setText(Messages.getString("Menu.territory.place.accu"));
-		mainStage.getPlaceScrewTerritoryRadioMenuItem().setText(Messages.getString("Menu.territory.place.screw"));
-		mainStage.getPlaceNutTerritoryRadioMenuItem().setText(Messages.getString("Menu.territory.place.nut"));
-		mainStage.getDeleteFieldRadioMenuItem().setText(Messages.getString("Menu.territory.delete"));
-		mainStage.getTerritoryMenu().setText(Messages.getString("Menu.territory"));
-		// robbi Menu
-		mainStage.getItemPresentMenuItem().setText(Messages.getString("Menu.robbi.itemPresent"));
-		mainStage.getIsStockpileMenuItem().setText(Messages.getString("Menu.robbi.isStockpile"));
-		mainStage.getHollowAheadMenuItem().setText(Messages.getString("Menu.robbi.hollowAhead"));
-		mainStage.getPileOfScrapAheadMenuItem().setText(Messages.getString("Menu.robbi.pileOfScrapAhead"));
-		mainStage.getIsBagFullMenuItem().setText(Messages.getString("Menu.robbi.isBagFull"));
-		mainStage.getPushPileOfScrapMenuItem().setText(Messages.getString("Menu.robbi.pushPileOfScrap"));
-		mainStage.getMoveMenuItem().setText(Messages.getString("Menu.robbi.move"));
-		mainStage.getTurnLeftMenuItem().setText(Messages.getString("Menu.robbi.turnLeft"));
-		mainStage.getPutMenuItem().setText(Messages.getString("Menu.robbi.put"));
-		mainStage.getTakeMenuItem().setText(Messages.getString("Menu.robbi.take"));
-		mainStage.getRobbiMenu().setText(Messages.getString("Menu.robbi"));
-		// simulation Menu
-		mainStage.getStartMenuItem().setText(Messages.getString("Menu.simulation.start"));
-		mainStage.getPauseMenuItem().setText(Messages.getString("Menu.simulation.pause"));
-		mainStage.getStopMenuItem().setText(Messages.getString("Menu.simulation.stop"));
-		mainStage.getSimulationMenu().setText(Messages.getString("Menu.simulation"));
-		// window Meun
-		mainStage.getLanguageMenu().setText(Messages.getString("Menu.window.language"));
-		mainStage.getEnglishLanguageMenuItem().setText(Messages.getString("Menu.window.language.english"));
-		mainStage.getGermanLanguageMenuItem().setText(Messages.getString("Menu.window.language.german"));
-		mainStage.getChangeCursorMenuItem().setText(Messages.getString("Menu.window.changeCursor"));
-		mainStage.getWindowMenu().setText(Messages.getString("Menu.window"));
-
-		// Tool bar
-		mainStage.getNewButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.control.new")));
-		mainStage.getLoadButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.control.load")));
-		mainStage.getSaveButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.control.save")));
-		mainStage.getCompileButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.control.compile")));
-
-		mainStage.getChangeSizeButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.territory.size")));
-		mainStage.getPlaceRobbiToggleButtonToolbar()
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeRobbi")));
-		mainStage.getPlaceHollowToggleButtonToolbar()
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeHollow")));
-		mainStage.getPlacePileOfScrapToggleButtonToolbar()
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placePileOfScrap")));
-		mainStage.getPlaceStockpileToggleButtonToolbar()
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeStockpile")));
-		mainStage.getPlaceAccuToggleButtonToolbar()
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeAccu")));
-		mainStage.getPlaceScrewToggleButtonToolbar()
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeScrew")));
-		mainStage.getPlaceNutToggleButtonToolbar()
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.placeNut")));
-		mainStage.getDeleteFieldToggleButtonToolbar()
-				.setTooltip(new Tooltip(Messages.getString("Toolbar.territory.delete")));
-
-		mainStage.getRobbiTurnLeftButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.turnLeft")));
-		mainStage.getRobbiMoveButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.move")));
-		mainStage.getRobbiPutButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.put")));
-		mainStage.getRobbiTakeButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.robbi.take")));
-
-		mainStage.getStartToggleButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.action.start")));
-		mainStage.getPauseToggleButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.action.pause")));
-		mainStage.getStopToggleButtonToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.action.stop")));
-		mainStage.getSpeedSliderToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.action.speed")));
-
-		mainStage.getMessageLabel().setText(Messages.getString("Messages.label.greeting"));
 	}
 }

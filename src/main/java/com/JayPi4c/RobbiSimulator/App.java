@@ -3,10 +3,10 @@ package com.JayPi4c.RobbiSimulator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
 import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
@@ -52,8 +52,8 @@ public class App extends Application {
 		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {
 			logger.error("Failed to load Program Controller");
-			AlertHelper.showAlertAndWait(AlertType.ERROR, Messages.getString("Init.error.message"), null, null,
-					Messages.getString("Init.error.title"), Messages.getString("Init.error.header"));
+			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Init.error.message"), null, null,
+					I18nUtils.i18n("Init.error.title"), I18nUtils.i18n("Init.error.header"));
 			Platform.exit();
 		}
 		logger.debug("loading Program Controller successfully");

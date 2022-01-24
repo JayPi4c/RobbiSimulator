@@ -1,6 +1,6 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
 
 /**
  * Exception to be thrown if an item is placed down while there is no item in
@@ -17,7 +17,7 @@ public class BagIsEmptyException extends RobbiException {
 	 * Constructor for a new BagIsEmptyException with a localized message.
 	 */
 	public BagIsEmptyException() {
-		super(Messages.getString("Exception.BagIsEmpty"));
+		super(I18nUtils.i18n("Exception.BagIsEmpty"));
 	}
 
 }

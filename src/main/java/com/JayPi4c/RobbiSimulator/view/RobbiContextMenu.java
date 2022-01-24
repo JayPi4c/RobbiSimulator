@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.JayPi4c.RobbiSimulator.controller.I18nUtils;
 import com.JayPi4c.RobbiSimulator.controller.MethodHandler;
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.model.Territory;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Invisible;
 
@@ -66,7 +66,7 @@ public class RobbiContextMenu extends ContextMenu {
 				if (method.getParameterCount() != 0 && !hasCorrectDefaultAnnotations(method)) {
 					item.setDisable(true);
 					// https://stackoverflow.com/a/43053529/13670629
-					Tooltip tooltip = new Tooltip(Messages.getString("Editor.contextMenu.tooltip"));
+					Tooltip tooltip = new Tooltip(I18nUtils.i18n("Editor.contextMenu.tooltip"));
 					Tooltip.install(item.getContent(), tooltip);
 
 				} else
