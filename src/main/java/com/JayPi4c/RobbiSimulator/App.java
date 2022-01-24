@@ -30,14 +30,6 @@ public class App extends Application {
 
 	private static final Logger logger = LogManager.getLogger(App.class);
 
-	@Override
-	public void start(Stage primaryStage) {
-		logger.info("Starting application");
-		logger.debug("Creating scene");
-		ProgramController.createAndShow(ProgramController.DEFAULT_ROBBI_FILE_NAME);
-		logger.debug("Scene creation done");
-	}
-
 	/**
 	 * Application entry point
 	 * 
@@ -51,7 +43,12 @@ public class App extends Application {
 	public void init() {
 		logger.info("Initialize application");
 
-		PropertiesLoader.initialize();
+		logger.debug("Initializing properties...");
+		if (PropertiesLoader.initialize()) {
+			logger.debug("Loaded properties successfully");
+			I18nUtils.setLocale(PropertiesLoader.getLocale());
+		} else
+			logger.debug("Failed to load properties.");
 
 		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {
@@ -84,6 +81,14 @@ public class App extends Application {
 	}
 
 	@Override
+	public void start(Stage primaryStage) {
+		logger.info("Starting application");
+		logger.debug("Creating scene");
+		ProgramController.createAndShow(ProgramController.DEFAULT_ROBBI_FILE_NAME);
+		logger.debug("Scene creation done");
+	}
+
+	@Override
 	public void stop() {
 		logger.debug("Closing Database Connection");
 		DatabaseManager.getDatabaseManager().shutDown();
@@ -96,6 +101,12 @@ public class App extends Application {
 			else
 				logger.debug("Failed to shutdown Tutor RMI server");
 		}
+
+		logger.debug("saving properties...");
+		if (PropertiesLoader.finish())
+			logger.debug("Properties saved");
+		else
+			logger.debug("Failed to save properties");
 
 		logger.info("Quitting application");
 	}
