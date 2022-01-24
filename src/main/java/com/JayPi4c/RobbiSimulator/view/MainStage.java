@@ -65,6 +65,7 @@ public class MainStage extends Stage {
 	private SimulationController simController;
 	private TerritorySaveController territorySaveController;
 	private ExamplesController examplesController;
+	private LanguageController languageController;
 
 	/**
 	 * Constant for the minimum value for the speed slider.
@@ -338,7 +339,7 @@ public class MainStage extends Stage {
 		simController = new SimulationController(this, territory);
 		territorySaveController = new TerritorySaveController(this);
 		examplesController = new ExamplesController(this);
-		new LanguageController(this); // TODO variable
+		languageController = new LanguageController(this);
 
 		show();
 		textArea.requestFocus();
@@ -1330,6 +1331,15 @@ public class MainStage extends Stage {
 	 */
 	public ExamplesController getExampleController() {
 		return examplesController;
+	}
+
+	/**
+	 * Getter for the languageController.
+	 * 
+	 * @return the languageController for this stage.
+	 */
+	public LanguageController getLanguageController() {
+		return languageController;
 	}
 
 	/**

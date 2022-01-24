@@ -9,9 +9,21 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.scene.control.Tooltip;
 
+/**
+ * Controller to handle the change of language.
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class LanguageController {
 	private MainStage stage;
 
+	/**
+	 * Constructor to create a new LanguageController. Sets the actions to the
+	 * languageSelection and binds text to all graphical elements.
+	 * 
+	 * @param mainStage the stage, this controller is for
+	 */
 	public LanguageController(MainStage mainStage) {
 		this.stage = mainStage;
 
@@ -80,7 +92,7 @@ public class LanguageController {
 		mainStage.getPauseMenuItem().textProperty().bind(createBinding("Menu.simulation.pause"));
 		mainStage.getStopMenuItem().textProperty().bind(createBinding("Menu.simulation.stop"));
 		mainStage.getSimulationMenu().textProperty().bind(createBinding("Menu.simulation"));
-		// window Meun
+		// window Menu
 		mainStage.getLanguageMenu().textProperty().bind(createBinding("Menu.window.language"));
 		mainStage.getEnglishLanguageMenuItem().textProperty().bind(createBinding("Menu.window.language.english"));
 		mainStage.getGermanLanguageMenuItem().textProperty().bind(createBinding("Menu.window.language.german"));
@@ -132,6 +144,12 @@ public class LanguageController {
 
 	}
 
+	/**
+	 * Helper to crate a new String Binding for the provided key.
+	 * 
+	 * @param key the key to be mapped on the resources
+	 * @return a binding for the provided key
+	 */
 	private StringBinding createBinding(String key) {
 		return Bindings.createStringBinding(() -> I18nUtils.i18n(key), I18nUtils.localeProperty());
 	}
