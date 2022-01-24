@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Optional;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -481,6 +482,8 @@ public class Territory extends Observable implements Serializable {
 			int x = 0;
 			int y = 0;
 			XMLInputFactory factory = XMLInputFactory.newInstance();
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 			XMLStreamReader parser = factory.createXMLStreamReader(stream);
 			while (parser.hasNext()) {
 				switch (parser.getEventType()) {

@@ -43,7 +43,7 @@ public class RobbiContextMenu extends ContextMenu {
 	 */
 	public RobbiContextMenu(Territory territory, Window parent) {
 
-		for (Method method : getDefaultMethods(territory.getRobbi())) {
+		for (Method method : getDefaultMethods()) {
 			MenuItem item = getMenuItem(method);
 
 			// if method needs arguments and no Parameterized Annotation is set -> disable
@@ -141,10 +141,9 @@ public class RobbiContextMenu extends ContextMenu {
 	 * Get all methods that are part of the default implementation, that are
 	 * visibile to the user.
 	 * 
-	 * @param robbi the robbi instance to get the default methods from
 	 * @return all methods that are part of the default implementation
 	 */
-	private Method[] getDefaultMethods(Robbi robbi) {
+	private Method[] getDefaultMethods() {
 		List<Method> methods = new ArrayList<>();
 
 		for (Method m : Robbi.class.getDeclaredMethods()) {

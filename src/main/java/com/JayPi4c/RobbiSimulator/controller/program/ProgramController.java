@@ -610,8 +610,7 @@ public class ProgramController {
 			case "boolean":
 				return val.equalsIgnoreCase("true") || val.equalsIgnoreCase("false");
 			case "char":
-				val.subSequence(0, 1);
-				return true;
+				return !val.isBlank();
 			case "double":
 				Double.parseDouble(val);
 				return true;

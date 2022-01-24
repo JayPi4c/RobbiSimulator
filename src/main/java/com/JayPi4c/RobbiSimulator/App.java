@@ -60,7 +60,7 @@ public class App extends Application {
 		logger.debug("loading Program Controller successfully");
 
 		logger.debug("Connecting to Database");
-		if (DatabaseManager.getDatabaseManager().initialize())
+		if (DatabaseManager.initialize())
 			logger.debug("Connecting to Database successfully");
 		else
 			logger.debug("Connecting to Database failed");

@@ -20,8 +20,14 @@ public class PropertiesLoader {
 	private static final Logger logger = LogManager.getLogger(PropertiesLoader.class);
 	private static Properties properties;
 
-	private static final String dir = System.getProperty("user.dir");
-	private static final String file = "/simulator.properties";
+	private static final String DIR = System.getProperty("user.dir");
+	private static final String FILE = "/simulator.properties";
+
+	/**
+	 * Private constructor to hide the implicit one.
+	 */
+	private PropertiesLoader() {
+	}
 
 	/**
 	 * Loads the properties and stores them in an Object.
@@ -30,7 +36,7 @@ public class PropertiesLoader {
 	 */
 	public static boolean initialize() {
 		properties = new Properties();
-		try (InputStream in = new FileInputStream(dir + file)) {
+		try (InputStream in = new FileInputStream(DIR + FILE)) {
 			properties.load(in);
 			return true;
 		} catch (IOException e) {
@@ -92,7 +98,7 @@ public class PropertiesLoader {
 	 */
 	public static boolean finish() {
 		properties.put("lang", I18nUtils.getLocale().toString());
-		try (FileOutputStream fos = new FileOutputStream(dir + file)) {
+		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {
 			properties.store(fos, null);
 			return true;
 		} catch (IOException e) {

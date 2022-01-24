@@ -23,7 +23,7 @@ public class Tutor extends UnicastRemoteObject implements ITutor {
 
 	private static final Logger logger = LogManager.getLogger(Tutor.class);
 
-	private List<Request> requests;
+	private transient List<Request> requests;
 	private int currentID = 0;
 
 	private Map<Integer, Answer> answers;

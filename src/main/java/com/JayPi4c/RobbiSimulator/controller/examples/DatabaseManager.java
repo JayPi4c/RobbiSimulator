@@ -259,7 +259,7 @@ public class DatabaseManager {
 	 * 
 	 * @return true if the initialization was successful, false otherwise
 	 */
-	public boolean initialize() {
+	public static boolean initialize() {
 		logger.debug("initialize database");
 		try {
 			// Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
