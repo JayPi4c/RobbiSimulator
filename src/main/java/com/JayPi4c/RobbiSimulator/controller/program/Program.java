@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.JayPi4c.RobbiSimulator.utils.Observable;
+
 /**
  * This class contains the contents, the name of program and whether it is
  * edited or not
@@ -14,7 +16,7 @@ import java.io.IOException;
  * @author Jonas Pohl
  *
  */
-public class Program {
+public class Program extends Observable {
 
 	private String name;
 
@@ -73,6 +75,18 @@ public class Program {
 	 */
 	public String getEditorContent() {
 		return this.editorContent;
+	}
+
+	/**
+	 * Sets the editorContent and notifies all Observers, namely the
+	 * MainStageController to update the textEditors content.
+	 * 
+	 * @param content the new content
+	 */
+	public void setEditorContent(String content) {
+		this.editorContent = content;
+		this.setChanged();
+		this.notifyAllObservers();
 	}
 
 	/**

@@ -69,9 +69,11 @@ public class App extends Application {
 			logger.debug("Connecting to Database failed");
 
 		if (PropertiesLoader.isTutor()) {
-			logger.debug("Starting Tutor Server");
-			TutorController.initialize();
-			logger.debug("Server started");
+			logger.debug("Starting Tutor RMI server");
+			if (TutorController.initialize())
+				logger.debug("RMI server started");
+			else
+				logger.debug("Failed to initialize RMI server.");
 		}
 
 		logger.debug("Loading images");
@@ -89,8 +91,10 @@ public class App extends Application {
 
 		if (PropertiesLoader.isTutor()) {
 			logger.debug("Stopping Tutor-Server.");
-			TutorController.shutdown();
-			logger.debug("Tutor-Server stopped successfully.");
+			if (TutorController.shutdown())
+				logger.debug("Tutor RMI server stopped successfully.");
+			else
+				logger.debug("Failed to shutdown Tutor RMI server");
 		}
 
 		logger.info("Quitting application");

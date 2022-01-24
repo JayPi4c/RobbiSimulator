@@ -16,12 +16,22 @@ public class PropertiesLoader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		System.out.println(properties.get("role"));
 	}
 
 	public static boolean isTutor() {
-		return properties.get("role").toString().equalsIgnoreCase("Tutor");
+		return properties.getProperty("role").toString().equalsIgnoreCase("Tutor");
+	}
+
+	public static String getTutorhost() {
+		return properties.getProperty("tutorhost");
+	}
+
+	public static int getTutorport() {
+		try {
+			return Integer.parseInt(properties.getProperty("tutorport"));
+		} catch (NumberFormatException e) {
+			return -1;
+		}
 	}
 
 }

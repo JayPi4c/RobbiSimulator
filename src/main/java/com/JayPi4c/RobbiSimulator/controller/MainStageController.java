@@ -21,6 +21,8 @@ import com.JayPi4c.RobbiSimulator.model.TileIsFullException;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.Observable;
+import com.JayPi4c.RobbiSimulator.utils.Observer;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
@@ -47,7 +49,7 @@ import javafx.stage.FileChooser;
  * @author Jonas Pohl
  *
  */
-public class MainStageController implements ILanguageChangeListener {
+public class MainStageController implements ILanguageChangeListener, Observer {
 	private static final Logger logger = LogManager.getLogger(MainStageController.class);
 
 	private ButtonState buttonState;
@@ -68,6 +70,7 @@ public class MainStageController implements ILanguageChangeListener {
 	public MainStageController(MainStage mainStage, ButtonState buttonState) {
 		this.mainStage = mainStage;
 		this.buttonState = buttonState;
+		this.mainStage.getProgram().addObserver(this);
 
 		Messages.registerListener(this);
 
@@ -531,5 +534,12 @@ public class MainStageController implements ILanguageChangeListener {
 		mainStage.getSpeedSliderToolbar().setTooltip(new Tooltip(Messages.getString("Toolbar.action.speed")));
 
 		mainStage.getMessageLabel().setText(Messages.getString("Messages.label.greeting"));
+	}
+
+	@Override
+	public void update(Observable observable) {
+		if (observable instanceof Program program) {
+			mainStage.getTextArea().setText(program.getEditorContent());
+		}
 	}
 }

@@ -1370,6 +1370,24 @@ public class MainStage extends Stage {
 	}
 
 	/**
+	 * Getter for the studentController.
+	 * 
+	 * @return the studentController for this stage.
+	 */
+	public StudentController getStudentController() {
+		return studenController;
+	}
+
+	/**
+	 * Getter for the tutorController.
+	 * 
+	 * @return the tutorController for this stage.
+	 */
+	public TutorController getTutorController() {
+		return tutorController;
+	}
+
+	/**
 	 * Getter for the editorMenu.
 	 * 
 	 * @return the editorMenu for this stage
