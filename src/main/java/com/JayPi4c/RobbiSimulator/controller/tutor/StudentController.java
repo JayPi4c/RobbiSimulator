@@ -10,14 +10,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.scene.control.Alert.AlertType;
 
-public class StudentController implements ILanguageChangeListener {
+public class StudentController {
 	private static Logger logger = LogManager.getLogger(StudentController.class);
 
 	private int requestID;
@@ -26,7 +25,6 @@ public class StudentController implements ILanguageChangeListener {
 
 	public StudentController(MainStage stage) {
 		this.stage = stage;
-		Messages.registerListener(this);
 		stage.getSendRequestMenuItem().setOnAction(e -> sendRequest());
 		stage.getReceiveAnswerMenuItem().setOnAction(e -> receiveAnswer());
 		stage.getSendRequestMenuItem().setDisable(false);
@@ -41,8 +39,8 @@ public class StudentController implements ILanguageChangeListener {
 			Answer answer = tutor.getAnswer(requestID);
 			if (answer == null) {
 				logger.debug("Answer is not ready yet!");
-				AlertHelper.createAlert(AlertType.INFORMATION,
-						Messages.getString("Menu.tutor.receiveAnswer.information"), stage);
+				AlertHelper.createAlert(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.receiveAnswer.information"),
+						stage);
 				return;
 			}
 			stage.getProgram().setEditorContent(answer.code());
@@ -65,17 +63,12 @@ public class StudentController implements ILanguageChangeListener {
 			logger.debug("The request has ID {}.", requestID);
 			stage.getSendRequestMenuItem().setDisable(true);
 			stage.getReceiveAnswerMenuItem().setDisable(false);
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-					Messages.getString("Menu.tutor.sendRequest.information"), stage);
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.sendRequest.information"),
+					stage);
 		} catch (RemoteException | NotBoundException e) {
 			e.printStackTrace();
 			logger.debug("Failed to send request to tutor.");
 		}
-	}
-
-	@Override
-	public void onLanguageChanged() {
-		// TODO
 	}
 
 }

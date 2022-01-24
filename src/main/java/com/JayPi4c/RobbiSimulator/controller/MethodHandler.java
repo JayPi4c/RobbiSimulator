@@ -10,7 +10,7 @@ import java.util.List;
 import com.JayPi4c.RobbiSimulator.model.RobbiException;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 
 import javafx.event.ActionEvent;
@@ -81,9 +81,8 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 
 							}
 						} catch (IllegalArgumentException e) {
-							AlertHelper.showAlertAndWait(AlertType.ERROR,
-									String.format(Messages.getString("Editor.contextMenu.executionError"), val,
-											method.getName()),
+							AlertHelper.showAlertAndWait(AlertType.ERROR, String
+									.format(I18nUtils.i18n("Editor.contextMenu.executionError"), val, method.getName()),
 									parent);
 							return;
 						}
@@ -96,7 +95,7 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 
 			if (result != null) {
 				AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						Messages.getString("Execution.information.result") + result.toString(), parent);
+						I18nUtils.i18n("Execution.information.result") + result.toString(), parent);
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();

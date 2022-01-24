@@ -1,6 +1,6 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 
 /**
  * Exception to be thrown if an item is picked up while the bag is already full.
@@ -16,7 +16,7 @@ public class BagIsFullException extends RobbiException {
 	 * Constructor for a new BagIsFullException with a localized message.
 	 */
 	public BagIsFullException() {
-		super(Messages.getString("Exception.BagIsFull"));
+		super(I18nUtils.i18n("Exception.BagIsFull"));
 	}
 
 }

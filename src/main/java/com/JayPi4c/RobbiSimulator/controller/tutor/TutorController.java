@@ -12,7 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
@@ -49,7 +49,7 @@ public class TutorController {
 			stage.getSaveAnswerMenuItem().setDisable(false);
 		}, () -> {
 			logger.debug("no request available");
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, Messages.getString("Menu.tutor.loadRequest.warning"),
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.loadRequest.warning"),
 					stage);
 		});
 	}
@@ -62,8 +62,7 @@ public class TutorController {
 		currentID = NO_ID;
 		stage.getLoadRequestMenuItem().setDisable(false);
 		stage.getSaveAnswerMenuItem().setDisable(true);
-		AlertHelper.showAlertAndWait(AlertType.INFORMATION, Messages.getString("Menu.tutor.saveAnswer.information"),
-				stage);
+		AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.saveAnswer.information"), stage);
 	}
 
 	public static boolean initialize() {

@@ -17,7 +17,7 @@ import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.model.DIRECTION;
 import com.JayPi4c.RobbiSimulator.model.Item;
 import com.JayPi4c.RobbiSimulator.model.Territory;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.stage.FileChooser;
@@ -62,10 +62,10 @@ public class TerritorySaveController {
 	 */
 	private void serialize() {
 		FileChooser chooser = new FileChooser();
-		chooser.setTitle(Messages.getString("Territory.save.dialog.title"));
+		chooser.setTitle(I18nUtils.i18n("Territory.save.dialog.title"));
 		chooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
 		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-				Messages.getString("Territory.save.dialog.filter"), "*" + DEFAULT_SERIALISATION_FILE_EXTENSION));
+				I18nUtils.i18n("Territory.save.dialog.filter"), "*" + DEFAULT_SERIALISATION_FILE_EXTENSION));
 
 		File file = chooser.showSaveDialog(mainStage);
 
@@ -100,10 +100,10 @@ public class TerritorySaveController {
 	 */
 	private void deserialize() {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(Messages.getString("Territory.load.dialog.title"));
+		fileChooser.setTitle(I18nUtils.i18n("Territory.load.dialog.title"));
 		fileChooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-				Messages.getString("Territory.load.dialog.filter"), "*" + DEFAULT_SERIALISATION_FILE_EXTENSION));
+				I18nUtils.i18n("Territory.load.dialog.filter"), "*" + DEFAULT_SERIALISATION_FILE_EXTENSION));
 
 		File file = fileChooser.showOpenDialog(mainStage);
 		if (file != null) {
@@ -131,10 +131,10 @@ public class TerritorySaveController {
 	 */
 	private void saveXMLtoFile() {
 		FileChooser chooser = new FileChooser();
-		chooser.setTitle(Messages.getString("Territory.save.dialog.xml.title"));
+		chooser.setTitle(I18nUtils.i18n("Territory.save.dialog.xml.title"));
 		chooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
 		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-				Messages.getString("Territory.save.dialog.xml.filter"), "*" + DEFAULT_XML_FILE_EXTENSION));
+				I18nUtils.i18n("Territory.save.dialog.xml.filter"), "*" + DEFAULT_XML_FILE_EXTENSION));
 
 		File file = chooser.showSaveDialog(mainStage);
 
@@ -158,10 +158,10 @@ public class TerritorySaveController {
 	 */
 	private void loadXMLfromFile() {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(Messages.getString("Territory.load.dialog.xml.title"));
+		fileChooser.setTitle(I18nUtils.i18n("Territory.load.dialog.xml.title"));
 		fileChooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-				Messages.getString("Territory.load.dialog.xml.filter"), "*" + DEFAULT_XML_FILE_EXTENSION));
+				I18nUtils.i18n("Territory.load.dialog.xml.filter"), "*" + DEFAULT_XML_FILE_EXTENSION));
 		File file = fileChooser.showOpenDialog(mainStage);
 		if (file != null) {
 			logger.debug("load territory from xml-file {}", file);
