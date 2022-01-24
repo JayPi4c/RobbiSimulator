@@ -10,6 +10,12 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Utility-class for Properties.
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class PropertiesLoader {
 	private static final Logger logger = LogManager.getLogger(PropertiesLoader.class);
 	private static Properties properties;
@@ -17,6 +23,11 @@ public class PropertiesLoader {
 	private static final String dir = System.getProperty("user.dir");
 	private static final String file = "/simulator.properties";
 
+	/**
+	 * Loads the properties and stores them in an Object.
+	 * 
+	 * @return true if the initialization was successful, false otherwise
+	 */
 	public static boolean initialize() {
 		properties = new Properties();
 		try (InputStream in = new FileInputStream(dir + file)) {
@@ -27,14 +38,29 @@ public class PropertiesLoader {
 		}
 	}
 
+	/**
+	 * Getter for the role
+	 * 
+	 * @return true if the role is set to tutor, false otherwise
+	 */
 	public static boolean isTutor() {
 		return properties.getProperty("role").toString().equalsIgnoreCase("Tutor");
 	}
 
+	/**
+	 * Getter for the tutorhost.
+	 * 
+	 * @return the tutorhost stored in the properties file
+	 */
 	public static String getTutorhost() {
 		return properties.getProperty("tutorhost");
 	}
 
+	/**
+	 * Getter for the tutorport.
+	 * 
+	 * @return the tutorport stored in the properties file
+	 */
 	public static int getTutorport() {
 		try {
 			return Integer.parseInt(properties.getProperty("tutorport"));
@@ -43,6 +69,11 @@ public class PropertiesLoader {
 		}
 	}
 
+	/**
+	 * Getter for the locale.
+	 * 
+	 * @return the locale stored in the properties file
+	 */
 	public static Locale getLocale() {
 		String[] parts = properties.getProperty("lang").split("_");
 		try {
@@ -54,6 +85,11 @@ public class PropertiesLoader {
 		}
 	}
 
+	/**
+	 * Stores all properties back in the properties file.
+	 * 
+	 * @return true, if the saving was successful, false otherwise
+	 */
 	public static boolean finish() {
 		properties.put("lang", I18nUtils.getLocale().toString());
 		try (FileOutputStream fos = new FileOutputStream(dir + file)) {

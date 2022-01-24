@@ -18,6 +18,12 @@ import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.scene.control.Alert.AlertType;
 
+/**
+ * Controller to handle actions of a tutor.
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class TutorController {
 	private static final Logger logger = LogManager.getLogger(TutorController.class);
 
@@ -31,6 +37,11 @@ public class TutorController {
 
 	public static final String TUTOR_CODE = "Tutor";
 
+	/**
+	 * Constructor to create a new TutorController.
+	 * 
+	 * @param mainStage the stage, the controller is for
+	 */
 	public TutorController(MainStage mainStage) {
 		this.stage = mainStage;
 		mainStage.getLoadRequestMenuItem().setOnAction(e -> loadRequest());
@@ -39,6 +50,9 @@ public class TutorController {
 		mainStage.getSaveAnswerMenuItem().setDisable(true);
 	}
 
+	/**
+	 * Helper to handle loadRequest actions
+	 */
 	private void loadRequest() {
 		tutor.getNewRequest().ifPresentOrElse(request -> {
 			logger.debug("Loading request with id {}.", request.id());
@@ -54,6 +68,9 @@ public class TutorController {
 		});
 	}
 
+	/**
+	 * Helper to handle save Answer actions
+	 */
 	private void saveAnswer() {
 		logger.debug("Saving answer for id {}.", currentID);
 		stage.getProgram().save(stage.getTextArea().getText());
@@ -65,6 +82,11 @@ public class TutorController {
 		AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.saveAnswer.information"), stage);
 	}
 
+	/**
+	 * Creates a new RMI registry and gets ready to accept connections.
+	 * 
+	 * @return true if the initialization finished successfully, false otherwise
+	 */
 	public static boolean initialize() {
 		try {
 			tutor = new Tutor();
@@ -78,6 +100,11 @@ public class TutorController {
 		return true;
 	}
 
+	/**
+	 * Unbinds all previously binded instances.
+	 * 
+	 * @return true if the unbinding was successful, false otherwise
+	 */
 	public static boolean shutdown() {
 		try {
 			registry.unbind(TUTOR_CODE);

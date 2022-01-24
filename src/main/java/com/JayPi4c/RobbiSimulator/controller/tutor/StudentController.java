@@ -16,6 +16,12 @@ import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.scene.control.Alert.AlertType;
 
+/**
+ * Controller to handle actions of a student.
+ * 
+ * @author Jonas Pohl
+ *
+ */
 public class StudentController {
 	private static Logger logger = LogManager.getLogger(StudentController.class);
 
@@ -23,6 +29,11 @@ public class StudentController {
 
 	private MainStage stage;
 
+	/**
+	 * Constructor to create a new StudentController
+	 * 
+	 * @param stage the stage, the controller is for
+	 */
 	public StudentController(MainStage stage) {
 		this.stage = stage;
 		stage.getSendRequestMenuItem().setOnAction(e -> sendRequest());
@@ -31,6 +42,9 @@ public class StudentController {
 		stage.getReceiveAnswerMenuItem().setDisable(true);
 	}
 
+	/**
+	 * Helper to handle receiveAnswer actions
+	 */
 	private void receiveAnswer() {
 		try {
 			Registry registry = LocateRegistry.getRegistry(PropertiesLoader.getTutorhost(),
@@ -53,6 +67,9 @@ public class StudentController {
 		}
 	}
 
+	/**
+	 * Helper to handle sendRequest actions
+	 */
 	private void sendRequest() {
 		try {
 			Registry registry = LocateRegistry.getRegistry(PropertiesLoader.getTutorhost(),

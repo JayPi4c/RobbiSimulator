@@ -6,8 +6,10 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.derby.tools.sysinfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Layout;
 
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
@@ -40,6 +42,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 
 /**
  * This controller contains all the settings for the mainStage
@@ -213,6 +216,34 @@ public class MainStageController implements Observer {
 			}
 		});
 		mainStage.getRobbiTakeButtonToolbar().onActionProperty().bind(mainStage.getTakeMenuItem().onActionProperty());
+
+		mainStage.getChangeCursorMenuItem().setOnAction(e -> {
+			setChangeCursor(mainStage.getChangeCursorMenuItem().isSelected());
+			if (!mainStage.getChangeCursorMenuItem().isSelected())
+				mainStage.getScene().setCursor(Cursor.DEFAULT);
+		});
+		mainStage.getDarkModeMenuItem().selectedProperty().addListener((obs, oldVal, newVal) -> {
+			if (Boolean.TRUE.equals(newVal)) {
+				mainStage.getScene().getStylesheets().add("css/dark-theme.css");
+			} else
+				mainStage.getScene().getStylesheets().remove("css/dark-theme.css");
+		});
+		mainStage.getInfoMenuItem().setOnAction(e -> {
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.window.info.content"), mainStage,
+					Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.info.title"),
+					I18nUtils.i18n("Menu.window.info.header"));
+		});
+		mainStage.getLibraryMenuItem().setOnAction(e -> {
+			String javaFxVersion = System.getProperty("javafx.version");
+			String javaVersion = System.getProperty("java.version");
+			String log4JVersion = Layout.class.getPackage().getImplementationVersion();
+			String derbyVersion = sysinfo.getVersionString();
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+					String.format(I18nUtils.i18n("Menu.window.libraries.content"), javaVersion, javaFxVersion,
+							log4JVersion, derbyVersion),
+					mainStage, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
+					I18nUtils.i18n("Menu.window.libraries.header"));
+		});
 
 		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
 			String extension = ".png";
