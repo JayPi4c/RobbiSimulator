@@ -9,10 +9,13 @@ import java.rmi.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
 import com.JayPi4c.RobbiSimulator.utils.Messages;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
+
+import javafx.scene.control.Alert.AlertType;
 
 public class StudentController implements ILanguageChangeListener {
 	private static Logger logger = LogManager.getLogger(StudentController.class);
@@ -38,6 +41,8 @@ public class StudentController implements ILanguageChangeListener {
 			Answer answer = tutor.getAnswer(requestID);
 			if (answer == null) {
 				logger.debug("Answer is not ready yet!");
+				AlertHelper.createAlert(AlertType.INFORMATION,
+						Messages.getString("Menu.tutor.receiveAnswer.information"), stage);
 				return;
 			}
 			stage.getProgram().setEditorContent(answer.code());
@@ -60,6 +65,8 @@ public class StudentController implements ILanguageChangeListener {
 			logger.debug("The request has ID {}.", requestID);
 			stage.getSendRequestMenuItem().setDisable(true);
 			stage.getReceiveAnswerMenuItem().setDisable(false);
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+					Messages.getString("Menu.tutor.sendRequest.information"), stage);
 		} catch (RemoteException | NotBoundException e) {
 			e.printStackTrace();
 			logger.debug("Failed to send request to tutor.");
