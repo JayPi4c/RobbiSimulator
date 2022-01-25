@@ -56,7 +56,7 @@ public class RobbiContextMenu extends ContextMenu {
 			getItems().add(item);
 		}
 
-		Method methods[] = getCustomMethods(territory.getRobbi());
+		Method[] methods = getCustomMethods(territory.getRobbi());
 		if (methods.length > 0) {
 			getItems().add(new SeparatorMenuItem());
 
@@ -126,15 +126,12 @@ public class RobbiContextMenu extends ContextMenu {
 					bobTheBuilder.append(" = ");
 					bobTheBuilder.append(a.value());
 				}
-			// bobTheBuilder.append(" ");
-			// bobTheBuilder.append(parameter.getName());
 			bobTheBuilder.append(", ");
 		}
 		if (m.getParameterCount() > 0)
 			bobTheBuilder.delete(bobTheBuilder.length() - 2, bobTheBuilder.length());
 		bobTheBuilder.append(")");
-		CustomMenuItem item = new CustomMenuItem(new Label(bobTheBuilder.toString()));
-		return item;
+		return new CustomMenuItem(new Label(bobTheBuilder.toString()));
 	}
 
 	/**

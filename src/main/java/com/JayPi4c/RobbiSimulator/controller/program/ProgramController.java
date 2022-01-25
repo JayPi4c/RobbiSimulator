@@ -112,9 +112,8 @@ public class ProgramController {
 	 */
 	public static boolean initialize() {
 		File dir = new File(PATH_TO_PROGRAMS);
-		if (!dir.exists()) {
-			if (!dir.mkdir())
-				return false;
+		if (!dir.exists() && !dir.mkdir()) {
+			return false;
 		}
 
 		File defaultProgram = new File(
@@ -204,8 +203,7 @@ public class ProgramController {
 		Platform.runLater(nameField::requestFocus);
 		dialog.setResultConverter(button -> (button == ButtonType.OK) ? nameField.getText() : null);
 
-		Optional<String> result = dialog.showAndWait();
-		return result;
+		return dialog.showAndWait();
 	}
 
 	/**
@@ -338,8 +336,7 @@ public class ProgramController {
 
 		if (newFile.exists())
 			return false;
-		boolean success = f.renameTo(newFile);
-		return success;
+		return f.renameTo(newFile);
 	}
 
 	/**
@@ -483,8 +480,9 @@ public class ProgramController {
 				robbi.ifPresentOrElse(r -> {
 					Diagnostics diag = new Diagnostics();
 					if (!hasValidAnnotations(r, diag)) {
-						List<Diagnostics.Diagnostic> diags = diag.getDiagnostics();
-						String val = null, type = null;
+						List<Diagnostics.Diagnostic> diags = diag.getDiagnosis();
+						String val = null;
+						String type = null;
 						if (!diags.isEmpty()) {
 							Diagnostics.Diagnostic diagnostic = diags.get(0);
 							val = diagnostic.value();
@@ -553,7 +551,7 @@ public class ProgramController {
 	 * @return true if the annotions are valid, false otherwise
 	 */
 	private static boolean hasValidAnnotations(Robbi robbi, Diagnostics diag) {
-		Method methods[] = getCustomMethods(robbi);
+		Method[] methods = getCustomMethods(robbi);
 		boolean result = true;
 		for (Method method : methods) {
 			if (!hasValidDefaultAnnotation(method, diag)) {
@@ -576,11 +574,10 @@ public class ProgramController {
 	private static boolean hasValidDefaultAnnotation(Method method, Diagnostics diag) {
 		boolean result = true;
 		for (Parameter parameter : method.getParameters()) {
-			Annotation annotations[] = parameter.getAnnotations();
+			Annotation[] annotations = parameter.getAnnotations();
 			for (Annotation annotation : annotations) {
-				if (annotation instanceof Default anno) {
-					if (!valueAcceptable(parameter, anno, diag))
-						result = false;
+				if (annotation instanceof Default anno && !valueAcceptable(parameter, anno, diag)) {
+					result = false;
 					// return false;
 				}
 			}

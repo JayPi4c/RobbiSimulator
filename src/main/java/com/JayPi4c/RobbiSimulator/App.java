@@ -9,8 +9,6 @@ import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
-import com.JayPi4c.RobbiSimulator.view.MainStage;
-import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -72,12 +70,6 @@ public class App extends Application {
 			else
 				logger.debug("Failed to initialize RMI server.");
 		}
-
-		logger.debug("Loading images");
-		MainStage.loadImages();
-		TerritoryPanel.loadImages();
-		logger.debug("Finished loading images");
-
 	}
 
 	@Override

@@ -222,94 +222,126 @@ public class MainStage extends Stage {
 	/**
 	 * Constant Image for open icon.
 	 */
-	public static Image openImage;
+	public static final Image openImage;
 	/**
 	 * Constant Image for new icon.
 	 */
-	public static Image newImage;
+	public static final Image newImage;
 	/**
 	 * Constant Image for save icon.
 	 */
-	public static Image saveImage;
+	public static final Image saveImage;
 	/**
 	 * Constant Image for compile icon.
 	 */
-	public static Image compileImage;
+	public static final Image compileImage;
 	/**
 	 * Constant Image for print icon.
 	 */
-	public static Image printImage;
+	public static final Image printImage;
 	/**
 	 * Constant Image for terrain icon. (Used for changeSize button)
 	 */
-	public static Image terrainImage;
+	public static final Image terrainImage;
 
 	/**
 	 * Constant Image for robbi icon.
 	 */
-	public static Image menuRobbiImage;
+	public static final Image menuRobbiImage;
 	/**
 	 * Constant Image for hollow icon.
 	 */
-	public static Image menuHollowImage;
+	public static final Image menuHollowImage;
 	/**
 	 * Constant Image for pileOfScrap icon.
 	 */
-	public static Image menuPileOfScrapImage;
+	public static final Image menuPileOfScrapImage;
 	/**
 	 * Constant Image for stockpile icon.
 	 */
-	public static Image menuStockpileImage;
+	public static final Image menuStockpileImage;
 	/**
 	 * Constant Image for accu icon.
 	 */
-	public static Image menuAccuImage;
+	public static final Image menuAccuImage;
 	/**
 	 * Constant Image for screw icon.
 	 */
-	public static Image menuScrewImage;
+	public static final Image menuScrewImage;
 	/**
 	 * Constant Image for nut icon.
 	 */
-	public static Image menuNutImage;
+	public static final Image menuNutImage;
 	/**
 	 * Constant Image for delete icon.
 	 */
-	public static Image menuDeleteImage;
+	public static final Image menuDeleteImage;
 
 	/**
 	 * Constant Image for reset icon.
 	 */
-	public static Image resetImage;
+	public static final Image resetImage;
 	/**
 	 * Constant Image for simulation start/resume icon.
 	 */
-	public static Image menuStartImage;
+	public static final Image menuStartImage;
 	/**
 	 * Constant Image for simulation pause icon.
 	 */
-	public static Image menuPauseImage;
+	public static final Image menuPauseImage;
 	/**
 	 * Constant Image for simulation stop icon.
 	 */
-	public static Image menuStopImage;
+	public static final Image menuStopImage;
 
 	/**
 	 * Constant Image for RobbiMove icon.
 	 */
-	public static Image robbiMove;
+	public static final Image robbiMove;
 	/**
 	 * Constant Image for RobbiTurnLeft icon.
 	 */
-	public static Image robbiTurnLeft;
+	public static final Image robbiTurnLeft;
 	/**
 	 * Constant Image for RobbiPut icon.
 	 */
-	public static Image robbiPut;
+	public static final Image robbiPut;
 	/**
 	 * Constant Image for RobbiTake icon.
 	 */
-	public static Image robbiTake;
+	public static final Image robbiTake;
+
+	/**
+	 * loading images
+	 */
+	static {
+		logger.debug("Loading stage images");
+
+		newImage = new Image("img/New24.gif");
+		saveImage = new Image("img/Save24.gif");
+		openImage = new Image("img/Open24.gif");
+		compileImage = new Image("img/Compile24.gif");
+		printImage = new Image("img/Print24.gif");
+		terrainImage = new Image("img/Terrain24.gif");
+		menuRobbiImage = new Image("img/Robbi24.png");
+		menuHollowImage = new Image("img/Hollow24.png");
+		menuPileOfScrapImage = new Image("img/PileOfScrap24.png");
+		menuStockpileImage = new Image("img/Stockpile24.png");
+		menuAccuImage = new Image("img/Accu24.png");
+		menuScrewImage = new Image("img/Screw24.png");
+		menuNutImage = new Image("img/Nut24.png");
+		menuDeleteImage = new Image("img/Delete24.gif");
+
+		resetImage = new Image("img/reset24.png");
+		menuStartImage = new Image("img/Play24.gif");
+		menuPauseImage = new Image("img/Pause24.gif");
+		menuStopImage = new Image("img/Stop24.gif");
+
+		robbiMove = new Image("img/RobbiMove24.png");
+		robbiTurnLeft = new Image("img/RobbiLeft24.png");
+		robbiPut = new Image("img/RobbiPut24.png");
+		robbiTake = new Image("img/RobbiTake24.png");
+	}
 
 	/**
 	 * Constructor for the MainStage. It creates a mainStage for the given Program
@@ -367,37 +399,6 @@ public class MainStage extends Stage {
 	 * awtAppClassNameField.setAccessible(true); awtAppClassNameField.set(xToolkit,
 	 * "MyApp"); } catch (Exception ignored) { } } }
 	 */
-
-	/**
-	 * Loads all images that are presented in the toolbar. This method must be
-	 * called before the first mainStage is created.
-	 */
-	public static void loadImages() {
-		newImage = new Image("img/New24.gif");
-		saveImage = new Image("img/Save24.gif");
-		openImage = new Image("img/Open24.gif");
-		compileImage = new Image("img/Compile24.gif");
-		printImage = new Image("img/Print24.gif");
-		terrainImage = new Image("img/Terrain24.gif");
-		menuRobbiImage = new Image("img/Robbi24.png");
-		menuHollowImage = new Image("img/Hollow24.png");
-		menuPileOfScrapImage = new Image("img/PileOfScrap24.png");
-		menuStockpileImage = new Image("img/Stockpile24.png");
-		menuAccuImage = new Image("img/Accu24.png");
-		menuScrewImage = new Image("img/Screw24.png");
-		menuNutImage = new Image("img/Nut24.png");
-		menuDeleteImage = new Image("img/Delete24.gif");
-
-		resetImage = new Image("img/reset24.png");
-		menuStartImage = new Image("img/Play24.gif");
-		menuPauseImage = new Image("img/Pause24.gif");
-		menuStopImage = new Image("img/Stop24.gif");
-
-		robbiMove = new Image("img/RobbiMove24.png");
-		robbiTurnLeft = new Image("img/RobbiLeft24.png");
-		robbiPut = new Image("img/RobbiPut24.png");
-		robbiTake = new Image("img/RobbiTake24.png");
-	}
 
 	/**
 	 * Creates the editor-related menu-bar elements.
@@ -1433,6 +1434,15 @@ public class MainStage extends Stage {
 	}
 
 	/**
+	 * Getter for the placeGroupTerritoryMenu.
+	 * 
+	 * @return the placeGroupTerritoryMenu
+	 */
+	public ToggleGroup getPlaceGroupTerritoryMenu() {
+		return placeGroupTerritoryMenu;
+	}
+
+	/**
 	 * Getter for the robbiMenu.
 	 * 
 	 * @return the robbiMenu for this stage
@@ -1549,23 +1559,47 @@ public class MainStage extends Stage {
 		return windowMenu;
 	}
 
-	// TODO javaDoc
+	/**
+	 * Getter for the tutorMenu.
+	 * 
+	 * @return the tutorMenu for this stage
+	 */
 	public Menu getTutorMenu() {
 		return tutorMenu;
 	}
 
+	/**
+	 * Getter for the sendRequestMenuItem.
+	 * 
+	 * @return the sendRequestMenuItem for this stage
+	 */
 	public MenuItem getSendRequestMenuItem() {
 		return sendRequestMenuItem;
 	}
 
+	/**
+	 * Getter for the receiveAnswerMenuItem.
+	 * 
+	 * @return the receiveAnswerMenuItem for this stage
+	 */
 	public MenuItem getReceiveAnswerMenuItem() {
 		return receiveAnswerMenuItem;
 	}
 
+	/**
+	 * Getter for the saveAnswerMenuItem.
+	 * 
+	 * @return the saveAnswerMenuItem for this stage
+	 */
 	public MenuItem getSaveAnswerMenuItem() {
 		return saveAnswerMenuItem;
 	}
 
+	/**
+	 * Getter for the lLoadRequestMenuItem.
+	 * 
+	 * @return the loadRequestMenuItem for this stage
+	 */
 	public MenuItem getLoadRequestMenuItem() {
 		return loadRequestMenuItem;
 	}

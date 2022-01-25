@@ -11,7 +11,7 @@ public class TerritoryState {
 	private int numberOfColumns;
 	private int numberOfRows;
 
-	private Tile tiles[][];
+	private Tile[][] tiles;
 	private RobbiState robbi;
 
 	/**

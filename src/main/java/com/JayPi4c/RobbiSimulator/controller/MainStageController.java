@@ -194,9 +194,7 @@ public class MainStageController implements Observer {
 		});
 		mainStage.getRobbiMoveButtonToolbar().onActionProperty().bind(mainStage.getMoveMenuItem().onActionProperty());
 
-		mainStage.getTurnLeftMenuItem().setOnAction(e -> {
-			mainStage.getTerritory().getRobbi().linksUm();
-		});
+		mainStage.getTurnLeftMenuItem().setOnAction(e -> mainStage.getTerritory().getRobbi().linksUm());
 		mainStage.getRobbiTurnLeftButtonToolbar().onActionProperty()
 				.bind(mainStage.getTurnLeftMenuItem().onActionProperty());
 
@@ -229,20 +227,19 @@ public class MainStageController implements Observer {
 			} else
 				mainStage.getScene().getStylesheets().remove("css/dark-theme.css");
 		});
-		mainStage.getInfoMenuItem().setOnAction(e -> {
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.window.info.content"), mainStage,
-					Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.info.title"),
-					I18nUtils.i18n("Menu.window.info.header"));
-		});
+		mainStage.getInfoMenuItem()
+				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+						I18nUtils.i18n("Menu.window.info.content"), mainStage, Modality.WINDOW_MODAL,
+						I18nUtils.i18n("Menu.window.info.title"), I18nUtils.i18n("Menu.window.info.header")));
 		mainStage.getLibraryMenuItem().setOnAction(e -> {
 			String javaFxVersion = System.getProperty("javafx.version");
 			String javaVersion = System.getProperty("java.version");
 			String log4JVersion = Layout.class.getPackage().getImplementationVersion();
 			String derbyVersion = sysinfo.getVersionString();
-			String JAXBVersion = JAXBContext.class.getPackage().getImplementationVersion();
+			String jaxbVersion = JAXBContext.class.getPackage().getImplementationVersion();
 			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 					String.format(I18nUtils.i18n("Menu.window.libraries.content"), javaVersion, javaFxVersion,
-							log4JVersion, derbyVersion, JAXBVersion),
+							log4JVersion, derbyVersion, jaxbVersion),
 					mainStage, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
 					I18nUtils.i18n("Menu.window.libraries.header"));
 		});
@@ -324,9 +321,8 @@ public class MainStageController implements Observer {
 		// https://stackoverflow.com/questions/18447963/javafx-slider-text-as-tick-label
 
 		// TODO print editor content
-		mainStage.getPrintEditorMenuItem().setOnAction(e -> {
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, "Not yet implemented", mainStage);
-		});
+		mainStage.getPrintEditorMenuItem().setOnAction(
+				e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, "Not yet implemented", mainStage));
 
 	}
 

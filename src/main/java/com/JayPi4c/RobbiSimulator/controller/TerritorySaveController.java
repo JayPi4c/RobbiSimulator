@@ -76,6 +76,11 @@ public class TerritorySaveController {
 
 		File file = chooser.showSaveDialog(mainStage);
 
+		if (file == null) {
+			logger.debug("No file was selected to serialze in.");
+			return;
+		}
+
 		if (!file.getName().endsWith(DEFAULT_SERIALISATION_FILE_EXTENSION)) {
 			File f = new File(file.getAbsolutePath() + DEFAULT_SERIALISATION_FILE_EXTENSION);
 			if (!file.renameTo(f))
@@ -83,22 +88,21 @@ public class TerritorySaveController {
 			file = f;
 		}
 
-		if (file != null) {
-			logger.debug("serialize in file {}", file);
-			try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
-				synchronized (mainStage.getTerritory()) {
-					oos.writeObject(mainStage.getTerritory());
-					oos.writeObject(mainStage.getTerritory().getRobbiItem());
-					oos.writeInt(mainStage.getTerritory().getRobbiX());
-					oos.writeInt(mainStage.getTerritory().getRobbiY());
-					oos.writeObject(mainStage.getTerritory().getRobbiDirection());
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				logger.info("finished serialization");
+		logger.debug("serialize in file {}", file);
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+			synchronized (mainStage.getTerritory()) {
+				oos.writeObject(mainStage.getTerritory());
+				oos.writeObject(mainStage.getTerritory().getRobbiItem());
+				oos.writeInt(mainStage.getTerritory().getRobbiX());
+				oos.writeInt(mainStage.getTerritory().getRobbiY());
+				oos.writeObject(mainStage.getTerritory().getRobbiDirection());
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			logger.info("finished serialization");
 		}
+
 	}
 
 	/**
@@ -145,19 +149,23 @@ public class TerritorySaveController {
 
 		File file = chooser.showSaveDialog(mainStage);
 
+		if (file == null) {
+			logger.debug("No file selected to save territory in.");
+			return;
+		}
+
 		if (!file.getName().endsWith(DEFAULT_XML_FILE_EXTENSION)) {
 			file = new File(file.getAbsolutePath() + DEFAULT_XML_FILE_EXTENSION);
 		}
 
-		if (file != null) {
-			logger.debug("save as XML in file {}", file);
-			try (ByteArrayOutputStream baos = mainStage.getTerritory().toXML();
-					OutputStream outputStream = new FileOutputStream(file.getAbsolutePath())) {
-				baos.writeTo(outputStream);
-			} catch (IOException e) {
-				logger.debug("failed");
-			}
+		logger.debug("save as XML in file {}", file);
+		try (ByteArrayOutputStream baos = mainStage.getTerritory().toXML();
+				OutputStream outputStream = new FileOutputStream(file.getAbsolutePath())) {
+			baos.writeTo(outputStream);
+		} catch (IOException e) {
+			logger.debug("failed");
 		}
+
 	}
 
 	/**

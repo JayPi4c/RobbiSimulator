@@ -1,5 +1,8 @@
 package com.JayPi4c.RobbiSimulator.view;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.TerritoryEventHandler;
 import com.JayPi4c.RobbiSimulator.model.Accu;
@@ -32,11 +35,13 @@ import javafx.stage.Window;
  */
 public class TerritoryPanel extends Canvas implements Observer {
 
+	private static final Logger logger = LogManager.getLogger(TerritoryPanel.class);
+
 	private Territory territory;
 
-	private static Image tileImages[] = new Image[4];
-	private static Image itemImages[] = new Image[3];
-	private static Image robbiImage;
+	private static final Image[] tileImages = new Image[4];
+	private static final Image[] itemImages = new Image[3];
+	private static final Image robbiImage;
 
 	private static final int TILE = 0;
 	private static final int STOCKPILE = 1;
@@ -51,6 +56,25 @@ public class TerritoryPanel extends Canvas implements Observer {
 
 	// store current bounds to allow centering on updated territory size
 	private Bounds bounds;
+
+	/**
+	 * loading territory images
+	 */
+	static {
+
+		logger.debug("Loading territory images");
+
+		robbiImage = new Image("img/0Robbi32.png");
+
+		tileImages[TILE] = new Image("img/Tile32.png");
+		tileImages[STOCKPILE] = new Image("img/Stockpile32.png");
+		tileImages[HOLLOW] = new Image("img/Hollow32.png");
+		tileImages[PILEOFSCRAP] = new Image("img/PileOfScrap32.png");
+
+		itemImages[NUT] = new Image("img/Nut32.png");
+		itemImages[SCREW] = new Image("img/Screw32.png");
+		itemImages[ACCU] = new Image("img/Accu32.png");
+	}
 
 	/**
 	 * Constructor to create a new territory panel for the given territory.
@@ -89,23 +113,6 @@ public class TerritoryPanel extends Canvas implements Observer {
 	 */
 	public static int getCellspacer() {
 		return CELLSPACER;
-	}
-
-	/**
-	 * Loads all images for the Territory GUI into static variables.<br>
-	 * Needs to be called at startup, before the territory is drawn the first time.
-	 */
-	public static void loadImages() {
-		robbiImage = new Image("img/0Robbi32.png");
-
-		tileImages[TILE] = new Image("img/Tile32.png");
-		tileImages[STOCKPILE] = new Image("img/Stockpile32.png");
-		tileImages[HOLLOW] = new Image("img/Hollow32.png");
-		tileImages[PILEOFSCRAP] = new Image("img/PileOfScrap32.png");
-
-		itemImages[NUT] = new Image("img/Nut32.png");
-		itemImages[SCREW] = new Image("img/Screw32.png");
-		itemImages[ACCU] = new Image("img/Accu32.png");
 	}
 
 	/**
@@ -170,15 +177,15 @@ public class TerritoryPanel extends Canvas implements Observer {
 					boolean screwDrawn = false;
 					for (Item item : stockpile.getAllItems()) {
 						if (!nutDrawn && item instanceof Nut) {
-							gc.drawImage(itemImages[NUT], getPos(i) + CELLSIZE / 2, getPos(j), CELLSIZE / 2,
-									CELLSIZE / 2);
+							gc.drawImage(itemImages[NUT], getPos(i) + CELLSIZE / 2d, getPos(j), CELLSIZE / 2d,
+									CELLSIZE / 2d);
 							nutDrawn = true;
 						} else if (!accuDrawn && item instanceof Accu) {
-							gc.drawImage(itemImages[ACCU], getPos(i), getPos(j), CELLSIZE / 2, CELLSIZE / 2);
+							gc.drawImage(itemImages[ACCU], getPos(i), getPos(j), CELLSIZE / 2d, CELLSIZE / 2d);
 							accuDrawn = true;
 						} else if (!screwDrawn && item instanceof Screw) {
-							gc.drawImage(itemImages[SCREW], getPos(i) + CELLSIZE / 3, getPos(j) + CELLSIZE / 2,
-									CELLSIZE / 2, CELLSIZE / 2);
+							gc.drawImage(itemImages[SCREW], getPos(i) + CELLSIZE / 3d, getPos(j) + CELLSIZE / 2d,
+									CELLSIZE / 2d, CELLSIZE / 2d);
 							screwDrawn = true;
 						}
 						if (nutDrawn && accuDrawn && screwDrawn)
@@ -217,9 +224,8 @@ public class TerritoryPanel extends Canvas implements Observer {
 		default:
 			yield 0;
 		};
-		drawRotatedImage(gc, robbiImage, angle, territory.getRobbiX() * (CELLSIZE + CELLSPACER) + CELLSPACER,
-				territory.getRobbiY() * (CELLSIZE + CELLSPACER) + CELLSPACER, CELLSIZE, CELLSIZE);
-
+		drawRotatedImage(gc, robbiImage, angle, (double) territory.getRobbiX() * (CELLSIZE + CELLSPACER) + CELLSPACER,
+				(double) territory.getRobbiY() * (CELLSIZE + CELLSPACER) + CELLSPACER, CELLSIZE, CELLSIZE);
 	}
 
 	/**

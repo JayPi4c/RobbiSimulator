@@ -110,21 +110,20 @@ public class DatabaseManager {
 				try {
 					conn.rollback();
 				} catch (SQLException ignore) {
+					// ignore
 				}
 				logger.debug("Could not store example in database");
 				return false;
 			} finally {
-				if (conn != null) {
-					try {
-						conn.setAutoCommit(true);
-					} catch (SQLException ignore) {
-					}
+				try {
+					conn.setAutoCommit(true);
+				} catch (SQLException ignore) {
+					// ignore
 				}
-				if (conn != null) {
-					try {
-						conn.close();
-					} catch (SQLException ignore) {
-					}
+				try {
+					conn.close();
+				} catch (SQLException ignore) {
+					// ignore
 				}
 			}
 		}
@@ -202,7 +201,6 @@ public class DatabaseManager {
 					return Optional.ofNullable(ex);
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
 				return Optional.empty();
 			}
 		}
@@ -303,18 +301,21 @@ public class DatabaseManager {
 				try {
 					stmt.close();
 				} catch (SQLException ignore) {
+					// ignore
 				}
 			}
 			if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException ignore) {
+					// ignore
 				}
 			}
 			if (conn != null) {
 				try {
 					conn.close();
 				} catch (SQLException ignore) {
+					// ignore
 				}
 			}
 		}
@@ -325,8 +326,6 @@ public class DatabaseManager {
 	 * Helper Method to drop all tables to reset the stored examples.
 	 */
 	public static void dropAllTables() {
-		// if(!initialized)
-		// return;
 		Optional<Connection> connection = DatabaseManager.getDatabaseManager().getConnection();
 		connection.ifPresent(conn -> {
 			Statement s = null;
@@ -346,12 +345,14 @@ public class DatabaseManager {
 					try {
 						s.close();
 					} catch (SQLException ignore) {
+						// ignore
 					}
 				}
 				if (conn != null) {
 					try {
 						conn.close();
 					} catch (SQLException ignore) {
+						// ignore
 					}
 				}
 			}

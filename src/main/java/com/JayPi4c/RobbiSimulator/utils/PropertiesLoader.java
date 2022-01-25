@@ -51,7 +51,7 @@ public class PropertiesLoader {
 	 * @return true if the role is set to tutor, false otherwise
 	 */
 	public static boolean isTutor() {
-		return properties.getProperty("role").toString().equalsIgnoreCase("Tutor");
+		return properties.getProperty("role").equalsIgnoreCase("Tutor");
 	}
 
 	/**
@@ -84,8 +84,7 @@ public class PropertiesLoader {
 	public static Locale getLocale() {
 		String[] parts = properties.getProperty("lang").split("_");
 		try {
-			Locale locale = new Locale(parts[0], parts[1]);
-			return locale;
+			return new Locale(parts[0], parts[1]);
 		} catch (IndexOutOfBoundsException e) {
 			logger.debug("Failed to load locale from properties");
 			return Locale.GERMANY;

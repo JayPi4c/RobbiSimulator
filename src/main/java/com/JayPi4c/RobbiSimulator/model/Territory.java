@@ -43,7 +43,7 @@ public class Territory extends Observable implements Serializable {
 	/**
 	 * Array-attribute to store the real territory
 	 */
-	private Tile tiles[][];
+	private Tile[][] tiles;
 	/**
 	 * Attribute to save if the territory has changed.
 	 */
@@ -55,11 +55,11 @@ public class Territory extends Observable implements Serializable {
 	/**
 	 * Attribute to store the current number of columns of the territory.
 	 */
-	private int NUMBER_OF_COLUMNS = DEFAULT_NUMBER_OF_COLUMNS;
+	private int numberOfColumns = DEFAULT_NUMBER_OF_COLUMNS;
 	/**
 	 * Attribute to store the current number of rows of the territory.
 	 */
-	private int NUMBER_OF_ROWS = DEFAULT_NUMBER_OF_ROWS;
+	private int numberOfRows = DEFAULT_NUMBER_OF_ROWS;
 
 	/**
 	 * Creates a new Territory with a new robbi instance and initializes all tiles
@@ -83,7 +83,7 @@ public class Territory extends Observable implements Serializable {
 	 * @return a Memento Object of the territory
 	 */
 	public synchronized TerritoryState save() {
-		return new TerritoryState(NUMBER_OF_COLUMNS, NUMBER_OF_ROWS, tiles, robbi);
+		return new TerritoryState(numberOfColumns, numberOfRows, tiles, robbi);
 	}
 
 	/**
@@ -91,14 +91,16 @@ public class Territory extends Observable implements Serializable {
 	 * 
 	 * @param state the Memento object of the state the territory should restore to.
 	 */
-	public synchronized void restore(TerritoryState state) {
-		NUMBER_OF_COLUMNS = state.getNumberOfColumns();
-		NUMBER_OF_ROWS = state.getNumberOfRows();
-		RobbiState robbiState = state.getRobbiState();
-		this.robbi.setPosition(robbiState.getX(), robbiState.getY());
-		this.robbi.setItem(robbiState.getItem());
-		this.robbi.setFacing(robbiState.getFacing());
-		this.tiles = state.getTiles();
+	public void restore(TerritoryState state) {
+		synchronized (this) {
+			numberOfColumns = state.getNumberOfColumns();
+			numberOfRows = state.getNumberOfRows();
+			RobbiState robbiState = state.getRobbiState();
+			this.robbi.setPosition(robbiState.getX(), robbiState.getY());
+			this.robbi.setItem(robbiState.getItem());
+			this.robbi.setFacing(robbiState.getFacing());
+			this.tiles = state.getTiles();
+		}
 		setChanged();
 		notifyAllObservers();
 	}
@@ -111,10 +113,10 @@ public class Territory extends Observable implements Serializable {
 	 * @return the tile for the corresponding coordinate
 	 */
 	public synchronized Tile getTile(int x, int y) {
-		x += NUMBER_OF_COLUMNS;
-		x %= NUMBER_OF_COLUMNS;
-		y += NUMBER_OF_ROWS;
-		y %= NUMBER_OF_ROWS;
+		x += numberOfColumns;
+		x %= numberOfColumns;
+		y += numberOfRows;
+		y %= numberOfRows;
 		return tiles[x][y];
 	}
 
@@ -124,7 +126,7 @@ public class Territory extends Observable implements Serializable {
 	 * @return the current number of rows
 	 */
 	public synchronized int getNumRows() {
-		return NUMBER_OF_ROWS;
+		return numberOfRows;
 	}
 
 	/**
@@ -133,7 +135,7 @@ public class Territory extends Observable implements Serializable {
 	 * @return the current number of columns
 	 */
 	public synchronized int getNumCols() {
-		return NUMBER_OF_COLUMNS;
+		return numberOfColumns;
 	}
 
 	/**
@@ -231,12 +233,13 @@ public class Territory extends Observable implements Serializable {
 	 * @param y    y-ordinate in the territory
 	 * @return true if the item has been placed in the territory, false otherwise
 	 */
-	public synchronized boolean placeItem(Item item, int x, int y) {
-		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
-		if (t.getItem() != null && !(t instanceof Stockpile))
-			return false;
-
-		t.setItem(item);
+	public boolean placeItem(Item item, int x, int y) {
+		synchronized (this) {
+			Tile t = tiles[normalizeCoord(x, numberOfColumns)][normalizeCoord(y, numberOfRows)];
+			if (t.getItem() != null && !(t instanceof Stockpile))
+				return false;
+			t.setItem(item);
+		}
 		setChanged();
 		notifyAllObservers();
 		return true;
@@ -250,7 +253,7 @@ public class Territory extends Observable implements Serializable {
 	 * @return the item, which is placed at the given position
 	 */
 	public synchronized Item getItem(int x, int y) {
-		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
+		Tile t = tiles[normalizeCoord(x, numberOfColumns)][normalizeCoord(y, numberOfRows)];
 		return t.getItem();
 	}
 
@@ -261,11 +264,15 @@ public class Territory extends Observable implements Serializable {
 	 * @param y y-ordinate in the territory
 	 * @return the item that has been removed from the tile
 	 */
-	public synchronized Item removeItem(int x, int y) {
-		Tile t = tiles[normalizeCoord(x, NUMBER_OF_COLUMNS)][normalizeCoord(y, NUMBER_OF_ROWS)];
+	public Item removeItem(int x, int y) {
+		Item i = null;
+		synchronized (this) {
+			Tile t = tiles[normalizeCoord(x, numberOfColumns)][normalizeCoord(y, numberOfRows)];
+			i = t.pickItem();
+		}
 		setChanged();
 		notifyAllObservers();
-		return t.pickItem();
+		return i;
 	}
 
 	/**
@@ -280,15 +287,17 @@ public class Territory extends Observable implements Serializable {
 	 * @param y         robbis y positions
 	 * @param facing    robbis facing
 	 */
-	public synchronized void update(Territory territory, Item item, int x, int y, DIRECTION facing) {
-		// TODO don't update if territory invalid
-		this.tiles = territory.tiles;
-		this.sizeChanged = true;
-		this.NUMBER_OF_COLUMNS = territory.NUMBER_OF_COLUMNS;
-		this.NUMBER_OF_ROWS = territory.NUMBER_OF_ROWS;
-		this.robbi.setPosition(x, y);
-		this.robbi.setFacing(facing);
-		this.robbi.setItem(item);
+	public void update(Territory territory, Item item, int x, int y, DIRECTION facing) {
+		synchronized (this) {
+			// TODO don't update if territory invalid
+			this.tiles = territory.tiles;
+			this.sizeChanged = true;
+			this.numberOfColumns = territory.numberOfColumns;
+			this.numberOfRows = territory.numberOfRows;
+			this.robbi.setPosition(x, y);
+			this.robbi.setFacing(facing);
+			this.robbi.setItem(item);
+		}
 		setChanged();
 		notifyAllObservers();
 	}
@@ -301,39 +310,40 @@ public class Territory extends Observable implements Serializable {
 	 * @param newCols new number of columns in the territory
 	 * @param newRows new number of rows in the territory
 	 */
-	public synchronized void changeSize(int newCols, int newRows) {
-		if (newCols <= 0 || newRows <= 0)
-			throw new IllegalArgumentException("Diese Größe ist für das Territorium nicht zulässig");
-		if (newCols != NUMBER_OF_COLUMNS || newRows != NUMBER_OF_ROWS)
-			sizeChanged = true;
-		else
-			return;
-		NUMBER_OF_COLUMNS = newCols;
-		NUMBER_OF_ROWS = newRows;
-		// create the new territory
-		Tile newTiles[][] = new Tile[NUMBER_OF_COLUMNS][NUMBER_OF_ROWS];
-		for (int i = 0; i < NUMBER_OF_COLUMNS; i++) {
-			for (int j = 0; j < NUMBER_OF_ROWS; j++) {
-				newTiles[i][j] = new Tile();
+	public void changeSize(int newCols, int newRows) {
+		synchronized (this) {
+			if (newCols <= 0 || newRows <= 0)
+				throw new IllegalArgumentException("Diese Größe ist für das Territorium nicht zulässig");
+			if (newCols != numberOfColumns || newRows != numberOfRows)
+				sizeChanged = true;
+			else
+				return;
+			numberOfColumns = newCols;
+			numberOfRows = newRows;
+			// create the new territory
+			Tile[][] newTiles = new Tile[numberOfColumns][numberOfRows];
+			for (int i = 0; i < numberOfColumns; i++) {
+				for (int j = 0; j < numberOfRows; j++) {
+					newTiles[i][j] = new Tile();
+				}
 			}
-		}
 
-		// copy the old territory into the new
-		for (int i = 0; i < tiles.length && i < newCols; i++) {
-			for (int j = 0; j < tiles[i].length && j < newRows; j++) {
-				newTiles[i][j] = tiles[i][j];
+			// copy the old territory into the new
+			for (int i = 0; i < tiles.length && i < newCols; i++) {
+				for (int j = 0; j < tiles[i].length && j < newRows; j++) {
+					newTiles[i][j] = tiles[i][j];
+				}
 			}
+
+			if (robbi.getX() >= numberOfColumns || robbi.getY() > numberOfRows) {
+				if (newTiles[0][0] instanceof Hollow)
+					newTiles[0][0] = new Tile();
+				robbi.setPosition(0, 0);
+			}
+			tiles = newTiles;
+
+			logger.debug("updated size to {}x{}", numberOfColumns, numberOfRows);
 		}
-
-		if (robbi.getX() >= NUMBER_OF_COLUMNS || robbi.getY() > NUMBER_OF_ROWS) {
-			if (newTiles[0][0] instanceof Hollow)
-				newTiles[0][0] = new Tile();
-			robbi.setPosition(0, 0);
-		}
-		tiles = newTiles;
-
-		logger.debug("updated size to {}x{}", NUMBER_OF_COLUMNS, NUMBER_OF_ROWS);
-
 		setChanged();
 		notifyAllObservers();
 	}
@@ -344,9 +354,11 @@ public class Territory extends Observable implements Serializable {
 	 * @param x robbis new x-position
 	 * @param y robbis new y-position
 	 */
-	public synchronized void placeRobbi(int x, int y) {
-		if ((x >= 0 && x < NUMBER_OF_COLUMNS && y >= 0 && y < NUMBER_OF_ROWS) && !(tiles[x][y] instanceof Hollow)) {
-			robbi.setPosition(x, y);
+	public void placeRobbi(int x, int y) {
+		synchronized (this) {
+			if ((x >= 0 && x < numberOfColumns && y >= 0 && y < numberOfRows) && !(tiles[x][y] instanceof Hollow)) {
+				robbi.setPosition(x, y);
+			}
 		}
 		setChanged();
 		notifyAllObservers();
@@ -359,11 +371,14 @@ public class Territory extends Observable implements Serializable {
 	 * @param x Hollows x-Position
 	 * @param y Hollows y-Position
 	 */
-	public synchronized void placeHollow(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
-		y = normalizeCoord(y, NUMBER_OF_ROWS);
-		if ((x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) && !(x == robbi.getX() && y == robbi.getY())) {
-			tiles[x][y] = new Hollow();
+	public void placeHollow(int x, int y) {
+		x = normalizeCoord(x, numberOfColumns);
+		y = normalizeCoord(y, numberOfRows);
+		synchronized (this) {
+			if ((x < numberOfColumns && y < numberOfRows) && !(x == robbi.getX() && y == robbi.getY()))
+				tiles[x][y] = new Hollow();
+		}
+		if ((x < numberOfColumns && y < numberOfRows) && !(x == robbi.getX() && y == robbi.getY())) {
 			setChanged();
 			notifyAllObservers();
 		}
@@ -375,14 +390,15 @@ public class Territory extends Observable implements Serializable {
 	 * @param x PileOfScrap x-Position
 	 * @param y PileOfScrap y-Position
 	 */
-	public synchronized void placePileOfScrap(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
-		y = normalizeCoord(y, NUMBER_OF_ROWS);
-		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
+	public void placePileOfScrap(int x, int y) {
+		x = normalizeCoord(x, numberOfColumns);
+		y = normalizeCoord(y, numberOfRows);
+		synchronized (this) {
 			tiles[x][y] = new PileOfScrap();
-			setChanged();
-			notifyAllObservers();
 		}
+		setChanged();
+		notifyAllObservers();
+
 	}
 
 	/**
@@ -391,14 +407,14 @@ public class Territory extends Observable implements Serializable {
 	 * @param x Stockpile x-Position
 	 * @param y Stockpile y-Position
 	 */
-	public synchronized void placeStockpile(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
-		y = normalizeCoord(y, NUMBER_OF_ROWS);
-		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
+	public void placeStockpile(int x, int y) {
+		x = normalizeCoord(x, numberOfColumns);
+		y = normalizeCoord(y, numberOfRows);
+		synchronized (this) {
 			tiles[x][y] = new Stockpile();
-			setChanged();
-			notifyAllObservers();
 		}
+		setChanged();
+		notifyAllObservers();
 	}
 
 	/**
@@ -407,14 +423,14 @@ public class Territory extends Observable implements Serializable {
 	 * @param x Accu x-Position
 	 * @param y Accu y-Position
 	 */
-	public synchronized void placeAccu(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
-		y = normalizeCoord(y, NUMBER_OF_ROWS);
-		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
+	public void placeAccu(int x, int y) {
+		x = normalizeCoord(x, numberOfColumns);
+		y = normalizeCoord(y, numberOfRows);
+		synchronized (this) {
 			tiles[x][y].setItem(new Accu());
-			setChanged();
-			notifyAllObservers();
 		}
+		setChanged();
+		notifyAllObservers();
 
 	}
 
@@ -424,14 +440,14 @@ public class Territory extends Observable implements Serializable {
 	 * @param x Screw x-Position
 	 * @param y Screw y-Position
 	 */
-	public synchronized void placeScrew(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
-		y = normalizeCoord(y, NUMBER_OF_ROWS);
-		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
+	public void placeScrew(int x, int y) {
+		x = normalizeCoord(x, numberOfColumns);
+		y = normalizeCoord(y, numberOfRows);
+		synchronized (this) {
 			tiles[x][y].setItem(new Screw());
-			setChanged();
-			notifyAllObservers();
 		}
+		setChanged();
+		notifyAllObservers();
 	}
 
 	/**
@@ -440,14 +456,14 @@ public class Territory extends Observable implements Serializable {
 	 * @param x Nut x-Position
 	 * @param y Nut y-Position
 	 */
-	public synchronized void placeNut(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
-		y = normalizeCoord(y, NUMBER_OF_ROWS);
-		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
+	public void placeNut(int x, int y) {
+		x = normalizeCoord(x, numberOfColumns);
+		y = normalizeCoord(y, numberOfRows);
+		synchronized (this) {
 			tiles[x][y].setItem(new Nut());
-			setChanged();
-			notifyAllObservers();
 		}
+		setChanged();
+		notifyAllObservers();
 	}
 
 	/**
@@ -456,14 +472,14 @@ public class Territory extends Observable implements Serializable {
 	 * @param x Tile x-Position
 	 * @param y Tile y-Position
 	 */
-	public synchronized void clearTile(int x, int y) {
-		x = normalizeCoord(x, NUMBER_OF_COLUMNS);
-		y = normalizeCoord(y, NUMBER_OF_ROWS);
-		if (x < NUMBER_OF_COLUMNS && y < NUMBER_OF_ROWS) {
+	public void clearTile(int x, int y) {
+		x = normalizeCoord(x, numberOfColumns);
+		y = normalizeCoord(y, numberOfRows);
+		synchronized (this) {
 			tiles[x][y] = new Tile();
-			setChanged();
-			notifyAllObservers();
 		}
+		setChanged();
+		notifyAllObservers();
 	}
 
 	/**
@@ -735,8 +751,8 @@ public class Territory extends Observable implements Serializable {
 	 */
 	public void print() {
 
-		for (int i = 0; i < NUMBER_OF_COLUMNS; i++) {
-			for (int j = 0; j < NUMBER_OF_ROWS; j++) {
+		for (int i = 0; i < numberOfColumns; i++) {
+			for (int j = 0; j < numberOfRows; j++) {
 				if (j == robbi.getX() && i == robbi.getY()) {
 					robbi.print();
 					continue;
