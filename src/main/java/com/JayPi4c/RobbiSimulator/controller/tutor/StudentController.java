@@ -9,6 +9,7 @@ import java.rmi.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
@@ -58,6 +59,8 @@ public class StudentController {
 				return;
 			}
 			stage.getProgram().setEditorContent(answer.code());
+			stage.getProgram().save(answer.code());
+			ProgramController.compile(stage.getProgram(), stage);
 			stage.getTerritory().fromXML(new ByteArrayInputStream(answer.territory().getBytes()));
 			stage.getSendRequestMenuItem().setDisable(false);
 			stage.getReceiveAnswerMenuItem().setDisable(true);

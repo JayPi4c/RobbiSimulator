@@ -11,6 +11,7 @@ import java.rmi.server.UnicastRemoteObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
@@ -52,11 +53,14 @@ public class TutorController {
 
 	/**
 	 * Helper to handle loadRequest actions
+	 * 
 	 */
 	private void loadRequest() {
 		tutor.getNewRequest().ifPresentOrElse(request -> {
 			logger.debug("Loading request with id {}.", request.id());
 			stage.getProgram().setEditorContent(request.code());
+			stage.getProgram().save(request.code());
+			ProgramController.compile(stage.getProgram(), stage);
 			stage.getTerritory().fromXML(new ByteArrayInputStream(request.territory().getBytes()));
 			currentID = request.id();
 			stage.getLoadRequestMenuItem().setDisable(true);
