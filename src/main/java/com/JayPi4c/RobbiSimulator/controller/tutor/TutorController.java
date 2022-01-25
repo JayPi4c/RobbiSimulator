@@ -59,8 +59,8 @@ public class TutorController {
 		tutor.getNewRequest().ifPresentOrElse(request -> {
 			logger.debug("Loading request with id {}.", request.id());
 			stage.getProgram().setEditorContent(request.code());
-			stage.getProgram().save(request.code());
-			ProgramController.compile(stage.getProgram(), stage);
+			stage.getProgram().save();
+			ProgramController.compile(stage.getProgram(), false, stage);
 			stage.getTerritory().fromXML(new ByteArrayInputStream(request.territory().getBytes()));
 			currentID = request.id();
 			stage.getLoadRequestMenuItem().setDisable(true);

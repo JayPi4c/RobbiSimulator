@@ -172,7 +172,7 @@ public class LanguageController {
 	/**
 	 * needed since the star (*) would mess with the binding property
 	 */
-	private void updateTitle() {
+	public void updateTitle() {
 		stage.setTitle(I18nUtils.i18n("Main.title") + ": " + stage.getProgram().getName()
 				+ (stage.getProgram().isEdited() ? "*" : ""));
 	}

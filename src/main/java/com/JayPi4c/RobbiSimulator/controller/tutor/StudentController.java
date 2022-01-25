@@ -9,6 +9,7 @@ import java.rmi.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
@@ -59,8 +60,8 @@ public class StudentController {
 				return;
 			}
 			stage.getProgram().setEditorContent(answer.code());
-			stage.getProgram().save(answer.code());
-			ProgramController.compile(stage.getProgram(), stage);
+			stage.getProgram().save();
+			ProgramController.compile(stage.getProgram(), false, stage);
 			stage.getTerritory().fromXML(new ByteArrayInputStream(answer.territory().getBytes()));
 			stage.getSendRequestMenuItem().setDisable(false);
 			stage.getReceiveAnswerMenuItem().setDisable(true);
@@ -78,8 +79,11 @@ public class StudentController {
 			Registry registry = LocateRegistry.getRegistry(PropertiesLoader.getTutorhost(),
 					PropertiesLoader.getTutorport());
 			ITutor tutor = (ITutor) registry.lookup(TutorController.TUTOR_CODE);
-			requestID = tutor.sendRequest(stage.getProgram().getEditorContent(),
-					stage.getTerritory().toXML().toString());
+			Program program = stage.getProgram();
+			program.setEdited(true);
+			program.save(stage.getTextArea().getText());
+			stage.getLanguageController().updateTitle();
+			requestID = tutor.sendRequest(program.getEditorContent(), stage.getTerritory().toXML().toString());
 			logger.debug("The request has ID {}.", requestID);
 			stage.getSendRequestMenuItem().setDisable(true);
 			stage.getReceiveAnswerMenuItem().setDisable(false);

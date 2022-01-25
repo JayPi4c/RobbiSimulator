@@ -17,7 +17,6 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  *
  */
 public class Program extends Observable {
-
 	private String name;
 
 	private String editorContent;
@@ -85,6 +84,7 @@ public class Program extends Observable {
 	 */
 	public void setEditorContent(String content) {
 		this.editorContent = content;
+		this.edited = true;
 		this.setChanged();
 		this.notifyAllObservers();
 	}
@@ -100,7 +100,14 @@ public class Program extends Observable {
 			return;
 
 		editorContent = text;
-		String content = ProgramController.createTemplate(name, text);
+		save();
+	}
+
+	/**
+	 * Forces the program to be saved even if it might not be edited.
+	 */
+	public void save() {
+		String content = ProgramController.createTemplate(name, editorContent);
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 			writer.write(content);
 		} catch (IOException e) {

@@ -38,8 +38,6 @@ public class Territory extends Observable implements Serializable {
 
 	private transient Robbi robbi;
 
-	// TODO move setĆhanged and notify out of synchronized.
-
 	/**
 	 * Array-attribute to store the real territory
 	 */
