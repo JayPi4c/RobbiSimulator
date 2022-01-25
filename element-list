@@ -3,6 +3,7 @@ com.JayPi4c.RobbiSimulator.controller
 com.JayPi4c.RobbiSimulator.controller.examples
 com.JayPi4c.RobbiSimulator.controller.program
 com.JayPi4c.RobbiSimulator.controller.simulation
+com.JayPi4c.RobbiSimulator.controller.tutor
 com.JayPi4c.RobbiSimulator.model
 com.JayPi4c.RobbiSimulator.utils
 com.JayPi4c.RobbiSimulator.utils.annotations
