@@ -22,6 +22,7 @@ public class PropertiesLoader {
 
 	private static final String DIR = System.getProperty("user.dir");
 	private static final String FILE = "/simulator.properties";
+	private static final String COMMENTS = "role=student OR tutor";
 
 	/**
 	 * Private constructor to hide the implicit one.
@@ -99,7 +100,7 @@ public class PropertiesLoader {
 	public static boolean finish() {
 		properties.put("lang", I18nUtils.getLocale().toString());
 		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {
-			properties.store(fos, null);
+			properties.store(fos, COMMENTS);
 			return true;
 		} catch (IOException e) {
 			return false;

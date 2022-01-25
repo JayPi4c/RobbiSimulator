@@ -27,6 +27,7 @@ import com.JayPi4c.RobbiSimulator.utils.Observer;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
+import jakarta.xml.bind.JAXBContext;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -238,9 +239,10 @@ public class MainStageController implements Observer {
 			String javaVersion = System.getProperty("java.version");
 			String log4JVersion = Layout.class.getPackage().getImplementationVersion();
 			String derbyVersion = sysinfo.getVersionString();
+			String JAXBVersion = JAXBContext.class.getPackage().getImplementationVersion();
 			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 					String.format(I18nUtils.i18n("Menu.window.libraries.content"), javaVersion, javaFxVersion,
-							log4JVersion, derbyVersion),
+							log4JVersion, derbyVersion, JAXBVersion),
 					mainStage, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
 					I18nUtils.i18n("Menu.window.libraries.header"));
 		});

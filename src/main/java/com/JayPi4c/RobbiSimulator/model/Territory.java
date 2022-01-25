@@ -30,7 +30,6 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * @author Jonas Pohl
  *
  */
-//@XmlRootElement
 public class Territory extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
