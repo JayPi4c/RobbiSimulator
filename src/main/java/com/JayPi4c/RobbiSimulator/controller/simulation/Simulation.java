@@ -32,6 +32,8 @@ public class Simulation extends Thread implements Observer {
 	private volatile boolean stop;
 	private volatile boolean pause;
 
+	private final Object lock = new Object();
+
 	/**
 	 * Constructor to create a new Simulation, which can execute robbis main-Method.
 	 * 
@@ -63,9 +65,7 @@ public class Simulation extends Thread implements Observer {
 			logger.debug("Simulation stopped");
 		} catch (RobbiException re) {
 			logger.debug("Simulation stopped with exception: {}", re.getMessage());
-			Platform.runLater(() -> {
-				AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent);
-			});
+			Platform.runLater(() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent));
 		} finally {
 			stop = true;
 			territory.removeObserver(this);
@@ -91,15 +91,16 @@ public class Simulation extends Thread implements Observer {
 			sleep(simController.getSpeed());
 		} catch (InterruptedException e) {
 			logger.debug("Stopping simulation during sleep");
+			Thread.currentThread().interrupt();
 		}
 		if (this.stop)
 			throw new StopException();
 		while (this.pause)
-			synchronized (this) {
+			synchronized (lock) {
 				try {
-					this.wait();
+					lock.wait();
 				} catch (InterruptedException e) {
-
+					Thread.currentThread().interrupt();
 				}
 			}
 		if (stop)
@@ -141,6 +142,15 @@ public class Simulation extends Thread implements Observer {
 	 */
 	public boolean getPause() {
 		return this.pause;
+	}
+
+	/**
+	 * Gets the lock instance for the simulation to synchronize on.
+	 * 
+	 * @return the simulations lock object
+	 */
+	public Object getLock() {
+		return lock;
 	}
 
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import com.JayPi4c.RobbiSimulator.controller.MethodHandler;
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.model.Territory;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Invisible;
 
@@ -43,7 +43,7 @@ public class RobbiContextMenu extends ContextMenu {
 	 */
 	public RobbiContextMenu(Territory territory, Window parent) {
 
-		for (Method method : getDefaultMethods(territory.getRobbi())) {
+		for (Method method : getDefaultMethods()) {
 			MenuItem item = getMenuItem(method);
 
 			// if method needs arguments and no Parameterized Annotation is set -> disable
@@ -56,7 +56,7 @@ public class RobbiContextMenu extends ContextMenu {
 			getItems().add(item);
 		}
 
-		Method methods[] = getCustomMethods(territory.getRobbi());
+		Method[] methods = getCustomMethods(territory.getRobbi());
 		if (methods.length > 0) {
 			getItems().add(new SeparatorMenuItem());
 
@@ -66,7 +66,7 @@ public class RobbiContextMenu extends ContextMenu {
 				if (method.getParameterCount() != 0 && !hasCorrectDefaultAnnotations(method)) {
 					item.setDisable(true);
 					// https://stackoverflow.com/a/43053529/13670629
-					Tooltip tooltip = new Tooltip(Messages.getString("Editor.contextMenu.tooltip"));
+					Tooltip tooltip = new Tooltip(I18nUtils.i18n("Editor.contextMenu.tooltip"));
 					Tooltip.install(item.getContent(), tooltip);
 
 				} else
@@ -122,29 +122,25 @@ public class RobbiContextMenu extends ContextMenu {
 			bobTheBuilder.append(parameter.getType());
 			List<Annotation> annos = Arrays.asList(parameter.getAnnotations());
 			for (Annotation anno : annos)
-				if (anno instanceof Default) {
+				if (anno instanceof Default a) {
 					bobTheBuilder.append(" = ");
-					bobTheBuilder.append(((Default) anno).value());
+					bobTheBuilder.append(a.value());
 				}
-			// bobTheBuilder.append(" ");
-			// bobTheBuilder.append(parameter.getName());
 			bobTheBuilder.append(", ");
 		}
 		if (m.getParameterCount() > 0)
 			bobTheBuilder.delete(bobTheBuilder.length() - 2, bobTheBuilder.length());
 		bobTheBuilder.append(")");
-		CustomMenuItem item = new CustomMenuItem(new Label(bobTheBuilder.toString()));
-		return item;
+		return new CustomMenuItem(new Label(bobTheBuilder.toString()));
 	}
 
 	/**
 	 * Get all methods that are part of the default implementation, that are
 	 * visibile to the user.
 	 * 
-	 * @param robbi the robbi instance to get the default methods from
 	 * @return all methods that are part of the default implementation
 	 */
-	private Method[] getDefaultMethods(Robbi robbi) {
+	private Method[] getDefaultMethods() {
 		List<Method> methods = new ArrayList<>();
 
 		for (Method m : Robbi.class.getDeclaredMethods()) {

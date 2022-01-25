@@ -16,7 +16,7 @@ public abstract class RobbiException extends RuntimeException {
 	 * 
 	 * @param msg a message to provide further details of the exception
 	 */
-	public RobbiException(String msg) {
+	protected RobbiException(String msg) {
 		super(msg);
 	}
 

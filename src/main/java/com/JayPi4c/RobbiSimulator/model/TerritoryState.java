@@ -11,7 +11,7 @@ public class TerritoryState {
 	private int numberOfColumns;
 	private int numberOfRows;
 
-	private Tile tiles[][];
+	private Tile[][] tiles;
 	private RobbiState robbi;
 
 	/**
@@ -35,9 +35,9 @@ public class TerritoryState {
 					newTile = new Hollow();
 				} else if (t instanceof PileOfScrap) {
 					newTile = new PileOfScrap();
-				} else if (t instanceof Stockpile) {
+				} else if (t instanceof Stockpile stockpile) {
 					newTile = new Stockpile();
-					for (Item item : ((Stockpile) t).getAllItems())
+					for (Item item : stockpile.getAllItems())
 						newTile.setItem(item);
 				} else {
 					newTile = new Tile();

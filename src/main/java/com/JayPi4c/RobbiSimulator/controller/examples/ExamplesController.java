@@ -9,8 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.ILanguageChangeListener;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.application.Platform;
@@ -42,7 +41,7 @@ import javafx.util.Pair;
  * @author Jonas Pohl
  *
  */
-public class ExamplesController implements ILanguageChangeListener {
+public class ExamplesController {
 	private static final Logger logger = LogManager.getLogger(ExamplesController.class);
 
 	private MainStage stage;
@@ -53,7 +52,6 @@ public class ExamplesController implements ILanguageChangeListener {
 	 * @param stage the mainStage, this controller is for
 	 */
 	public ExamplesController(MainStage stage) {
-		Messages.registerListener(this);
 		this.stage = stage;
 
 		stage.getSaveExampleMenuItem().setOnAction(e -> {
@@ -77,14 +75,14 @@ public class ExamplesController implements ILanguageChangeListener {
 						Optional<Integer> idOpt = showProgramSelection(programsOpt.get());
 						idOpt.ifPresentOrElse(id -> {
 							Optional<Example> exOpt = DatabaseManager.getDatabaseManager().loadExample(id);
-							exOpt.ifPresentOrElse(example -> example.load(),
+							exOpt.ifPresentOrElse(Example::load,
 									() -> logger.debug("Could not load example from database"));
 						}, () -> logger.debug("No example selected"));
 					}
 				}, () -> logger.debug("No tag selected"));
 			}, () -> {
 				logger.info("No tags are stored in database");
-				AlertHelper.showAlertAndWait(AlertType.WARNING, Messages.getString("Examples.load.dialog.tags.fail"),
+				AlertHelper.showAlertAndWait(AlertType.WARNING, I18nUtils.i18n("Examples.load.dialog.tags.fail"),
 						stage);
 			});
 
@@ -102,8 +100,8 @@ public class ExamplesController implements ILanguageChangeListener {
 	 */
 	public Optional<Integer> showProgramSelection(List<Pair<Integer, String>> programs) {
 		Dialog<Integer> dialog = new Dialog<>();
-		dialog.setTitle(Messages.getString("Examples.load.dialog.program.title"));
-		dialog.setHeaderText(Messages.getString("Examples.load.dialog.program.header"));
+		dialog.setTitle(I18nUtils.i18n("Examples.load.dialog.program.title"));
+		dialog.setHeaderText(I18nUtils.i18n("Examples.load.dialog.program.header"));
 		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -111,14 +109,13 @@ public class ExamplesController implements ILanguageChangeListener {
 		ComboBox<HideableItem<Pair<Integer, String>>> comboBox = createComboBoxWithAutoCompletionSupport(programs);
 		comboBox.getSelectionModel().select(0);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(Messages.getString("Examples.load.dialog.program.name")), comboBox);
+		grid.addRow(0, new Label(I18nUtils.i18n("Examples.load.dialog.program.name")), comboBox);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(comboBox::requestFocus);
 		dialog.setResultConverter(
 				button -> (button == ButtonType.OK) ? comboBox.getValue().getObject().getKey() : null);
-		Optional<Integer> result = dialog.showAndWait();
-		return result;
+		return dialog.showAndWait();
 	}
 
 	/**
@@ -130,8 +127,8 @@ public class ExamplesController implements ILanguageChangeListener {
 	 */
 	public Optional<String> showTagSelection(List<String> tags) {
 		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(Messages.getString("Examples.load.dialog.tags.title"));
-		dialog.setHeaderText(Messages.getString("Examples.load.dialog.tags.header"));
+		dialog.setTitle(I18nUtils.i18n("Examples.load.dialog.tags.title"));
+		dialog.setHeaderText(I18nUtils.i18n("Examples.load.dialog.tags.header"));
 		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -139,13 +136,12 @@ public class ExamplesController implements ILanguageChangeListener {
 		ComboBox<HideableItem<String>> comboBox = createComboBoxWithAutoCompletionSupport(tags);
 		comboBox.getSelectionModel().select(0);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(Messages.getString("Examples.load.dialog.tags.name")), comboBox);
+		grid.addRow(0, new Label(I18nUtils.i18n("Examples.load.dialog.tags.name")), comboBox);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(comboBox::requestFocus);
 		dialog.setResultConverter(button -> (button == ButtonType.OK) ? comboBox.getValue().toString() : null);
-		Optional<String> result = dialog.showAndWait();
-		return result;
+		return dialog.showAndWait();
 	}
 
 	/**
@@ -157,20 +153,20 @@ public class ExamplesController implements ILanguageChangeListener {
 	 */
 	private Optional<List<String>> enterTags() {
 		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(Messages.getString("Examples.save.tags.title"));
-		dialog.setHeaderText(Messages.getString("Examples.save.tags.header"));
+		dialog.setTitle(I18nUtils.i18n("Examples.save.tags.title"));
+		dialog.setHeaderText(I18nUtils.i18n("Examples.save.tags.header"));
 		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 		TextField tagsField = new TextField();
-		tagsField.setPromptText(Messages.getString("Examples.save.tags.prompt"));
+		tagsField.setPromptText(I18nUtils.i18n("Examples.save.tags.prompt"));
 
 		tagsField.textProperty().addListener((observable, oldVal, newVal) -> dialog.getDialogPane()
 				.lookupButton(ButtonType.OK).setDisable(newVal.isBlank()));
 
 		dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(Messages.getString("Examples.save.tags.name")), tagsField);
+		grid.addRow(0, new Label(I18nUtils.i18n("Examples.save.tags.name")), tagsField);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(tagsField::requestFocus);
@@ -188,13 +184,6 @@ public class ExamplesController implements ILanguageChangeListener {
 			return Optional.of(tags);
 		} else
 			return Optional.empty();
-	}
-
-	@Override
-	public void onLanguageChanged() {
-		stage.getExamplesMenu().setText(Messages.getString("Menu.examples"));
-		stage.getLoadExampleMenuItem().setText(Messages.getString("Menu.examples.load"));
-		stage.getSaveExampleMenuItem().setText(Messages.getString("Menu.examples.save"));
 	}
 
 	/**
@@ -307,7 +296,7 @@ public class ExamplesController implements ILanguageChangeListener {
 		comboBox.setItems(filteredHideableItems);
 
 		@SuppressWarnings("unchecked")
-		HideableItem<T>[] selectedItem = (HideableItem<T>[]) new HideableItem[1];
+		HideableItem<T>[] selectedItem = new HideableItem[1];
 
 		comboBox.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 			if (!comboBox.isShowing())
@@ -317,7 +306,7 @@ public class ExamplesController implements ILanguageChangeListener {
 		});
 
 		comboBox.showingProperty().addListener((obs, oldVal, newVal) -> {
-			if (newVal) {
+			if (Boolean.TRUE.equals(newVal)) {
 				@SuppressWarnings("unchecked")
 				ListView<HideableItem<T>> lv = (ListView<HideableItem<T>>) ((ComboBoxListViewSkin<?>) comboBox
 						.getSkin()).getPopupContent();

@@ -36,7 +36,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
@@ -112,9 +112,8 @@ public class ProgramController {
 	 */
 	public static boolean initialize() {
 		File dir = new File(PATH_TO_PROGRAMS);
-		if (!dir.exists()) {
-			if (!dir.mkdir())
-				return false;
+		if (!dir.exists() && !dir.mkdir()) {
+			return false;
 		}
 
 		File defaultProgram = new File(
@@ -154,7 +153,7 @@ public class ProgramController {
 				.collect(Collectors.toCollection(ArrayList::new));
 
 		logger.debug("Found following files in 'programs' directory:");
-		filenamesInDirectory.forEach(f -> logger.debug(f));
+		filenamesInDirectory.forEach(logger::debug);
 		return filenamesInDirectory;
 	}
 
@@ -179,13 +178,13 @@ public class ProgramController {
 	 */
 	private static Optional<String> getNameForProgram(Window parent) {
 		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(Messages.getString("New.dialog.title"));
-		dialog.setHeaderText(Messages.getString("New.dialog.header"));
+		dialog.setTitle(I18nUtils.i18n("New.dialog.title"));
+		dialog.setHeaderText(I18nUtils.i18n("New.dialog.header"));
 		dialog.initOwner(parent);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 		TextField nameField = new TextField();
-		nameField.setPromptText(Messages.getString("New.dialog.prompt"));
+		nameField.setPromptText(I18nUtils.i18n("New.dialog.prompt"));
 
 		Collection<String> filenamesInDirectory = getFilenamesInDirectory();
 
@@ -198,14 +197,13 @@ public class ProgramController {
 
 		dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(Messages.getString("New.dialog.name")), nameField);
+		grid.addRow(0, new Label(I18nUtils.i18n("New.dialog.name")), nameField);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(nameField::requestFocus);
 		dialog.setResultConverter(button -> (button == ButtonType.OK) ? nameField.getText() : null);
 
-		Optional<String> result = dialog.showAndWait();
-		return result;
+		return dialog.showAndWait();
 	}
 
 	/**
@@ -264,10 +262,10 @@ public class ProgramController {
 				stage.close();
 			}
 
-			Alert alert = AlertHelper.createAlert(AlertType.INFORMATION,
-					Messages.getString("Examples.duplication.message"), null);
-			alert.setHeaderText(Messages.getString("Examples.duplication.header"));
-			alert.setTitle(Messages.getString("Examples.duplication.title"));
+			Alert alert = AlertHelper.createAlert(AlertType.INFORMATION, I18nUtils.i18n("Examples.duplication.message"),
+					null);
+			alert.setHeaderText(I18nUtils.i18n("Examples.duplication.header"));
+			alert.setTitle(I18nUtils.i18n("Examples.duplication.title"));
 			alert.getButtonTypes().remove(ButtonType.OK);
 			alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
 			Optional<ButtonType> result = alert.showAndWait();
@@ -338,8 +336,7 @@ public class ProgramController {
 
 		if (newFile.exists())
 			return false;
-		boolean success = f.renameTo(newFile);
-		return success;
+		return f.renameTo(newFile);
 	}
 
 	/**
@@ -382,10 +379,10 @@ public class ProgramController {
 	 */
 	public static void openProgram(Window parent) {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(Messages.getString("Open.dialog.title"));
+		fileChooser.setTitle(I18nUtils.i18n("Open.dialog.title"));
 		fileChooser.setInitialDirectory(new File(PATH_TO_PROGRAMS));
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(Messages.getString("Open.dialog.filter"),
-				"*" + DEFAULT_FILE_EXTENSION));
+		fileChooser.getExtensionFilters().add(
+				new FileChooser.ExtensionFilter(I18nUtils.i18n("Open.dialog.filter"), "*" + DEFAULT_FILE_EXTENSION));
 
 		File file = fileChooser.showOpenDialog(parent);
 		if (file != null) {
@@ -440,7 +437,7 @@ public class ProgramController {
 					.getJavaFileObjectsFromFiles(Arrays.asList(program.getFile()));
 			CompilationTask task = javac.getTask(null, manager, diagnostics, null, null, units);
 
-			if (!task.call()) {
+			if (Boolean.FALSE.equals(task.call())) {
 				boolean showedAlert = false; // flag to indicate that only one alert is shown
 				diagnostics.toString();
 				logger.error("Compilation failed");
@@ -457,11 +454,11 @@ public class ProgramController {
 					if (showAlerts && !showedAlert) {
 						StringBuilder bobTheBuilder = new StringBuilder();
 						bobTheBuilder.append(
-								String.format(Messages.getString("Compilation.diagnostic.kind"), diagnostic.getKind()));
+								String.format(I18nUtils.i18n("Compilation.diagnostic.kind"), diagnostic.getKind()));
 						// bobTheBuilder.append(String.format("Quelle: %s%n", diagnostic.getSource()));
-						bobTheBuilder.append(String.format(Messages.getString("Compilation.diagnostic.CodeAndMessage"),
+						bobTheBuilder.append(String.format(I18nUtils.i18n("Compilation.diagnostic.CodeAndMessage"),
 								diagnostic.getCode(), diagnostic.getMessage(null)));
-						bobTheBuilder.append(String.format(Messages.getString("Compilation.diagnostic.row"),
+						bobTheBuilder.append(String.format(I18nUtils.i18n("Compilation.diagnostic.row"),
 								diagnostic.getLineNumber()));
 						// bobTheBuilder.append(
 						// String.format("Position/Spalte: %s/%s%n", diagnostic.getPosition(),
@@ -471,7 +468,7 @@ public class ProgramController {
 						// diagnostic.getEndPosition()));
 
 						AlertHelper.showAlertAndWait(AlertType.ERROR, bobTheBuilder.toString(), parent,
-								Modality.WINDOW_MODAL, Messages.getString("Compilation.diagnostic.title"),
+								Modality.WINDOW_MODAL, I18nUtils.i18n("Compilation.diagnostic.title"),
 								diagnostic.getKind().toString());
 						showedAlert = true;
 					}
@@ -483,9 +480,10 @@ public class ProgramController {
 				robbi.ifPresentOrElse(r -> {
 					Diagnostics diag = new Diagnostics();
 					if (!hasValidAnnotations(r, diag)) {
-						List<Diagnostics.Diagnostic> diags = diag.getDiagnostics();
-						String val = null, type = null;
-						if (diags.size() > 0) {
+						List<Diagnostics.Diagnostic> diags = diag.getDiagnosis();
+						String val = null;
+						String type = null;
+						if (!diags.isEmpty()) {
 							Diagnostics.Diagnostic diagnostic = diags.get(0);
 							val = diagnostic.value();
 							type = diagnostic.type();
@@ -493,13 +491,13 @@ public class ProgramController {
 						} else
 							logger.error("[Annotation Error]: Error has been found but could not be diagnosed.");
 						if (showAlerts) {
-							String msg = Messages.getString("Compilation.annotations.msg.default");
+							String msg = I18nUtils.i18n("Compilation.annotations.msg.default");
 							if (val != null && type != null) {
-								msg = String.format(Messages.getString("Compilation.annotations.msg.info"), val, type);
+								msg = String.format(I18nUtils.i18n("Compilation.annotations.msg.info"), val, type);
 							}
 							AlertHelper.showAlertAndWait(AlertType.WARNING, msg, parent, Modality.WINDOW_MODAL,
-									Messages.getString("Compilation.annotations.title"),
-									Messages.getString("Compilation.annotations.header"));
+									I18nUtils.i18n("Compilation.annotations.title"),
+									I18nUtils.i18n("Compilation.annotations.header"));
 						}
 					} else {
 						if (overwritesMainMethod(r)) {
@@ -508,14 +506,13 @@ public class ProgramController {
 							s.getTerritory().setRobbi(r);
 							if (showAlerts) {
 								AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-										String.format(Messages.getString("Compilation.success.message"),
-												program.getName()),
-										parent, Modality.WINDOW_MODAL, Messages.getString("Compilation.success.title"),
-										Messages.getString("Compilation.success.header"));
+										String.format(I18nUtils.i18n("Compilation.success.message"), program.getName()),
+										parent, Modality.WINDOW_MODAL, I18nUtils.i18n("Compilation.success.title"),
+										I18nUtils.i18n("Compilation.success.header"));
 							}
 						} else {
 							AlertHelper.showAlertAndWait(AlertType.ERROR,
-									Messages.getString("Compilation.diagnostic.override"), parent);
+									I18nUtils.i18n("Compilation.diagnostic.override"), parent);
 							logger.error("The custom Robbi class does not overwrite the main-Method");
 						}
 					}
@@ -554,7 +551,7 @@ public class ProgramController {
 	 * @return true if the annotions are valid, false otherwise
 	 */
 	private static boolean hasValidAnnotations(Robbi robbi, Diagnostics diag) {
-		Method methods[] = getCustomMethods(robbi);
+		Method[] methods = getCustomMethods(robbi);
 		boolean result = true;
 		for (Method method : methods) {
 			if (!hasValidDefaultAnnotation(method, diag)) {
@@ -577,11 +574,10 @@ public class ProgramController {
 	private static boolean hasValidDefaultAnnotation(Method method, Diagnostics diag) {
 		boolean result = true;
 		for (Parameter parameter : method.getParameters()) {
-			Annotation annotations[] = parameter.getAnnotations();
+			Annotation[] annotations = parameter.getAnnotations();
 			for (Annotation annotation : annotations) {
-				if (annotation instanceof Default) {
-					if (!valueAcceptable(parameter, (Default) annotation, diag))
-						result = false;
+				if (annotation instanceof Default anno && !valueAcceptable(parameter, anno, diag)) {
+					result = false;
 					// return false;
 				}
 			}
@@ -611,8 +607,7 @@ public class ProgramController {
 			case "boolean":
 				return val.equalsIgnoreCase("true") || val.equalsIgnoreCase("false");
 			case "char":
-				val.subSequence(0, 1);
-				return true;
+				return !val.isBlank();
 			case "double":
 				Double.parseDouble(val);
 				return true;
@@ -644,9 +639,7 @@ public class ProgramController {
 		List<Method> methods = new ArrayList<>();
 		// if robbi is custom class
 		if (Robbi.class != robbi.getClass()) {
-			for (Method m : robbi.getClass().getDeclaredMethods()) {
-				methods.add(m);
-			}
+			methods.addAll(Arrays.asList(robbi.getClass().getDeclaredMethods()));
 		}
 		return methods.toArray(new Method[0]);
 	}

@@ -5,10 +5,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
+import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.Messages;
-import com.JayPi4c.RobbiSimulator.view.MainStage;
-import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
+import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,14 +28,6 @@ public class App extends Application {
 
 	private static final Logger logger = LogManager.getLogger(App.class);
 
-	@Override
-	public void start(Stage primaryStage) {
-		logger.info("Starting application");
-		logger.debug("Creating scene");
-		ProgramController.createAndShow(ProgramController.DEFAULT_ROBBI_FILE_NAME);
-		logger.debug("Scene creation done");
-	}
-
 	/**
 	 * Application entry point
 	 * 
@@ -49,26 +41,43 @@ public class App extends Application {
 	public void init() {
 		logger.info("Initialize application");
 
+		logger.debug("Initializing properties...");
+		if (PropertiesLoader.initialize()) {
+			logger.debug("Loaded properties successfully");
+			I18nUtils.setLocale(PropertiesLoader.getLocale());
+		} else
+			logger.debug("Failed to load properties.");
+
 		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {
 			logger.error("Failed to load Program Controller");
-			AlertHelper.showAlertAndWait(AlertType.ERROR, Messages.getString("Init.error.message"), null, null,
-					Messages.getString("Init.error.title"), Messages.getString("Init.error.header"));
+			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Init.error.message"), null, null,
+					I18nUtils.i18n("Init.error.title"), I18nUtils.i18n("Init.error.header"));
 			Platform.exit();
 		}
 		logger.debug("loading Program Controller successfully");
 
 		logger.debug("Connecting to Database");
-		if (DatabaseManager.getDatabaseManager().initialize())
+		if (DatabaseManager.initialize())
 			logger.debug("Connecting to Database successfully");
 		else
 			logger.debug("Connecting to Database failed");
 
-		logger.debug("Loading images");
-		MainStage.loadImages();
-		TerritoryPanel.loadImages();
-		logger.debug("Finished loading images");
+		if (PropertiesLoader.isTutor()) {
+			logger.debug("Starting Tutor RMI server");
+			if (TutorController.initialize())
+				logger.debug("RMI server started");
+			else
+				logger.debug("Failed to initialize RMI server.");
+		}
+	}
 
+	@Override
+	public void start(Stage primaryStage) {
+		logger.info("Starting application");
+		logger.debug("Creating scene");
+		ProgramController.createAndShow(ProgramController.DEFAULT_ROBBI_FILE_NAME);
+		logger.debug("Scene creation done");
 	}
 
 	@Override
@@ -76,6 +85,20 @@ public class App extends Application {
 		logger.debug("Closing Database Connection");
 		DatabaseManager.getDatabaseManager().shutDown();
 		logger.debug("Closing Database Connection successfully");
+
+		if (PropertiesLoader.isTutor()) {
+			logger.debug("Stopping Tutor-Server.");
+			if (TutorController.shutdown())
+				logger.debug("Tutor RMI server stopped successfully.");
+			else
+				logger.debug("Failed to shutdown Tutor RMI server");
+		}
+
+		logger.debug("saving properties...");
+		if (PropertiesLoader.finish())
+			logger.debug("Properties saved");
+		else
+			logger.debug("Failed to save properties");
 
 		logger.info("Quitting application");
 	}

@@ -1,6 +1,6 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import com.JayPi4c.RobbiSimulator.utils.Messages;
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 
 /**
  * Exception to be thrown if robbi attempts to push a pile of scrap while there
@@ -17,7 +17,7 @@ public class NoPileOfScrapAheadException extends RobbiException {
 	 * Constructor for a new NoPileOfScrapAheadException with localized message.
 	 */
 	public NoPileOfScrapAheadException() {
-		super(Messages.getString("Exception.NoPileOfScrapAhead"));
+		super(I18nUtils.i18n("Exception.NoPileOfScrapAhead"));
 	}
 
 }
