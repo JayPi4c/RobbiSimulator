@@ -53,44 +53,15 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 			List<Object> args = new ArrayList<>();
 			for (Parameter p : method.getParameters()) {
 				for (Annotation anno : p.getAnnotations()) {
-					if (anno instanceof Default) {
-						String val = ((Default) anno).value();
-						try {
-							switch (p.getType().getName()) {
-							case "int":
-								args.add(Integer.parseInt(val));
-								break;
-							case "boolean":
-								args.add(Boolean.parseBoolean(val));
-								break;
-							case "char":
-								args.add(val.subSequence(0, 1));
-								break;
-							case "double":
-								args.add(Double.parseDouble(val));
-								break;
-							case "float":
-								args.add(Float.parseFloat(val));
-								break;
-							case "long":
-								args.add(Long.parseLong(val));
-								break;
-							case "String":
-							default:
-								args.add(val);
-
-							}
-						} catch (IllegalArgumentException e) {
-							AlertHelper.showAlertAndWait(AlertType.ERROR, String
-									.format(I18nUtils.i18n("Editor.contextMenu.executionError"), val, method.getName()),
-									parent);
+					if (anno instanceof Default a) {
+						String val = a.value();
+						if (!addToList(args, p, val))
 							return;
-						}
 						break;
 					}
 				}
 			}
-			Object arr[] = args.toArray(new Object[0]);
+			Object[] arr = args.toArray(new Object[0]);
 			Object result = this.method.invoke(this.territory.getRobbi(), arr);
 
 			if (result != null) {
@@ -110,6 +81,47 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 		} finally {
 			this.territory.activateNotification();
 		}
+	}
+
+	/**
+	 * Helper to add the correct value type to the arguments list.
+	 * 
+	 * @param args the list of arguments for the annotated method
+	 * @param p    the parameter, the value was taken from
+	 * @param val  the value to add to the list
+	 * @return true, if the addition was successful, false otherwise
+	 */
+	private boolean addToList(List<Object> args, Parameter p, String val) {
+		try {
+			switch (p.getType().getName()) {
+			case "int":
+				args.add(Integer.parseInt(val));
+				break;
+			case "boolean":
+				args.add(Boolean.parseBoolean(val));
+				break;
+			case "char":
+				args.add(val.subSequence(0, 1));
+				break;
+			case "double":
+				args.add(Double.parseDouble(val));
+				break;
+			case "float":
+				args.add(Float.parseFloat(val));
+				break;
+			case "long":
+				args.add(Long.parseLong(val));
+				break;
+			case "String":
+			default:
+				args.add(val);
+			}
+		} catch (IllegalArgumentException e) {
+			AlertHelper.showAlertAndWait(AlertType.ERROR,
+					String.format(I18nUtils.i18n("Editor.contextMenu.executionError"), val, method.getName()), parent);
+			return false;
+		}
+		return true;
 	}
 
 }

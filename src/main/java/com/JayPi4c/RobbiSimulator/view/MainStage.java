@@ -2,7 +2,6 @@ package com.JayPi4c.RobbiSimulator.view;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Layout;
 
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.LanguageController;
@@ -11,13 +10,13 @@ import com.JayPi4c.RobbiSimulator.controller.TerritorySaveController;
 import com.JayPi4c.RobbiSimulator.controller.examples.ExamplesController;
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.simulation.SimulationController;
+import com.JayPi4c.RobbiSimulator.controller.tutor.StudentController;
+import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.model.Territory;
-import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
+import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 
-import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
@@ -35,7 +34,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -43,7 +41,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -65,6 +62,8 @@ public class MainStage extends Stage {
 	private SimulationController simController;
 	private TerritorySaveController territorySaveController;
 	private ExamplesController examplesController;
+	private StudentController studenController;
+	private TutorController tutorController;
 	private LanguageController languageController;
 
 	/**
@@ -169,6 +168,13 @@ public class MainStage extends Stage {
 	private MenuItem libraryMenuItem;
 	private Menu windowMenu;
 
+	// tutor Menu
+	private Menu tutorMenu;
+	private MenuItem sendRequestMenuItem;
+	private MenuItem receiveAnswerMenuItem;
+	private MenuItem loadRequestMenuItem;
+	private MenuItem saveAnswerMenuItem;
+
 	private MenuBar menubar;
 
 	// Tool bar
@@ -216,94 +222,126 @@ public class MainStage extends Stage {
 	/**
 	 * Constant Image for open icon.
 	 */
-	public static Image openImage;
+	public static final Image openImage;
 	/**
 	 * Constant Image for new icon.
 	 */
-	public static Image newImage;
+	public static final Image newImage;
 	/**
 	 * Constant Image for save icon.
 	 */
-	public static Image saveImage;
+	public static final Image saveImage;
 	/**
 	 * Constant Image for compile icon.
 	 */
-	public static Image compileImage;
+	public static final Image compileImage;
 	/**
 	 * Constant Image for print icon.
 	 */
-	public static Image printImage;
+	public static final Image printImage;
 	/**
 	 * Constant Image for terrain icon. (Used for changeSize button)
 	 */
-	public static Image terrainImage;
+	public static final Image terrainImage;
 
 	/**
 	 * Constant Image for robbi icon.
 	 */
-	public static Image menuRobbiImage;
+	public static final Image menuRobbiImage;
 	/**
 	 * Constant Image for hollow icon.
 	 */
-	public static Image menuHollowImage;
+	public static final Image menuHollowImage;
 	/**
 	 * Constant Image for pileOfScrap icon.
 	 */
-	public static Image menuPileOfScrapImage;
+	public static final Image menuPileOfScrapImage;
 	/**
 	 * Constant Image for stockpile icon.
 	 */
-	public static Image menuStockpileImage;
+	public static final Image menuStockpileImage;
 	/**
 	 * Constant Image for accu icon.
 	 */
-	public static Image menuAccuImage;
+	public static final Image menuAccuImage;
 	/**
 	 * Constant Image for screw icon.
 	 */
-	public static Image menuScrewImage;
+	public static final Image menuScrewImage;
 	/**
 	 * Constant Image for nut icon.
 	 */
-	public static Image menuNutImage;
+	public static final Image menuNutImage;
 	/**
 	 * Constant Image for delete icon.
 	 */
-	public static Image menuDeleteImage;
+	public static final Image menuDeleteImage;
 
 	/**
 	 * Constant Image for reset icon.
 	 */
-	public static Image resetImage;
+	public static final Image resetImage;
 	/**
 	 * Constant Image for simulation start/resume icon.
 	 */
-	public static Image menuStartImage;
+	public static final Image menuStartImage;
 	/**
 	 * Constant Image for simulation pause icon.
 	 */
-	public static Image menuPauseImage;
+	public static final Image menuPauseImage;
 	/**
 	 * Constant Image for simulation stop icon.
 	 */
-	public static Image menuStopImage;
+	public static final Image menuStopImage;
 
 	/**
 	 * Constant Image for RobbiMove icon.
 	 */
-	public static Image robbiMove;
+	public static final Image robbiMove;
 	/**
 	 * Constant Image for RobbiTurnLeft icon.
 	 */
-	public static Image robbiTurnLeft;
+	public static final Image robbiTurnLeft;
 	/**
 	 * Constant Image for RobbiPut icon.
 	 */
-	public static Image robbiPut;
+	public static final Image robbiPut;
 	/**
 	 * Constant Image for RobbiTake icon.
 	 */
-	public static Image robbiTake;
+	public static final Image robbiTake;
+
+	/**
+	 * loading images
+	 */
+	static {
+		logger.debug("Loading stage images");
+
+		newImage = new Image("img/New24.gif");
+		saveImage = new Image("img/Save24.gif");
+		openImage = new Image("img/Open24.gif");
+		compileImage = new Image("img/Compile24.gif");
+		printImage = new Image("img/Print24.gif");
+		terrainImage = new Image("img/Terrain24.gif");
+		menuRobbiImage = new Image("img/Robbi24.png");
+		menuHollowImage = new Image("img/Hollow24.png");
+		menuPileOfScrapImage = new Image("img/PileOfScrap24.png");
+		menuStockpileImage = new Image("img/Stockpile24.png");
+		menuAccuImage = new Image("img/Accu24.png");
+		menuScrewImage = new Image("img/Screw24.png");
+		menuNutImage = new Image("img/Nut24.png");
+		menuDeleteImage = new Image("img/Delete24.gif");
+
+		resetImage = new Image("img/reset24.png");
+		menuStartImage = new Image("img/Play24.gif");
+		menuPauseImage = new Image("img/Pause24.gif");
+		menuStopImage = new Image("img/Stop24.gif");
+
+		robbiMove = new Image("img/RobbiMove24.png");
+		robbiTurnLeft = new Image("img/RobbiLeft24.png");
+		robbiPut = new Image("img/RobbiPut24.png");
+		robbiTake = new Image("img/RobbiTake24.png");
+	}
 
 	/**
 	 * Constructor for the MainStage. It creates a mainStage for the given Program
@@ -341,6 +379,11 @@ public class MainStage extends Stage {
 		examplesController = new ExamplesController(this);
 		languageController = new LanguageController(this);
 
+		if (PropertiesLoader.isTutor())
+			tutorController = new TutorController(this);
+		else
+			studenController = new StudentController(this);
+
 		show();
 		textArea.requestFocus();
 		logger.info("Finished loading '{}'", program.getName());
@@ -356,37 +399,6 @@ public class MainStage extends Stage {
 	 * awtAppClassNameField.setAccessible(true); awtAppClassNameField.set(xToolkit,
 	 * "MyApp"); } catch (Exception ignored) { } } }
 	 */
-
-	/**
-	 * Loads all images that are presented in the toolbar. This method must be
-	 * called before the first mainStage is created.
-	 */
-	public static void loadImages() {
-		newImage = new Image("img/New24.gif");
-		saveImage = new Image("img/Save24.gif");
-		openImage = new Image("img/Open24.gif");
-		compileImage = new Image("img/Compile24.gif");
-		printImage = new Image("img/Print24.gif");
-		terrainImage = new Image("img/Terrain24.gif");
-		menuRobbiImage = new Image("img/Robbi24.png");
-		menuHollowImage = new Image("img/Hollow24.png");
-		menuPileOfScrapImage = new Image("img/PileOfScrap24.png");
-		menuStockpileImage = new Image("img/Stockpile24.png");
-		menuAccuImage = new Image("img/Accu24.png");
-		menuScrewImage = new Image("img/Screw24.png");
-		menuNutImage = new Image("img/Nut24.png");
-		menuDeleteImage = new Image("img/Delete24.gif");
-
-		resetImage = new Image("img/reset24.png");
-		menuStartImage = new Image("img/Play24.gif");
-		menuPauseImage = new Image("img/Pause24.gif");
-		menuStopImage = new Image("img/Stop24.gif");
-
-		robbiMove = new Image("img/RobbiMove24.png");
-		robbiTurnLeft = new Image("img/RobbiLeft24.png");
-		robbiPut = new Image("img/RobbiPut24.png");
-		robbiTake = new Image("img/RobbiTake24.png");
-	}
 
 	/**
 	 * Creates the editor-related menu-bar elements.
@@ -539,48 +551,38 @@ public class MainStage extends Stage {
 	}
 
 	/**
+	 * Creates the tutor-related menu-bar elements
+	 */
+	private void createTutorMenu() {
+		if (PropertiesLoader.isTutor()) {
+			loadRequestMenuItem = new MenuItem(I18nUtils.i18n("Menu.tutor.loadRequest"));
+			saveAnswerMenuItem = new MenuItem(I18nUtils.i18n("Menu.tutor.saveAnswer"));
+
+			tutorMenu = new Menu(I18nUtils.i18n("Menu.tutor"), null, loadRequestMenuItem, saveAnswerMenuItem);
+		} else {
+			sendRequestMenuItem = new MenuItem(I18nUtils.i18n("Menu.tutor.sendRequest"));
+			receiveAnswerMenuItem = new MenuItem(I18nUtils.i18n("Menu.tutor.receiveAnswer"));
+
+			tutorMenu = new Menu(I18nUtils.i18n("Menu.tutor"), null, sendRequestMenuItem, receiveAnswerMenuItem);
+		}
+	}
+
+	/**
 	 * Creates the window-related menu-bar elements.
 	 */
 	private void createWindowMenu() {
 		englishLanguageMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.language.english"));
 		germanLanguageMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.language.german"));
-
 		languageMenu = new Menu(I18nUtils.i18n("Menu.window.language"), null, englishLanguageMenuItem,
 				germanLanguageMenuItem);
+
 		changeCursorMenuItem = new CheckMenuItem(I18nUtils.i18n("Menu.window.changeCursor"));
-		changeCursorMenuItem.setOnAction(e -> {
-			mainStageController.setChangeCursor(changeCursorMenuItem.isSelected());
-			if (!changeCursorMenuItem.isSelected())
-				scene.setCursor(Cursor.DEFAULT);
-		});
 
 		// https://stackoverflow.com/a/49159612/13670629
 		darkModeMenuItem = new CheckMenuItem(I18nUtils.i18n("Menu.window.darkmode"));
-		darkModeMenuItem.selectedProperty().addListener((obs, oldVal, newVal) -> {
-			if (newVal) {
-				scene.getStylesheets().add("css/dark-theme.css");
-			} else
-				scene.getStylesheets().remove("css/dark-theme.css");
-		});
-
 		infoMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.info"));
-		infoMenuItem.setOnAction(e -> {
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.window.info.content"), this,
-					Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.info.title"),
-					I18nUtils.i18n("Menu.window.info.header"));
-		});
-
 		libraryMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.libraries"));
-		libraryMenuItem.setOnAction(e -> {
-			String javaFxVersion = System.getProperty("javafx.version");
-			String javaVersion = System.getProperty("java.version");
-			String log4JVersion = Layout.class.getPackage().getImplementationVersion();
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-					String.format(I18nUtils.i18n("Menu.window.libraries.content"), javaVersion, javaFxVersion,
-							log4JVersion),
-					this, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
-					I18nUtils.i18n("Menu.window.libraries.header"));
-		});
+
 		windowMenu = new Menu(I18nUtils.i18n("Menu.window"), null, languageMenu, changeCursorMenuItem, darkModeMenuItem,
 				new SeparatorMenuItem(), infoMenuItem, libraryMenuItem);
 	}
@@ -596,8 +598,10 @@ public class MainStage extends Stage {
 		createRobbi();
 		createSimulation();
 		createExamplesMenu();
+		createTutorMenu();
 		createWindowMenu();
-		menubar = new MenuBar(editorMenu, territoryMenu, robbiMenu, simulationMenu, examplesMenu, windowMenu);
+		menubar = new MenuBar(editorMenu, territoryMenu, robbiMenu, simulationMenu, examplesMenu, tutorMenu,
+				windowMenu);
 	}
 
 	/**
@@ -607,101 +611,78 @@ public class MainStage extends Stage {
 		logger.debug("Create toolbar");
 
 		newButtonToolbar = new Button(null, new ImageView(newImage));
-		newButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.control.new")));
 
 		loadButtonToolbar = new Button(null, new ImageView(openImage));
-		loadButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.control.load")));
 
 		saveButtonToolbar = new Button(null, new ImageView(saveImage));
-		saveButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.control.save")));
 
 		compileButtonToolbar = new Button(null, new ImageView(compileImage));
-		compileButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.control.compile")));
 
 		changeSizeButtonToolbar = new Button(null, new ImageView(terrainImage));
-		changeSizeButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.size")));
 
 		var placeGroupToolbar = new ToggleGroup();
 
 		placeRobbiToggleButtonToolbar = new ToggleButton(null, new ImageView(menuRobbiImage));
-		placeRobbiToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeRobbi")));
 		placeRobbiToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		placeRobbiToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeRobbiTerritoryRadioMenuItem.selectedProperty());
 
 		placeHollowToggleButtonToolbar = new ToggleButton(null, new ImageView(menuHollowImage));
 		placeHollowToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
-		placeHollowToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeHollow")));
 		placeHollowToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeHollowTerritoryRadioMenuItem.selectedProperty());
 
 		placePileOfScrapToggleButtonToolbar = new ToggleButton(null, new ImageView(menuPileOfScrapImage));
 		placePileOfScrapToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
-		placePileOfScrapToggleButtonToolbar
-				.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placePileOfScrap")));
 		placePileOfScrapToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placePileOfScrapTerritoryRadioMenuItem.selectedProperty());
 
 		placeStockpileToggleButtonToolbar = new ToggleButton(null, new ImageView(menuStockpileImage));
 		placeStockpileToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
-		placeStockpileToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeStockpile")));
 		placeStockpileToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeStockpileTerritoryRadioMenuItem.selectedProperty());
 
 		placeAccuToggleButtonToolbar = new ToggleButton(null, new ImageView(menuAccuImage));
 		placeAccuToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
-		placeAccuToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeAccu")));
 		placeAccuToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeAccuTerritoryRadioMenuItem.selectedProperty());
 
 		placeScrewToggleButtonToolbar = new ToggleButton(null, new ImageView(menuScrewImage));
 		placeScrewToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
-		placeScrewToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeScrew")));
 		placeScrewToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeScrewTerritoryRadioMenuItem.selectedProperty());
 
 		placeNutToggleButtonToolbar = new ToggleButton(null, new ImageView(menuNutImage));
 		placeNutToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
-		placeNutToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeNut")));
 		placeNutToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeNutTerritoryRadioMenuItem.selectedProperty());
 
 		deleteFieldToggleButtonToolbar = new ToggleButton(null, new ImageView(menuDeleteImage));
 		deleteFieldToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
-		deleteFieldToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.delete")));
 		deleteFieldToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(deleteFieldRadioMenuItem.selectedProperty());
 
 		robbiMoveButtonToolbar = new Button(null, new ImageView(robbiMove));
-		robbiMoveButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.robbi.move")));
 
 		robbiTurnLeftButtonToolbar = new Button(null, new ImageView(robbiTurnLeft));
-		robbiTurnLeftButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.robbi.turnLeft")));
 
 		robbiPutButtonToolbar = new Button(null, new ImageView(robbiPut));
-		robbiPutButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.robbi.put")));
 
 		robbiTakeButtonToolbar = new Button(null, new ImageView(robbiTake));
-		robbiTakeButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.robbi.take")));
 
 		resetButtonToolbar = new Button(null, new ImageView(resetImage));
-		resetButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.action.reset")));
 
 		var simulationGroupToolbar = new ToggleGroup();
 		startToggleButtonToolbar = new ToggleButton(null, new ImageView(menuStartImage));
 		startToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
-		startToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.action.start")));
 
 		pauseToggleButtonToolbar = new ToggleButton(null, new ImageView(menuPauseImage));
 		pauseToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
-		pauseToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.action.pause")));
 
 		stopToggleButtonToolbar = new ToggleButton(null, new ImageView(menuStopImage));
 		stopToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
-		stopToggleButtonToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.action.stop")));
 
 		speedSliderToolbar = new Slider(MIN_SPEED_VALUE, MAX_SPEED_VALUE, (MIN_SPEED_VALUE + MAX_SPEED_VALUE) / 2d);
-		speedSliderToolbar.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.action.speed")));
 
 		toolbar = new ToolBar(newButtonToolbar, loadButtonToolbar, new Separator(), saveButtonToolbar,
 				compileButtonToolbar, new Separator(), changeSizeButtonToolbar, placeRobbiToggleButtonToolbar,
@@ -1307,6 +1288,15 @@ public class MainStage extends Stage {
 	}
 
 	/**
+	 * Getter for the mainStageController.
+	 * 
+	 * @return the mainStageController for this stage
+	 */
+	public MainStageController getMainStageController() {
+		return mainStageController;
+	}
+
+	/**
 	 * Getter for the territorySaveController.
 	 * 
 	 * @return the territorySaveController for this stage
@@ -1334,12 +1324,32 @@ public class MainStage extends Stage {
 	}
 
 	/**
+	 * Getter for the studentController.
+	 * 
+	 * @return the studentController for this stage.
+	 */
+	public StudentController getStudentController() {
+		return studenController;
+	}
+
+	/**
+	 * Getter for the tutorController.
+	 * 
+	 * @return the tutorController for this stage.
+	 */
+	public TutorController getTutorController() {
+		return tutorController;
+	}
+
+	/**
 	 * Getter for the languageController.
 	 * 
 	 * @return the languageController for this stage.
 	 */
+
 	public LanguageController getLanguageController() {
 		return languageController;
+
 	}
 
 	/**
@@ -1424,6 +1434,15 @@ public class MainStage extends Stage {
 	}
 
 	/**
+	 * Getter for the placeGroupTerritoryMenu.
+	 * 
+	 * @return the placeGroupTerritoryMenu
+	 */
+	public ToggleGroup getPlaceGroupTerritoryMenu() {
+		return placeGroupTerritoryMenu;
+	}
+
+	/**
 	 * Getter for the robbiMenu.
 	 * 
 	 * @return the robbiMenu for this stage
@@ -1500,7 +1519,7 @@ public class MainStage extends Stage {
 	 * 
 	 * @return the changeCursorMenuItem for this stage
 	 */
-	public MenuItem getChangeCursorMenuItem() {
+	public CheckMenuItem getChangeCursorMenuItem() {
 		return changeCursorMenuItem;
 	}
 
@@ -1509,7 +1528,7 @@ public class MainStage extends Stage {
 	 * 
 	 * @return the darkModeMenuItem for this stage
 	 */
-	public MenuItem getDarkModeMenuItem() {
+	public CheckMenuItem getDarkModeMenuItem() {
 		return darkModeMenuItem;
 	}
 
@@ -1538,6 +1557,51 @@ public class MainStage extends Stage {
 	 */
 	public Menu getWindowMenu() {
 		return windowMenu;
+	}
+
+	/**
+	 * Getter for the tutorMenu.
+	 * 
+	 * @return the tutorMenu for this stage
+	 */
+	public Menu getTutorMenu() {
+		return tutorMenu;
+	}
+
+	/**
+	 * Getter for the sendRequestMenuItem.
+	 * 
+	 * @return the sendRequestMenuItem for this stage
+	 */
+	public MenuItem getSendRequestMenuItem() {
+		return sendRequestMenuItem;
+	}
+
+	/**
+	 * Getter for the receiveAnswerMenuItem.
+	 * 
+	 * @return the receiveAnswerMenuItem for this stage
+	 */
+	public MenuItem getReceiveAnswerMenuItem() {
+		return receiveAnswerMenuItem;
+	}
+
+	/**
+	 * Getter for the saveAnswerMenuItem.
+	 * 
+	 * @return the saveAnswerMenuItem for this stage
+	 */
+	public MenuItem getSaveAnswerMenuItem() {
+		return saveAnswerMenuItem;
+	}
+
+	/**
+	 * Getter for the lLoadRequestMenuItem.
+	 * 
+	 * @return the loadRequestMenuItem for this stage
+	 */
+	public MenuItem getLoadRequestMenuItem() {
+		return loadRequestMenuItem;
 	}
 
 	/**

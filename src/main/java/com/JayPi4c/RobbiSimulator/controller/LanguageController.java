@@ -3,6 +3,7 @@ package com.JayPi4c.RobbiSimulator.controller;
 import java.util.Locale;
 
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
+import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.beans.binding.Bindings;
@@ -103,45 +104,47 @@ public class LanguageController {
 		mainStage.getInfoMenuItem().textProperty().bind(createBinding("Menu.window.info"));
 
 		// Tool bar
-		mainStage.getNewButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.control.new")));
-		mainStage.getLoadButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.control.load")));
-		mainStage.getSaveButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.control.save")));
-		mainStage.getCompileButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.control.compile")));
+		mainStage.getNewButtonToolbar().setTooltip(createTooltip("Toolbar.control.new"));
+		mainStage.getLoadButtonToolbar().setTooltip(createTooltip("Toolbar.control.load"));
+		mainStage.getSaveButtonToolbar().setTooltip(createTooltip("Toolbar.control.save"));
+		mainStage.getCompileButtonToolbar().setTooltip(createTooltip("Toolbar.control.compile"));
 
-		mainStage.getChangeSizeButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.size")));
-		mainStage.getPlaceRobbiToggleButtonToolbar()
-				.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeRobbi")));
-		mainStage.getPlaceHollowToggleButtonToolbar()
-				.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeHollow")));
+		mainStage.getChangeSizeButtonToolbar().setTooltip(createTooltip("Toolbar.territory.size"));
+		mainStage.getPlaceRobbiToggleButtonToolbar().setTooltip(createTooltip("Toolbar.territory.placeRobbi"));
+		mainStage.getPlaceHollowToggleButtonToolbar().setTooltip(createTooltip("Toolbar.territory.placeHollow"));
 		mainStage.getPlacePileOfScrapToggleButtonToolbar()
-				.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placePileOfScrap")));
-		mainStage.getPlaceStockpileToggleButtonToolbar()
-				.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeStockpile")));
-		mainStage.getPlaceAccuToggleButtonToolbar()
-				.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeAccu")));
-		mainStage.getPlaceScrewToggleButtonToolbar()
-				.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeScrew")));
-		mainStage.getPlaceNutToggleButtonToolbar()
-				.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.placeNut")));
-		mainStage.getDeleteFieldToggleButtonToolbar()
-				.setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.territory.delete")));
+				.setTooltip(createTooltip("Toolbar.territory.placePileOfScrap"));
+		mainStage.getPlaceStockpileToggleButtonToolbar().setTooltip(createTooltip("Toolbar.territory.placeStockpile"));
+		mainStage.getPlaceAccuToggleButtonToolbar().setTooltip(createTooltip("Toolbar.territory.placeAccu"));
+		mainStage.getPlaceScrewToggleButtonToolbar().setTooltip(createTooltip("Toolbar.territory.placeScrew"));
+		mainStage.getPlaceNutToggleButtonToolbar().setTooltip(createTooltip("Toolbar.territory.placeNut"));
+		mainStage.getDeleteFieldToggleButtonToolbar().setTooltip(createTooltip("Toolbar.territory.delete"));
 
-		mainStage.getRobbiTurnLeftButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.robbi.turnLeft")));
-		mainStage.getRobbiMoveButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.robbi.move")));
-		mainStage.getRobbiPutButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.robbi.put")));
-		mainStage.getRobbiTakeButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.robbi.take")));
+		mainStage.getRobbiTurnLeftButtonToolbar().setTooltip(createTooltip("Toolbar.robbi.turnLeft"));
+		mainStage.getRobbiMoveButtonToolbar().setTooltip(createTooltip("Toolbar.robbi.move"));
+		mainStage.getRobbiPutButtonToolbar().setTooltip(createTooltip("Toolbar.robbi.put"));
+		mainStage.getRobbiTakeButtonToolbar().setTooltip(createTooltip("Toolbar.robbi.take"));
 
-		mainStage.getStartToggleButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.action.start")));
-		mainStage.getPauseToggleButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.action.pause")));
-		mainStage.getStopToggleButtonToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.action.stop")));
-		mainStage.getSpeedSliderToolbar().setTooltip(new Tooltip(I18nUtils.i18n("Toolbar.action.speed")));
+		mainStage.getResetButtonToolbar().setTooltip(createTooltip("Toolbar.action.reset"));
+		mainStage.getStartToggleButtonToolbar().setTooltip(createTooltip("Toolbar.action.start"));
+		mainStage.getPauseToggleButtonToolbar().setTooltip(createTooltip("Toolbar.action.pause"));
+		mainStage.getStopToggleButtonToolbar().setTooltip(createTooltip("Toolbar.action.stop"));
+		mainStage.getSpeedSliderToolbar().setTooltip(createTooltip("Toolbar.action.speed"));
 
 		mainStage.getMessageLabel().textProperty().bind(createBinding("Messages.label.greeting"));
 
-		stage.getExamplesMenu().textProperty().bind(createBinding("Menu.examples"));
-		stage.getLoadExampleMenuItem().textProperty().bind(createBinding("Menu.examples.load"));
-		stage.getSaveExampleMenuItem().textProperty().bind(createBinding("Menu.examples.save"));
+		mainStage.getExamplesMenu().textProperty().bind(createBinding("Menu.examples"));
+		mainStage.getLoadExampleMenuItem().textProperty().bind(createBinding("Menu.examples.load"));
+		mainStage.getSaveExampleMenuItem().textProperty().bind(createBinding("Menu.examples.save"));
 
+		if (PropertiesLoader.isTutor()) {
+			mainStage.getLoadRequestMenuItem().textProperty().bind(createBinding("Menu.tutor.loadRequest"));
+			mainStage.getSaveAnswerMenuItem().textProperty().bind(createBinding("Menu.tutor.saveAnswer"));
+		} else {
+			mainStage.getSendRequestMenuItem().textProperty().bind(createBinding("Menu.tutor.sendRequest"));
+			mainStage.getReceiveAnswerMenuItem().textProperty().bind(createBinding("Menu.tutor.receiveAnswer"));
+		}
+		mainStage.getTutorMenu().textProperty().bind(createBinding("Menu.tutor"));
 	}
 
 	/**
@@ -155,9 +158,21 @@ public class LanguageController {
 	}
 
 	/**
+	 * Helper to create a new Tooltip with a text-binding to the provided key.
+	 * 
+	 * @param key the key to map the text to
+	 * @return a Tooltip with text-binding
+	 */
+	private Tooltip createTooltip(String key) {
+		Tooltip tt = new Tooltip();
+		tt.textProperty().bind(createBinding(key));
+		return tt;
+	}
+
+	/**
 	 * needed since the star (*) would mess with the binding property
 	 */
-	private void updateTitle() {
+	public void updateTitle() {
 		stage.setTitle(I18nUtils.i18n("Main.title") + ": " + stage.getProgram().getName()
 				+ (stage.getProgram().isEdited() ? "*" : ""));
 	}

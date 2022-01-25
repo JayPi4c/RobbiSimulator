@@ -43,7 +43,7 @@ public class RobbiContextMenu extends ContextMenu {
 	 */
 	public RobbiContextMenu(Territory territory, Window parent) {
 
-		for (Method method : getDefaultMethods(territory.getRobbi())) {
+		for (Method method : getDefaultMethods()) {
 			MenuItem item = getMenuItem(method);
 
 			// if method needs arguments and no Parameterized Annotation is set -> disable
@@ -56,7 +56,7 @@ public class RobbiContextMenu extends ContextMenu {
 			getItems().add(item);
 		}
 
-		Method methods[] = getCustomMethods(territory.getRobbi());
+		Method[] methods = getCustomMethods(territory.getRobbi());
 		if (methods.length > 0) {
 			getItems().add(new SeparatorMenuItem());
 
@@ -122,29 +122,25 @@ public class RobbiContextMenu extends ContextMenu {
 			bobTheBuilder.append(parameter.getType());
 			List<Annotation> annos = Arrays.asList(parameter.getAnnotations());
 			for (Annotation anno : annos)
-				if (anno instanceof Default) {
+				if (anno instanceof Default a) {
 					bobTheBuilder.append(" = ");
-					bobTheBuilder.append(((Default) anno).value());
+					bobTheBuilder.append(a.value());
 				}
-			// bobTheBuilder.append(" ");
-			// bobTheBuilder.append(parameter.getName());
 			bobTheBuilder.append(", ");
 		}
 		if (m.getParameterCount() > 0)
 			bobTheBuilder.delete(bobTheBuilder.length() - 2, bobTheBuilder.length());
 		bobTheBuilder.append(")");
-		CustomMenuItem item = new CustomMenuItem(new Label(bobTheBuilder.toString()));
-		return item;
+		return new CustomMenuItem(new Label(bobTheBuilder.toString()));
 	}
 
 	/**
 	 * Get all methods that are part of the default implementation, that are
 	 * visibile to the user.
 	 * 
-	 * @param robbi the robbi instance to get the default methods from
 	 * @return all methods that are part of the default implementation
 	 */
-	private Method[] getDefaultMethods(Robbi robbi) {
+	private Method[] getDefaultMethods() {
 		List<Method> methods = new ArrayList<>();
 
 		for (Method m : Robbi.class.getDeclaredMethods()) {

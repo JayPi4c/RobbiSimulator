@@ -13,14 +13,14 @@ import java.util.List;
  */
 public class Diagnostics {
 
-	private List<Diagnostic> diagnostics;
+	private List<Diagnostic> diags;
 
 	/**
 	 * Constructor for the Diagnostics-class. It creates the list to hold the
 	 * diagnostics.
 	 */
 	public Diagnostics() {
-		diagnostics = new ArrayList<>();
+		diags = new ArrayList<>();
 	}
 
 	/**
@@ -29,7 +29,7 @@ public class Diagnostics {
 	 * @param d The Diagnostic to be added to the list of diagnostics
 	 */
 	public void add(Diagnostic d) {
-		diagnostics.add(d);
+		diags.add(d);
 	}
 
 	/**
@@ -37,8 +37,8 @@ public class Diagnostics {
 	 * 
 	 * @return the list of all diagnostics
 	 */
-	public List<Diagnostic> getDiagnostics() {
-		return diagnostics;
+	public List<Diagnostic> getDiagnosis() {
+		return diags;
 	}
 
 	/**

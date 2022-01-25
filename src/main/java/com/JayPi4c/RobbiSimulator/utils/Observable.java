@@ -20,7 +20,7 @@ public abstract class Observable {
 	/**
 	 * Constructor for the Observable class which initializes the observer array.
 	 */
-	public Observable() {
+	protected Observable() {
 		observers = new CopyOnWriteArrayList<>();
 		changed = false;
 	}

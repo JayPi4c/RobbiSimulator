@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.JayPi4c.RobbiSimulator.utils.Observable;
+
 /**
  * This class contains the contents, the name of program and whether it is
  * edited or not
@@ -14,8 +16,7 @@ import java.io.IOException;
  * @author Jonas Pohl
  *
  */
-public class Program {
-
+public class Program extends Observable {
 	private String name;
 
 	private String editorContent;
@@ -76,6 +77,19 @@ public class Program {
 	}
 
 	/**
+	 * Sets the editorContent and notifies all Observers, namely the
+	 * MainStageController to update the textEditors content.
+	 * 
+	 * @param content the new content
+	 */
+	public void setEditorContent(String content) {
+		this.editorContent = content;
+		this.edited = true;
+		this.setChanged();
+		this.notifyAllObservers();
+	}
+
+	/**
 	 * saves the text of the editor-content into the corresponding file It does only
 	 * save the given text, if the changes were made
 	 * 
@@ -86,7 +100,14 @@ public class Program {
 			return;
 
 		editorContent = text;
-		String content = ProgramController.createTemplate(name, text);
+		save();
+	}
+
+	/**
+	 * Forces the program to be saved even if it might not be edited.
+	 */
+	public void save() {
+		String content = ProgramController.createTemplate(name, editorContent);
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 			writer.write(content);
 		} catch (IOException e) {

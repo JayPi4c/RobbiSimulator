@@ -6,8 +6,10 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.derby.tools.sysinfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Layout;
 
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
@@ -20,9 +22,12 @@ import com.JayPi4c.RobbiSimulator.model.TileBlockedException;
 import com.JayPi4c.RobbiSimulator.model.TileIsFullException;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
+import com.JayPi4c.RobbiSimulator.utils.Observable;
+import com.JayPi4c.RobbiSimulator.utils.Observer;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
+import jakarta.xml.bind.JAXBContext;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -38,6 +43,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 
 /**
  * This controller contains all the settings for the mainStage
@@ -45,7 +51,8 @@ import javafx.stage.FileChooser;
  * @author Jonas Pohl
  *
  */
-public class MainStageController {
+public class MainStageController implements Observer {
+
 	private static final Logger logger = LogManager.getLogger(MainStageController.class);
 
 	private ButtonState buttonState;
@@ -66,6 +73,7 @@ public class MainStageController {
 	public MainStageController(MainStage mainStage, ButtonState buttonState) {
 		this.mainStage = mainStage;
 		this.buttonState = buttonState;
+		this.mainStage.getProgram().addObserver(this);
 
 		mainStage.setTitle(I18nUtils.i18n("Main.title") + ": " + mainStage.getProgram().getName());
 		mainStage.setOnCloseRequest(e -> {
@@ -186,9 +194,7 @@ public class MainStageController {
 		});
 		mainStage.getRobbiMoveButtonToolbar().onActionProperty().bind(mainStage.getMoveMenuItem().onActionProperty());
 
-		mainStage.getTurnLeftMenuItem().setOnAction(e -> {
-			mainStage.getTerritory().getRobbi().linksUm();
-		});
+		mainStage.getTurnLeftMenuItem().setOnAction(e -> mainStage.getTerritory().getRobbi().linksUm());
 		mainStage.getRobbiTurnLeftButtonToolbar().onActionProperty()
 				.bind(mainStage.getTurnLeftMenuItem().onActionProperty());
 
@@ -209,6 +215,34 @@ public class MainStageController {
 			}
 		});
 		mainStage.getRobbiTakeButtonToolbar().onActionProperty().bind(mainStage.getTakeMenuItem().onActionProperty());
+
+		mainStage.getChangeCursorMenuItem().setOnAction(e -> {
+			setChangeCursor(mainStage.getChangeCursorMenuItem().isSelected());
+			if (!mainStage.getChangeCursorMenuItem().isSelected())
+				mainStage.getScene().setCursor(Cursor.DEFAULT);
+		});
+		mainStage.getDarkModeMenuItem().selectedProperty().addListener((obs, oldVal, newVal) -> {
+			if (Boolean.TRUE.equals(newVal)) {
+				mainStage.getScene().getStylesheets().add("css/dark-theme.css");
+			} else
+				mainStage.getScene().getStylesheets().remove("css/dark-theme.css");
+		});
+		mainStage.getInfoMenuItem()
+				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+						I18nUtils.i18n("Menu.window.info.content"), mainStage, Modality.WINDOW_MODAL,
+						I18nUtils.i18n("Menu.window.info.title"), I18nUtils.i18n("Menu.window.info.header")));
+		mainStage.getLibraryMenuItem().setOnAction(e -> {
+			String javaFxVersion = System.getProperty("javafx.version");
+			String javaVersion = System.getProperty("java.version");
+			String log4JVersion = Layout.class.getPackage().getImplementationVersion();
+			String derbyVersion = sysinfo.getVersionString();
+			String jaxbVersion = JAXBContext.class.getPackage().getImplementationVersion();
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+					String.format(I18nUtils.i18n("Menu.window.libraries.content"), javaVersion, javaFxVersion,
+							log4JVersion, derbyVersion, jaxbVersion),
+					mainStage, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
+					I18nUtils.i18n("Menu.window.libraries.header"));
+		});
 
 		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
 			String extension = ".png";
@@ -287,9 +321,8 @@ public class MainStageController {
 		// https://stackoverflow.com/questions/18447963/javafx-slider-text-as-tick-label
 
 		// TODO print editor content
-		mainStage.getPrintEditorMenuItem().setOnAction(e -> {
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, "Not yet implemented", mainStage);
-		});
+		mainStage.getPrintEditorMenuItem().setOnAction(
+				e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, "Not yet implemented", mainStage));
 
 	}
 
@@ -417,5 +450,12 @@ public class MainStageController {
 			}
 
 		};
+	}
+
+	@Override
+	public void update(Observable observable) {
+		if (observable instanceof Program program) {
+			mainStage.getTextArea().setText(program.getEditorContent());
+		}
 	}
 }

@@ -75,7 +75,7 @@ public class ExamplesController {
 						Optional<Integer> idOpt = showProgramSelection(programsOpt.get());
 						idOpt.ifPresentOrElse(id -> {
 							Optional<Example> exOpt = DatabaseManager.getDatabaseManager().loadExample(id);
-							exOpt.ifPresentOrElse(example -> example.load(),
+							exOpt.ifPresentOrElse(Example::load,
 									() -> logger.debug("Could not load example from database"));
 						}, () -> logger.debug("No example selected"));
 					}
@@ -115,8 +115,7 @@ public class ExamplesController {
 		Platform.runLater(comboBox::requestFocus);
 		dialog.setResultConverter(
 				button -> (button == ButtonType.OK) ? comboBox.getValue().getObject().getKey() : null);
-		Optional<Integer> result = dialog.showAndWait();
-		return result;
+		return dialog.showAndWait();
 	}
 
 	/**
@@ -142,8 +141,7 @@ public class ExamplesController {
 		dialogPane.setContent(grid);
 		Platform.runLater(comboBox::requestFocus);
 		dialog.setResultConverter(button -> (button == ButtonType.OK) ? comboBox.getValue().toString() : null);
-		Optional<String> result = dialog.showAndWait();
-		return result;
+		return dialog.showAndWait();
 	}
 
 	/**
@@ -298,7 +296,7 @@ public class ExamplesController {
 		comboBox.setItems(filteredHideableItems);
 
 		@SuppressWarnings("unchecked")
-		HideableItem<T>[] selectedItem = (HideableItem<T>[]) new HideableItem[1];
+		HideableItem<T>[] selectedItem = new HideableItem[1];
 
 		comboBox.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 			if (!comboBox.isShowing())
@@ -308,7 +306,7 @@ public class ExamplesController {
 		});
 
 		comboBox.showingProperty().addListener((obs, oldVal, newVal) -> {
-			if (newVal) {
+			if (Boolean.TRUE.equals(newVal)) {
 				@SuppressWarnings("unchecked")
 				ListView<HideableItem<T>> lv = (ListView<HideableItem<T>>) ((ComboBoxListViewSkin<?>) comboBox
 						.getSkin()).getPopupContent();

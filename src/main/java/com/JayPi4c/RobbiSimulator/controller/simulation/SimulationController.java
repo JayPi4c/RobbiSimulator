@@ -118,8 +118,8 @@ public class SimulationController {
 	private void resume() {
 		logger.debug("Resuming simulation");
 		simulation.setPause(false);
-		synchronized (simulation) {
-			simulation.notify();
+		synchronized (simulation.getLock()) {
+			simulation.getLock().notifyAll();
 		}
 		disableButtonStates(true, false, false);
 	}
@@ -132,8 +132,8 @@ public class SimulationController {
 		simulation.setStop(true);
 		simulation.setPause(false);
 		simulation.interrupt();
-		synchronized (simulation) {
-			simulation.notify();
+		synchronized (simulation.getLock()) {
+			simulation.getLock().notifyAll();
 		}
 	}
 
