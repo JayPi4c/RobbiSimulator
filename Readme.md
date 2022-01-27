@@ -1,7 +1,7 @@
 # Jonas Pohl Robbi Simulator
 
 In diesem Repository ist der Code für die Mini-Programmierwelt (MPW) "Robbi Simulator".
-
+Da die Builds im Workflow auf einem Linux-Server erstellt werden, sind die Jars aufgrund von JavaFX nur auf Linux ausführbar. Für Windows und Mac muss der Simulator auf dem entsprechenden System gebaut werden.
 
 ### Aktuelle TODOs
 
