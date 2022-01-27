@@ -37,7 +37,12 @@ public class RobbiState {
 		this.item = item;
 	}
 
+	/**
+	 * This constructor is needed for JAXB to work.
+	 */
+	@SuppressWarnings("unused")
 	private RobbiState() {
+		// needed for JAXB
 	}
 
 	/**

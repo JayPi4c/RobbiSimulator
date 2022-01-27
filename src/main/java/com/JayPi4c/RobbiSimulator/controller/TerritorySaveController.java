@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,6 +50,7 @@ public class TerritorySaveController {
 
 	private static final String DEFAULT_SERIALISATION_FILE_EXTENSION = ".ter";
 	private static final String DEFAULT_XML_FILE_EXTENSION = ".rsxml";
+	private static final String DEFAULT_JAXB_FILE_EXTENSION = ".rsjaxb";
 
 	private MainStage mainStage;
 
@@ -65,34 +67,25 @@ public class TerritorySaveController {
 		this.mainStage.getSaveXMLTerritoryMenuItem().setOnAction(e -> saveXMLtoFile());
 		this.mainStage.getLoadXMLTerritoryMenuItem().setOnAction(e -> loadXMLfromFile());
 
-		this.mainStage.getSaveJAXBTerritoryMenuItem()
-				.setOnAction(e -> saveJAXB(ProgramController.PATH_TO_PROGRAMS + "/territory.jaxb"));
-		this.mainStage.getLoadJAXBTerritoryMenuItem()
-				.setOnAction(e -> loadJAXB(ProgramController.PATH_TO_PROGRAMS + "/territory.jaxb"));
+		this.mainStage.getSaveJAXBTerritoryMenuItem().setOnAction(e -> saveJAXB());
+		this.mainStage.getLoadJAXBTerritoryMenuItem().setOnAction(e -> loadJAXB());
 	}
 
 	/**
 	 * Helper to serialize the territory of the mainStage into a file.
 	 */
 	private void serialize() {
-		FileChooser chooser = new FileChooser();
-		chooser.setTitle(I18nUtils.i18n("Territory.save.dialog.title"));
-		chooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
-		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-				I18nUtils.i18n("Territory.save.dialog.filter"), "*" + DEFAULT_SERIALISATION_FILE_EXTENSION));
+		Optional<File> fileOpt = getSaveFile(I18nUtils.i18n("Territory.save.dialog.title"),
+				I18nUtils.i18n("Territory.save.dialog.filter.serial"), DEFAULT_SERIALISATION_FILE_EXTENSION);
 
-		File file = chooser.showSaveDialog(mainStage);
-
-		if (file == null) {
+		if (fileOpt.isEmpty()) {
 			logger.debug("No file was selected to serialze in.");
 			return;
 		}
 
+		File file = fileOpt.get();
 		if (!file.getName().endsWith(DEFAULT_SERIALISATION_FILE_EXTENSION)) {
-			File f = new File(file.getAbsolutePath() + DEFAULT_SERIALISATION_FILE_EXTENSION);
-			if (!file.renameTo(f))
-				logger.warn("Could not rename serializationfile from '{}' to '{}'", file.getName(), f.getName());
-			file = f;
+			file = new File(file.getAbsolutePath() + DEFAULT_SERIALISATION_FILE_EXTENSION);
 		}
 
 		logger.debug("serialize in file {}", file);
@@ -117,29 +110,27 @@ public class TerritorySaveController {
 	 * the new values.
 	 */
 	private void deserialize() {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(I18nUtils.i18n("Territory.load.dialog.title"));
-		fileChooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-				I18nUtils.i18n("Territory.load.dialog.filter"), "*" + DEFAULT_SERIALISATION_FILE_EXTENSION));
+		Optional<File> fileOpt = getLoadFile(I18nUtils.i18n("Territory.load.dialog.title"),
+				I18nUtils.i18n("Territory.load.dialog.filter.deserial"), DEFAULT_SERIALISATION_FILE_EXTENSION);
 
-		File file = fileChooser.showOpenDialog(mainStage);
-		if (file != null) {
-			try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-				logger.debug("deserialize from file {}", file);
-				Territory t = (Territory) ois.readObject();
-				Item item = (Item) ois.readObject();
-				int x = ois.readInt();
-				int y = ois.readInt();
-				DIRECTION facing = (DIRECTION) ois.readObject();
-				synchronized (mainStage.getTerritory()) {
-					mainStage.getTerritory().update(t, item, x, y, facing);
-				}
-			} catch (IOException | ClassNotFoundException e) {
-				e.printStackTrace();
-			} finally {
-				logger.info("finished deserialization");
-			}
+		if (fileOpt.isEmpty()) {
+			logger.debug("No file was selected to deserialize from.");
+			return;
+		}
+		File file = fileOpt.get();
+
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+			logger.debug("deserialize from file {}", file);
+			Territory t = (Territory) ois.readObject();
+			Item item = (Item) ois.readObject();
+			int x = ois.readInt();
+			int y = ois.readInt();
+			DIRECTION facing = (DIRECTION) ois.readObject();
+			mainStage.getTerritory().update(t, item, x, y, facing);
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			logger.info("finished deserialization");
 		}
 	}
 
@@ -148,18 +139,14 @@ public class TerritorySaveController {
 	 * file.
 	 */
 	private void saveXMLtoFile() {
-		FileChooser chooser = new FileChooser();
-		chooser.setTitle(I18nUtils.i18n("Territory.save.dialog.xml.title"));
-		chooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
-		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-				I18nUtils.i18n("Territory.save.dialog.xml.filter"), "*" + DEFAULT_XML_FILE_EXTENSION));
+		Optional<File> fileOpt = getSaveFile(I18nUtils.i18n("Territory.save.dialog.title"),
+				I18nUtils.i18n("Territory.save.dialog.filter.xml"), DEFAULT_XML_FILE_EXTENSION);
 
-		File file = chooser.showSaveDialog(mainStage);
-
-		if (file == null) {
+		if (fileOpt.isEmpty()) {
 			logger.debug("No file selected to save territory in.");
 			return;
 		}
+		File file = fileOpt.get();
 
 		if (!file.getName().endsWith(DEFAULT_XML_FILE_EXTENSION)) {
 			file = new File(file.getAbsolutePath() + DEFAULT_XML_FILE_EXTENSION);
@@ -179,71 +166,109 @@ public class TerritorySaveController {
 	 * Asks for an XML-File and loads the contents into the territory.
 	 */
 	private void loadXMLfromFile() {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(I18nUtils.i18n("Territory.load.dialog.xml.title"));
-		fileChooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-				I18nUtils.i18n("Territory.load.dialog.xml.filter"), "*" + DEFAULT_XML_FILE_EXTENSION));
-		File file = fileChooser.showOpenDialog(mainStage);
-		if (file != null) {
-			logger.debug("load territory from xml-file {}", file);
-			try {
-				mainStage.getTerritory().fromXML(new FileInputStream(file));
-			} catch (FileNotFoundException e) {
-				logger.debug("Could not find file {}", file.getAbsolutePath());
-			}
-			logger.info("finished loading from xml-file");
+		Optional<File> fileOpt = getLoadFile(I18nUtils.i18n("Territory.load.dialog.title"),
+				I18nUtils.i18n("Territory.load.dialog.filter.xml"), DEFAULT_XML_FILE_EXTENSION);
+
+		if (fileOpt.isEmpty()) {
+			logger.debug("No file selected to load XML from.");
+			return;
 		}
+
+		File file = fileOpt.get();
+		logger.debug("load territory from xml-file {}", file);
+		try {
+			mainStage.getTerritory().fromXML(new FileInputStream(file));
+		} catch (FileNotFoundException e) {
+			logger.debug("Could not find file {}", file.getAbsolutePath());
+		}
+		logger.info("finished loading from xml-file");
 	}
 
 	/**
 	 * Loads a territory by a filename using JAXB
 	 * 
-	 * @param filename the name of the file in which the territory is stored
-	 * 
 	 * @return true if the territory was loaded successfully, false otherwise
-	 *
 	 */
-	private boolean loadJAXB(String filename) {
+	private void loadJAXB() {
+		Optional<File> fileOpt = getLoadFile(I18nUtils.i18n("Territory.load.dialog.title"),
+				I18nUtils.i18n("Territory.load.dialog.filter.jaxb"), DEFAULT_JAXB_FILE_EXTENSION);
 
-		// TODO investigate JAXB
-
+		if (fileOpt.isEmpty()) {
+			logger.debug("No file selected");
+			return;
+		}
+		File file = fileOpt.get();
+		logger.debug("load territory from jaxb-file {}", file);
 		try {
 			JAXBContext context = JAXBContext.newInstance(TerritoryState.class, Nut.class, Screw.class, Accu.class,
 					Stockpile.class, PileOfScrap.class, Hollow.class);
 			Unmarshaller um = context.createUnmarshaller();
-			TerritoryState ter = (TerritoryState) um.unmarshal(new FileReader(new File(filename)));
+			TerritoryState ter = (TerritoryState) um.unmarshal(new FileReader(file));
 			mainStage.getTerritory().restore(ter);
-			return true;
 		} catch (IOException | JAXBException e) {
 			e.printStackTrace();
 			logger.debug("failed to load JAXB");
-			return false;
 		}
 	}
 
 	/**
 	 * Saves the territory using JAXB.
-	 * 
-	 * @param filename name of the file in which the territory will be saved
-	 * 
-	 * @return true if the territory was saved successfully, false otherwise
 	 */
+	private void saveJAXB() {
+		Optional<File> fileOpt = getSaveFile(I18nUtils.i18n("Territory.save.dialog.title"),
+				I18nUtils.i18n("Territory.save.dialog.filter.jaxb"), DEFAULT_JAXB_FILE_EXTENSION);
 
-	private boolean saveJAXB(String filename) {
-
-		try (Writer w = new FileWriter(filename)) {
+		if (fileOpt.isEmpty()) {
+			logger.debug("No file selected to save territory in.");
+			return;
+		}
+		File file = fileOpt.get();
+		if (!file.getName().endsWith(DEFAULT_JAXB_FILE_EXTENSION)) {
+			file = new File(file.getAbsolutePath() + DEFAULT_JAXB_FILE_EXTENSION);
+		}
+		logger.debug("save territory from jaxb-file {}", file);
+		try (Writer w = new FileWriter(file)) {
 			JAXBContext context = JAXBContext.newInstance(TerritoryState.class, Nut.class, Screw.class, Accu.class,
 					Stockpile.class, PileOfScrap.class, Hollow.class);
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			m.marshal(mainStage.getTerritory().save(), w);
-			return true;
 		} catch (IOException | JAXBException e) {
 			e.printStackTrace();
 			logger.debug("failed to save jaxb");
-			return false;
 		}
+	}
+
+	/**
+	 * Opens a dialog to ask for a file to save the territory in.
+	 * 
+	 * @param title         the title of the dialog
+	 * @param description   file description for the allowed files
+	 * @param fileExtension allowed file-extension
+	 * @return a file to save the territory in
+	 */
+	private Optional<File> getSaveFile(String title, String description, String fileExtension) {
+		FileChooser chooser = new FileChooser();
+		chooser.setTitle(title);
+		chooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
+		chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(description, "*" + fileExtension));
+		return Optional.ofNullable(chooser.showSaveDialog(mainStage));
+	}
+
+	/**
+	 * Opens a dialog to ask for a file to load a territory from.
+	 * 
+	 * @param title         the title of the dialog
+	 * @param description   file description for allowed files
+	 * @param fileExtension allowed file-extension
+	 * @return a file to load a territory from
+	 */
+	public Optional<File> getLoadFile(String title, String description, String fileExtension) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(title);
+		fileChooser.setInitialDirectory(new File(ProgramController.PATH_TO_PROGRAMS));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(description, "*" + fileExtension));
+		return Optional.ofNullable(fileChooser.showOpenDialog(mainStage));
 	}
 
 }

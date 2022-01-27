@@ -89,6 +89,7 @@ public class LanguageController {
 		mainStage.getTakeMenuItem().textProperty().bind(createBinding("Menu.robbi.take"));
 		mainStage.getRobbiMenu().textProperty().bind(createBinding("Menu.robbi"));
 		// simulation Menu
+		mainStage.getResetMenuItem().textProperty().bind(createBinding("Menu.simulation.reset"));
 		mainStage.getStartMenuItem().textProperty().bind(createBinding("Menu.simulation.start"));
 		mainStage.getPauseMenuItem().textProperty().bind(createBinding("Menu.simulation.pause"));
 		mainStage.getStopMenuItem().textProperty().bind(createBinding("Menu.simulation.stop"));

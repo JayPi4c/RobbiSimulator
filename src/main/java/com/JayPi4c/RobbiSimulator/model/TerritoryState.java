@@ -58,8 +58,12 @@ public class TerritoryState {
 		this.robbi = new RobbiState(robbi.getX(), robbi.getY(), robbi.getFacing(), robbi.getItem());
 	}
 
+	/**
+	 * This constructor is needed for JAXB to work.
+	 */
+	@SuppressWarnings("unused")
 	private TerritoryState() {
-
+		// needed for JAXB
 	}
 
 	/**
