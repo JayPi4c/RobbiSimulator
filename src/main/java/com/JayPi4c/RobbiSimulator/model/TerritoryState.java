@@ -1,5 +1,8 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 /**
  * Territory State to store all state relevant attributes in order to apply the
  * Memento-Pattern.
@@ -7,11 +10,16 @@ package com.JayPi4c.RobbiSimulator.model;
  * @author Jonas Pohl
  *
  */
+@XmlRootElement
 public class TerritoryState {
+	@XmlElement
 	private int numberOfColumns;
+	@XmlElement
 	private int numberOfRows;
 
+	@XmlElement
 	private Tile[][] tiles;
+	@XmlElement
 	private RobbiState robbi;
 
 	/**
@@ -48,6 +56,10 @@ public class TerritoryState {
 			}
 		}
 		this.robbi = new RobbiState(robbi.getX(), robbi.getY(), robbi.getFacing(), robbi.getItem());
+	}
+
+	private TerritoryState() {
+
 	}
 
 	/**

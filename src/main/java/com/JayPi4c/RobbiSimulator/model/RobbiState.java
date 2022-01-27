@@ -1,5 +1,9 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 /**
  * Robbi State to store all state relevant attributes in order to apply the
  * Memento-Pattern.
@@ -7,10 +11,15 @@ package com.JayPi4c.RobbiSimulator.model;
  * @author Jonas Pohl
  *
  */
+@XmlRootElement
 public class RobbiState {
+	@XmlElement
 	private int x;
+	@XmlElement
 	private int y;
+	@XmlElement
 	private DIRECTION facing;
+	@XmlAnyElement
 	private Item item;
 
 	/**
@@ -26,6 +35,9 @@ public class RobbiState {
 		this.y = y;
 		this.facing = facing;
 		this.item = item;
+	}
+
+	private RobbiState() {
 	}
 
 	/**

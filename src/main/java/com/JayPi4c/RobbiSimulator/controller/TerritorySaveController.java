@@ -17,9 +17,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
+import com.JayPi4c.RobbiSimulator.model.Accu;
 import com.JayPi4c.RobbiSimulator.model.DIRECTION;
+import com.JayPi4c.RobbiSimulator.model.Hollow;
 import com.JayPi4c.RobbiSimulator.model.Item;
+import com.JayPi4c.RobbiSimulator.model.Nut;
+import com.JayPi4c.RobbiSimulator.model.PileOfScrap;
+import com.JayPi4c.RobbiSimulator.model.Screw;
+import com.JayPi4c.RobbiSimulator.model.Stockpile;
 import com.JayPi4c.RobbiSimulator.model.Territory;
+import com.JayPi4c.RobbiSimulator.model.TerritoryState;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
@@ -198,17 +205,15 @@ public class TerritorySaveController {
 	 *
 	 */
 	private boolean loadJAXB(String filename) {
-		if (filename != null)
-			return false;
+
 		// TODO investigate JAXB
 
 		try {
-			JAXBContext context = JAXBContext.newInstance(Territory.class);
+			JAXBContext context = JAXBContext.newInstance(TerritoryState.class, Nut.class, Screw.class, Accu.class,
+					Stockpile.class, PileOfScrap.class, Hollow.class);
 			Unmarshaller um = context.createUnmarshaller();
-			Territory ter = (Territory) um.unmarshal(new FileReader(new File(filename)));
-			ter.print();
-			mainStage.getTerritory().update(ter, ter.getRobbiItem(), ter.getRobbiX(), ter.getRobbiY(),
-					ter.getRobbiDirection());
+			TerritoryState ter = (TerritoryState) um.unmarshal(new FileReader(new File(filename)));
+			mainStage.getTerritory().restore(ter);
 			return true;
 		} catch (IOException | JAXBException e) {
 			e.printStackTrace();
@@ -226,14 +231,13 @@ public class TerritorySaveController {
 	 */
 
 	private boolean saveJAXB(String filename) {
-		if (filename != null)
-			return false;
+
 		try (Writer w = new FileWriter(filename)) {
-			JAXBContext context = JAXBContext.newInstance(Territory.class);
+			JAXBContext context = JAXBContext.newInstance(TerritoryState.class, Nut.class, Screw.class, Accu.class,
+					Stockpile.class, PileOfScrap.class, Hollow.class);
 			Marshaller m = context.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			mainStage.getTerritory().print();
-			m.marshal(mainStage.getTerritory(), w);
+			m.marshal(mainStage.getTerritory().save(), w);
 			return true;
 		} catch (IOException | JAXBException e) {
 			e.printStackTrace();
