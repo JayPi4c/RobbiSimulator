@@ -1,11 +1,14 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 /**
  * Class representing a PileOfScrap Tile.
  * 
  * @author Jonas Pohl
  *
  */
+@XmlRootElement
 public class PileOfScrap extends Tile {
 
 	private static final long serialVersionUID = 1L;

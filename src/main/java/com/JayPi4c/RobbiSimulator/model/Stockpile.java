@@ -3,12 +3,17 @@ package com.JayPi4c.RobbiSimulator.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 /**
  * Class representing a Stockpile tile.
  * 
  * @author Jonas Pohl
  *
  */
+@XmlRootElement
 public class Stockpile extends Tile {
 
 	private static final long serialVersionUID = 1L;
@@ -16,6 +21,8 @@ public class Stockpile extends Tile {
 	/**
 	 * Attribute to store all items placed on the tile
 	 */
+	@XmlElementWrapper
+	@XmlAnyElement(lax = true)
 	private ArrayList<Item> items;
 	// TODO Queue more efficient?
 	// check if queue would be better, allowing an easier iteration over the
