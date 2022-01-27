@@ -1,11 +1,14 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 /**
  * Class representing a Hollow tile.
  * 
  * @author Jonas Pohl
  *
  */
+@XmlRootElement
 public class Hollow extends Tile {
 
 	private static final long serialVersionUID = 1L;
