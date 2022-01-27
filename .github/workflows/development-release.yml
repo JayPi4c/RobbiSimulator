@@ -1,13 +1,13 @@
-name: tagged-release
+name: development build
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - develop
       
 jobs:
-  tagged-release:
-    name: "Tagged Release"
+  pre-release:
+    name: "Pre Release"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -25,6 +25,8 @@ jobs:
     - uses: "marvinpinto/action-automatic-releases@latest"        
       with: 
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: false
+        automatic_release_tag: "development"
+        prerelease: true
+        title: "Development Build"
         files: |
           target/*.jar
