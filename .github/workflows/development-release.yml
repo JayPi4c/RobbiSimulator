@@ -1,13 +1,17 @@
-name: development build
+name: development-build
 
 on:
   push:
     branches:
       - develop
+    paths:
+      - src/**
+      - pom.xml
+      - simulator-example.properties
       
 jobs:
-  pre-release:
-    name: "Pre Release"
+  development-build:
+    name: "Development Build"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
