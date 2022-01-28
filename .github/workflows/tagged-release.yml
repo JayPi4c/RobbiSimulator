@@ -22,7 +22,7 @@ jobs:
         prerelease: false
         overwrite: true
         tag: ${{ github.ref }}
-        release_name: Automatic Tag Build
+        release_name: ${{ github.ref }}
         body: This release is an automatic build.
   publish:
     name: Publish for ${{ matrix.os }}
@@ -63,5 +63,5 @@ jobs:
         prerelease: false
         overwrite: true
         tag: ${{ github.ref }}
-        release_name: Automatic Tag Build
+        release_name: ${{ github.ref }}
         body: This release is an automatic build.
