@@ -260,7 +260,6 @@ public class DatabaseManager {
 	public static boolean initialize() {
 		logger.debug("initialize database");
 		try {
-			// Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
 			DriverManager.registerDriver(new EmbeddedDriver());
 		} catch (SQLException e) {
 			return false;
@@ -271,7 +270,6 @@ public class DatabaseManager {
 		Statement stmt = null;
 		try {
 
-			// dropAllTables();
 			conn = DriverManager.getConnection("jdbc:derby:" + DB_NAME + ";create=true");
 
 			// check if the database has the table already. Create if not

@@ -28,7 +28,6 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 
 	private Dialog<Dimension> dialog;
 	private Territory territory;
-	// private Window parent;
 
 	/**
 	 * Creates a new ChangeTerritorySizeHandler and sets up a new Dialog, which can
@@ -40,7 +39,6 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 	 */
 	public ChangeTerritorySizeHandler(Window parent, Territory territory) {
 		this.territory = territory;
-		// this.parent = parent;
 
 		dialog = new Dialog<>();
 		dialog.setTitle(I18nUtils.i18n("ChangeSize.dialog.title"));
