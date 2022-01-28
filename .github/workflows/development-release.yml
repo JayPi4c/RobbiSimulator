@@ -10,9 +10,39 @@ on:
       - simulator-example.properties
       
 jobs:
-  development-build:
-    name: "Development Build"
+  properties:
+    name: Publish simulator properties
     runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Upload Properties
+      uses: svenstaro/upload-release-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: simulator-example.properties
+        asset_name: simulator.properties
+        prerelease: true
+        overwrite: true
+        tag: development
+        release_name: Automatic Development Build
+        body: This release is an automatic build from the develop branch.
+  publish:
+    name: Publish for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: RobbiSimulator.jar
+            asset_name: RobbiSimulator-Linux.jar
+          - os: windows-latest
+            artifact_name: RobbiSimulator.jar
+            asset_name: RobbiSimulator-Win.jar
+          - os: macos-latest
+            artifact_name: RobbiSimulator.jar
+            asset_name: RobbiSimulator-Mac.jar
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 17
@@ -26,11 +56,16 @@ jobs:
     - name: Generate Jar
       run: |
         mvn clean install package
-    - uses: "marvinpinto/action-automatic-releases@latest"        
-      with: 
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "development"
+    - name: Upload Application
+      uses: svenstaro/upload-release-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/${{ matrix.artifact_name }}
+        asset_name: ${{ matrix.asset_name }}
         prerelease: true
-        title: "Development Build"
-        files: |
-          target/*.jar
+        overwrite: true
+        tag: development
+        release_name: Automatic Development Build
+        body: This release is an automatic build from the develop branch.
