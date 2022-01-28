@@ -369,7 +369,6 @@ public class MainStage extends Stage {
 
 		setMinWidth(MIN_WIDTH);
 		setMinHeight(MIN_HEIGHT);
-		// setWidth(WIDTH);
 		setHeight(HEIGHT);
 		getIcons().add(menuRobbiImage);
 
@@ -388,17 +387,6 @@ public class MainStage extends Stage {
 		textArea.requestFocus();
 		logger.info("Finished loading '{}'", program.getName());
 	}
-
-	// https://stackoverflow.com/questions/31219169/javafx-application-name-on-gnome
-	// does not work yet
-	/*
-	 * private void initJavaFX() { if
-	 * (System.getProperty("os.name").toLowerCase().contains("linux")) { try {
-	 * Toolkit xToolkit = Toolkit.getDefaultToolkit(); Field awtAppClassNameField =
-	 * xToolkit.getClass().getDeclaredField("com.JayPi4c.RobbiSimulator.App");
-	 * awtAppClassNameField.setAccessible(true); awtAppClassNameField.set(xToolkit,
-	 * "MyApp"); } catch (Exception ignored) { } } }
-	 */
 
 	/**
 	 * Creates the editor-related menu-bar elements.
