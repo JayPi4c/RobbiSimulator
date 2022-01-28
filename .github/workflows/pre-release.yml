@@ -1,4 +1,4 @@
-name: pre-release
+name: pre-release-build
 
 on:
   push:
@@ -10,9 +10,38 @@ on:
       - simulator-example.properties
       
 jobs:
-  pre-release:
-    name: "Pre Release"
+  properties:
+    name Publish simulator properties
     runs-on: ubuntu-latest
+    steps:
+    - name: Upload Properties
+      uses: svenstaro/upload-release-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: simulator-example.properties
+        asset_name: simulator.properties
+        prerelease: true
+        overwrite: true
+        tag: latest
+        release_name: Automatic Prerelease Build
+        body: This release is an automatic build from the develop main.
+  publish:
+    name: Publish for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: RobbiSimulator.jar
+            asset_name: RobbiSimulator-Linux.jar
+          - os: windows-latest
+            artifact_name: RobbiSimulator.jar
+            asset_name: RobbiSimulator-Win.jar
+          - os: macos-latest
+            artifact_name: RobbiSimulator.jar
+            asset_name: RobbiSimulator-Mac.jar
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 17
@@ -26,11 +55,16 @@ jobs:
     - name: Generate Jar
       run: |
         mvn clean install package
-    - uses: "marvinpinto/action-automatic-releases@latest"        
-      with: 
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
+    - name: Upload Application
+      uses: svenstaro/upload-release-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/${{ matrix.artifact_name }}
+        asset_name: ${{ matrix.asset_name }}
         prerelease: true
-        title: "Pre-release Build"
-        files: |
-          target/*.jar
+        overwrite: true
+        tag: latest
+        release_name: Automatic Prerelease Build
+        body: This release is an automatic build from the develop main.
