@@ -8,6 +8,7 @@
 		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -51,7 +52,16 @@
 					<mainClass>com.JayPi4c.RobbiSimulator.Launcher</mainClass>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>3.3.0</version>
@@ -65,6 +75,8 @@
 							<mainClass>com.JayPi4c.RobbiSimulator.Launcher</mainClass>
 						</manifest>
 					</archive>
+					<finalName>RobbiSimulator</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 				<executions>
 					<execution>
