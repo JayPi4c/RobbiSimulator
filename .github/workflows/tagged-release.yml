@@ -7,9 +7,10 @@ on:
       
 jobs:
   properties:
-    name Publish simulator properties
+    name: Publish simulator properties
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Upload Properties
       uses: svenstaro/upload-release-action@v2
       env:
