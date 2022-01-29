@@ -96,9 +96,6 @@ public class ProgramController {
 	 */
 	public static final String POSTFIX_TEMPLATE = "}";
 
-	// private static final String VALID_IDENTIFIER_REGEX =
-	// "^([a-zA-Z_$][a-zA-Z\\d_$]*)$";
-
 	private static HashMap<String, Stage> programs;
 
 	private ProgramController() {
@@ -455,18 +452,10 @@ public class ProgramController {
 						StringBuilder bobTheBuilder = new StringBuilder();
 						bobTheBuilder.append(
 								String.format(I18nUtils.i18n("Compilation.diagnostic.kind"), diagnostic.getKind()));
-						// bobTheBuilder.append(String.format("Quelle: %s%n", diagnostic.getSource()));
 						bobTheBuilder.append(String.format(I18nUtils.i18n("Compilation.diagnostic.CodeAndMessage"),
 								diagnostic.getCode(), diagnostic.getMessage(null)));
 						bobTheBuilder.append(String.format(I18nUtils.i18n("Compilation.diagnostic.row"),
 								diagnostic.getLineNumber()));
-						// bobTheBuilder.append(
-						// String.format("Position/Spalte: %s/%s%n", diagnostic.getPosition(),
-						// diagnostic.getColumnNumber()));
-						// bobTheBuilder.append(String.format("Startpostion/Endposition: %s/%s%n",
-						// diagnostic.getStartPosition(),
-						// diagnostic.getEndPosition()));
-
 						AlertHelper.showAlertAndWait(AlertType.ERROR, bobTheBuilder.toString(), parent,
 								Modality.WINDOW_MODAL, I18nUtils.i18n("Compilation.diagnostic.title"),
 								diagnostic.getKind().toString());
@@ -556,11 +545,11 @@ public class ProgramController {
 		for (Method method : methods) {
 			if (!hasValidDefaultAnnotation(method, diag)) {
 				result = false;
-				// return false;
+
 				// use return to fasten things up. Following annotation errors are ignored
 			}
 		}
-		return result; // return true;
+		return result;
 	}
 
 	/**
@@ -578,11 +567,10 @@ public class ProgramController {
 			for (Annotation annotation : annotations) {
 				if (annotation instanceof Default anno && !valueAcceptable(parameter, anno, diag)) {
 					result = false;
-					// return false;
 				}
 			}
 		}
-		return result; // return true;
+		return result;
 	}
 
 	/**

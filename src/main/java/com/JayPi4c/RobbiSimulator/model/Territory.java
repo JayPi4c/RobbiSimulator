@@ -621,7 +621,6 @@ public class Territory extends Observable implements Serializable {
 
 			writer.writeDTD("<!DOCTYPE territory [" + dtd + "]>");
 			writer.writeCharacters("\n");
-			// writer.writeDTD("<!DOCTYPE territory SYSTEM \"xml/simulator.dtd\">");
 			synchronized (this) {
 				writer.writeStartElement("territory");
 				writer.writeAttribute("col", Integer.toString(getNumCols()));

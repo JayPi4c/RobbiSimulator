@@ -66,8 +66,9 @@ public class StudentController {
 			stage.getSendRequestMenuItem().setDisable(false);
 			stage.getReceiveAnswerMenuItem().setDisable(true);
 		} catch (RemoteException | NotBoundException e) {
-			e.printStackTrace();
 			logger.debug("Failed to fetch answer from tutor.");
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.receiveAnswer.error"),
+					stage);
 		}
 	}
 
@@ -90,8 +91,8 @@ public class StudentController {
 			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.sendRequest.information"),
 					stage);
 		} catch (RemoteException | NotBoundException e) {
-			e.printStackTrace();
 			logger.debug("Failed to send request to tutor.");
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.sendRequest.error"), stage);
 		}
 	}
 

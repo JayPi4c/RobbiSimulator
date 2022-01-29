@@ -155,12 +155,6 @@ public class TerritoryPanel extends Canvas implements Observer {
 
 		GraphicsContext gc = getGraphicsContext2D();
 		for (int i = 0; i < territory.getNumCols(); i++) {
-			// gc.setStroke(Color.BLACK);
-			// gc.setLineWidth(CELLSPACER);
-			// gc.strokeLine(getPos(i) - 1, 0, getPos(i) - 1,
-			// getPos(territory.getNumRows()));
-			// gc.strokeLine(0, getPos(i) - 1, getPos(territory.getNumCols()), getPos(i) -
-			// 1);
 
 			for (int j = 0; j < territory.getNumRows(); j++) {
 				Tile t = territory.getTile(i, j);
@@ -205,13 +199,6 @@ public class TerritoryPanel extends Canvas implements Observer {
 				}
 			}
 		}
-
-		// gc.strokeLine(getPos(territory.getNumCols()) - 1, 0,
-		// getPos(territory.getNumCols()) - 1,
-		// getPos(territory.getNumRows()));
-		// gc.strokeLine(0, getPos(territory.getNumRows()) - 1,
-		// getPos(territory.getNumCols()) - 1,
-		// getPos(territory.getNumRows()));
 
 		double angle = switch (territory.getRobbiDirection()) {
 		case NORTH:
