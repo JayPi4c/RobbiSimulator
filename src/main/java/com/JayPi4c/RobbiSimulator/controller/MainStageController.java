@@ -317,8 +317,6 @@ public class MainStageController implements Observer {
 			if (before != program.isEdited())
 				mainStage.setTitle(getTitle(program));
 		});
-		// TODO set slider labels
-		// https://stackoverflow.com/questions/18447963/javafx-slider-text-as-tick-label
 
 		// TODO print editor content
 		mainStage.getPrintEditorMenuItem().setOnAction(

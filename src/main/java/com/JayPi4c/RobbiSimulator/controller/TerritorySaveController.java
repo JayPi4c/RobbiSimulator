@@ -21,6 +21,7 @@ import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.model.Accu;
 import com.JayPi4c.RobbiSimulator.model.DIRECTION;
 import com.JayPi4c.RobbiSimulator.model.Hollow;
+import com.JayPi4c.RobbiSimulator.model.InvalidTerritoryException;
 import com.JayPi4c.RobbiSimulator.model.Item;
 import com.JayPi4c.RobbiSimulator.model.Nut;
 import com.JayPi4c.RobbiSimulator.model.PileOfScrap;
@@ -28,6 +29,7 @@ import com.JayPi4c.RobbiSimulator.model.Screw;
 import com.JayPi4c.RobbiSimulator.model.Stockpile;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.model.TerritoryState;
+import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
@@ -35,6 +37,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
 
 /**
@@ -126,7 +129,11 @@ public class TerritorySaveController {
 			int x = ois.readInt();
 			int y = ois.readInt();
 			DIRECTION facing = (DIRECTION) ois.readObject();
-			mainStage.getTerritory().update(t, item, x, y, facing);
+			try {
+				mainStage.getTerritory().update(t, item, x, y, facing);
+			} catch (InvalidTerritoryException e) {
+				AlertHelper.showAlertAndWait(AlertType.WARNING, I18nUtils.i18n("Territory.load.failure"), mainStage);
+			}
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
@@ -177,11 +184,14 @@ public class TerritorySaveController {
 		File file = fileOpt.get();
 		logger.debug("load territory from xml-file {}", file);
 		try {
-			mainStage.getTerritory().fromXML(new FileInputStream(file));
+			if (mainStage.getTerritory().fromXML(new FileInputStream(file)))
+				logger.info("finished loading from xml-file");
+			else
+				logger.info("Failed loading from xml-file");
 		} catch (FileNotFoundException e) {
 			logger.debug("Could not find file {}", file.getAbsolutePath());
 		}
-		logger.info("finished loading from xml-file");
+
 	}
 
 	/**
