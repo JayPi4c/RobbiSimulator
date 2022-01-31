@@ -51,16 +51,25 @@ public class PropertiesLoader {
 	 * @return true if the role is set to tutor, false otherwise
 	 */
 	public static boolean isTutor() {
-		return properties.getProperty("role").equalsIgnoreCase("Tutor");
+		try {
+			return properties.getProperty("role").equalsIgnoreCase("Tutor");
+		} catch (NullPointerException e) {
+			return false;
+		}
 	}
 
 	/**
 	 * Getter for the tutorhost.
 	 * 
-	 * @return the tutorhost stored in the properties file
+	 * @return the tutorhost stored in the properties file, localhost if no
+	 *         propterty is found
 	 */
 	public static String getTutorhost() {
-		return properties.getProperty("tutorhost");
+		try {
+			return properties.getProperty("tutorhost");
+		} catch (NullPointerException e) {
+			return "localhost";
+		}
 	}
 
 	/**
@@ -71,7 +80,7 @@ public class PropertiesLoader {
 	public static int getTutorport() {
 		try {
 			return Integer.parseInt(properties.getProperty("tutorport"));
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | NullPointerException e) {
 			return -1;
 		}
 	}
@@ -82,10 +91,10 @@ public class PropertiesLoader {
 	 * @return the locale stored in the properties file
 	 */
 	public static Locale getLocale() {
-		String[] parts = properties.getProperty("lang").split("_");
 		try {
+			String[] parts = properties.getProperty("lang").split("_");
 			return new Locale(parts[0], parts[1]);
-		} catch (IndexOutOfBoundsException e) {
+		} catch (IndexOutOfBoundsException | NullPointerException e) {
 			logger.debug("Failed to load locale from properties");
 			return Locale.GERMANY;
 		}
@@ -97,7 +106,7 @@ public class PropertiesLoader {
 	 * @return true, if the saving was successful, false otherwise
 	 */
 	public static boolean finish() {
-		properties.put("lang", I18nUtils.getLocale().toString());
+		properties.put("lang", I18nUtils.getBundle().getLocale().toString());
 		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {
 			properties.store(fos, COMMENTS);
 			return true;

@@ -1,6 +1,5 @@
 package com.JayPi4c.RobbiSimulator.utils;
 
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.ObjectProperty;
@@ -14,7 +13,7 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public class I18nUtils {
 
-	private static final ObjectProperty<Locale> locale = new SimpleObjectProperty<>(Locale.GERMANY);
+	private static final ObjectProperty<ResourceBundle> bundle = new SimpleObjectProperty<>();
 
 	/**
 	 * Private constructor to hide the implicit one.
@@ -28,8 +27,8 @@ public class I18nUtils {
 	 * 
 	 * @return The ObjectProperty
 	 */
-	public static ObjectProperty<Locale> localeProperty() {
-		return locale;
+	public static ObjectProperty<ResourceBundle> bundleProperty() {
+		return bundle;
 	}
 
 	/**
@@ -37,8 +36,8 @@ public class I18nUtils {
 	 * 
 	 * @return the current locale
 	 */
-	public static Locale getLocale() {
-		return locale.get();
+	public static ResourceBundle getBundle() {
+		return bundle.get();
 	}
 
 	/**
@@ -46,9 +45,8 @@ public class I18nUtils {
 	 * 
 	 * @param locale the new locale
 	 */
-	public static void setLocale(Locale locale) {
-		Locale.setDefault(locale);
-		localeProperty().set(locale);
+	public static void setBundle(ResourceBundle bundle) {
+		bundleProperty().set(bundle);
 	}
 
 	/**
@@ -58,6 +56,6 @@ public class I18nUtils {
 	 * @return the localized String for the key
 	 */
 	public static String i18n(String key) {
-		return ResourceBundle.getBundle("lang.messages", getLocale()).getString(key);
+		return getBundle().getString(key);
 	}
 }
