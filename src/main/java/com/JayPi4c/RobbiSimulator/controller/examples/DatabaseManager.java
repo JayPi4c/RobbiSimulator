@@ -42,8 +42,8 @@ public class DatabaseManager {
 	private static final String INSERT_TAG = "INSERT INTO " + TAGS_TABLE_NAME + " (ex_id, tagname) VALUES (?, ?)";
 	private static final String SELECT_DISTINCT_TAGS = "SELECT DISTINCT tagname FROM " + TAGS_TABLE_NAME
 			+ " ORDER BY tagname";
-	private static final String SELECT_IDS_BY_TAG = "SELECT ex_id FROM " + TAGS_TABLE_NAME + " WHERE tagname=?";
-	private static final String SELECT_NAME_BY_ID = "SELECT name FROM " + EXAMPLES_TABLE_NAME + " WHERE ex_id=?";
+	private static final String SELECT_NAMES_BY_TAG = "SELECT name, ex_id FROM " + EXAMPLES_TABLE_NAME
+			+ " WHERE ex_id IN (SELECT ex_id FROM " + TAGS_TABLE_NAME + " WHERE tagname=?)";
 	private static final String SELECT_PROGRAM_BY_ID = "SELECT name, code, territory FROM " + EXAMPLES_TABLE_NAME
 			+ " WHERE ex_id=?";
 
@@ -142,24 +142,14 @@ public class DatabaseManager {
 
 		Optional<Connection> connection = getConnection();
 		if (connection.isPresent()) {
-
 			logger.info("Loading Examples by tag {}", tag);
 			try (Connection conn = connection.get();
-					PreparedStatement stmt = conn.prepareStatement(SELECT_IDS_BY_TAG)) {
-				// TODO combine both statements into one
+					PreparedStatement stmt = conn.prepareStatement(SELECT_NAMES_BY_TAG)) {
 				stmt.setString(1, tag);
-				try (ResultSet rs = stmt.executeQuery();
-						PreparedStatement s = conn.prepareStatement(SELECT_NAME_BY_ID)) {
+				try (ResultSet rs = stmt.executeQuery()) {
 					ArrayList<Pair<Integer, String>> programs = new ArrayList<>();
 					while (rs.next()) {
-						int id = rs.getInt("ex_id");
-						s.setInt(1, id);
-						try (ResultSet resultSet = s.executeQuery()) {
-							if (resultSet.next()) { // ids are unique -> only one result
-								String name = resultSet.getString("name");
-								programs.add(new Pair<>(id, name));
-							}
-						}
+						programs.add(new Pair<>(rs.getInt("ex_id"), rs.getString("name")));
 					}
 					if (programs.isEmpty())
 						return Optional.empty();

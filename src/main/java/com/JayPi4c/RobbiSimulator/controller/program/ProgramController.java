@@ -69,7 +69,7 @@ public class ProgramController {
 	/**
 	 * Constant String with the Path name for the programs directory.
 	 */
-	public static final String PATH_TO_PROGRAMS = "programs"; // TODO make path relative to jar directory
+	public static final String PATH_TO_PROGRAMS = "programs";
 	/**
 	 * Constant String for the Default Robbi File name.
 	 */
