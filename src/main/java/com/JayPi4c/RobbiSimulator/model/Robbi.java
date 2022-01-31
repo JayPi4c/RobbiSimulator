@@ -46,7 +46,7 @@ public class Robbi {
 	 * The main-Method which will be overwritten by every custom Robbi
 	 * implementation. When starting a simulation, this method will be called.
 	 */
-	public void main() {
+	void main() {
 		// will be overritten
 		logger.error("Please overrite the main-method");
 	}

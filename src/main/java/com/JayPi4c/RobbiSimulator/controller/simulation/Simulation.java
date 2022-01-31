@@ -1,9 +1,11 @@
 package com.JayPi4c.RobbiSimulator.controller.simulation;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.model.RobbiException;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
@@ -59,13 +61,17 @@ public class Simulation extends Thread implements Observer {
 		logger.info("Simulation started");
 		territory.addObserver(this);
 		try {
-			Robbi robbi = territory.getRobbi();
-			robbi.main();
+			Method main = territory.getRobbi().getClass().getDeclaredMethod("main");
+			main.setAccessible(true);
+			main.invoke(territory.getRobbi());
 		} catch (StopException e) {
 			logger.debug("Simulation stopped");
 		} catch (RobbiException re) {
 			logger.debug("Simulation stopped with exception: {}", re.getMessage());
 			Platform.runLater(() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent));
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			e.printStackTrace();
 		} finally {
 			stop = true;
 			territory.removeObserver(this);
