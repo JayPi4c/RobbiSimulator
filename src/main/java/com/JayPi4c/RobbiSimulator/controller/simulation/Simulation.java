@@ -64,14 +64,15 @@ public class Simulation extends Thread implements Observer {
 			Method main = territory.getRobbi().getClass().getDeclaredMethod("main");
 			main.setAccessible(true);
 			main.invoke(territory.getRobbi());
-		} catch (StopException e) {
-			logger.debug("Simulation stopped");
-		} catch (RobbiException re) {
-			logger.debug("Simulation stopped with exception: {}", re.getMessage());
-			Platform.runLater(() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent));
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
 				| SecurityException e) {
-			e.printStackTrace();
+			if (e.getCause() instanceof StopException) {
+				logger.debug("Simulation stopped");
+			} else if (e.getCause() instanceof RobbiException re) {
+				logger.debug("Simulation stopped with exception: {}", re.getMessage());
+				Platform.runLater(() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent));
+			} else
+				e.printStackTrace();
 		} finally {
 			stop = true;
 			territory.removeObserver(this);
