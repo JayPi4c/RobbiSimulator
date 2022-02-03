@@ -26,8 +26,11 @@ import javafx.stage.Window;
  */
 public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 
-	private Dialog<Dimension> dialog;
 	private Territory territory;
+
+	private Dialog<Dimension> dialog;
+	private TextField rowField;
+	private TextField colField;
 
 	/**
 	 * Creates a new ChangeTerritorySizeHandler and sets up a new Dialog, which can
@@ -45,10 +48,10 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 		dialog.setHeaderText(I18nUtils.i18n("ChangeSize.dialog.header"));
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-		TextField rowField = new TextField(Integer.toString(territory.getNumRows()));
+		rowField = new TextField();
 		rowField.textProperty().addListener((observeable, oldVal, newVal) -> dialog.getDialogPane()
 				.lookupButton(ButtonType.OK).setDisable(newVal.isEmpty() || !isValid(newVal)));
-		TextField colField = new TextField(Integer.toString(territory.getNumCols()));
+		colField = new TextField();
 		colField.textProperty().addListener((observable, oldVal, newVal) -> dialog.getDialogPane()
 				.lookupButton(ButtonType.OK).setDisable(newVal.isEmpty() || !isValid(newVal)));
 
@@ -82,6 +85,8 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 
 	@Override
 	public void handle(ActionEvent event) {
+		rowField.setText(Integer.toString(territory.getNumRows()));
+		colField.setText(Integer.toString(territory.getNumCols()));
 		Optional<Dimension> optionalDimension = dialog.showAndWait();
 		optionalDimension.ifPresent(result -> territory.changeSize(result.cols(), result.rows()));
 	}
