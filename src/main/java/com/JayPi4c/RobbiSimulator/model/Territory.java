@@ -489,7 +489,9 @@ public class Territory extends Observable implements Serializable {
 	}
 
 	/**
-	 * Updates this territory to the territory encoded as the XML-InputStream.
+	 * Updates this territory to the territory encoded as the XML-InputStream. <br>
+	 * It uses the StAX Cursor API, since it is more efficient by not creating any
+	 * new objects.
 	 * 
 	 * @param stream InputStream of the XML-encoded territory
 	 */
