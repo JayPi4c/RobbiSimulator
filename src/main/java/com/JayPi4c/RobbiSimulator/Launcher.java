@@ -27,7 +27,7 @@ public class Launcher {
 					Further information can be obtained running the
 					application in the command line.
 					Please consider submitting your error.
-								""");
+					""");
 		}
 	}
 

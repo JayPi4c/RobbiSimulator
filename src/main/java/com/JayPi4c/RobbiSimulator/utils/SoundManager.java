@@ -17,24 +17,24 @@ public class SoundManager {
 
 	private static final ObjectProperty<Boolean> sound = new SimpleObjectProperty<>(PropertiesLoader.getSounds());
 
-	private static Media WARNING_SOUND = null;
+	private static Media warningSound = null;
 
 	/**
 	 * Plays a warning sounds. If the sound is not loaded yet, the sound will be
 	 * loaded and stored for further plays.
 	 */
 	public static void playWarnSound() {
-		if (sound.get())
+		if (Boolean.FALSE.equals(sound.get()))
 			return;
-		if (WARNING_SOUND == null) {
+		if (warningSound == null) {
 			try {
-				WARNING_SOUND = new Media(
+				warningSound = new Media(
 						SoundManager.class.getResource("/sounds/warning-sound.mp3").toURI().toString());
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
 		}
-		MediaPlayer mediaPlayer = new MediaPlayer(WARNING_SOUND);
+		MediaPlayer mediaPlayer = new MediaPlayer(warningSound);
 		mediaPlayer.play();
 	}
 

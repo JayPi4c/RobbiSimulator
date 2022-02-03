@@ -129,11 +129,9 @@ public class TerritorySaveController {
 			int x = ois.readInt();
 			int y = ois.readInt();
 			DIRECTION facing = (DIRECTION) ois.readObject();
-			try {
-				mainStage.getTerritory().update(t, item, x, y, facing);
-			} catch (InvalidTerritoryException e) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, I18nUtils.i18n("Territory.load.failure"), mainStage);
-			}
+			mainStage.getTerritory().update(t, item, x, y, facing);
+		} catch (InvalidTerritoryException e) {
+			AlertHelper.showAlertAndWait(AlertType.WARNING, I18nUtils.i18n("Territory.load.failure"), mainStage);
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {

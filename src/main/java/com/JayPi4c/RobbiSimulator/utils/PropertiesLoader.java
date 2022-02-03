@@ -76,8 +76,10 @@ public class PropertiesLoader {
 	public static String getTutorhost() {
 		String key = "tutorhost";
 		String host = properties.getProperty(key);
-		if (host == null)
-			properties.put(key, host = "localhost");
+		if (host == null) {
+			host = "localhost";
+			properties.put(key, host);
+		}
 		return host;
 	}
 
