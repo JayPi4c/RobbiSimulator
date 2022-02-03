@@ -63,8 +63,22 @@ public class PropertiesLoader {
 		}
 	}
 
+	/**
+	 * Getter for the sounds property.
+	 * 
+	 * @return true if the sounds property is set to true
+	 */
 	public static boolean getSounds() {
 		return Boolean.parseBoolean(properties.getProperty("sounds"));
+	}
+
+	/**
+	 * Getter for the sounds property.
+	 * 
+	 * @return true if the sounds property is set to true
+	 */
+	public static boolean getDarkmode() {
+		return Boolean.parseBoolean(properties.getProperty("darkmode"));
 	}
 
 	/**
@@ -121,6 +135,7 @@ public class PropertiesLoader {
 	public static boolean finish() {
 		properties.put("lang", I18nUtils.getBundle().getLocale().toString());
 		properties.put("sounds", Boolean.toString(SoundManager.getSound()));
+		properties.put("darkmode", Boolean.toString(SceneManager.getDarkmode()));
 		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {
 			properties.store(fos, COMMENTS);
 			return true;

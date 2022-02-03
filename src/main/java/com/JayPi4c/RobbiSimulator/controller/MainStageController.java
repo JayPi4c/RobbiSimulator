@@ -24,6 +24,7 @@ import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 import com.JayPi4c.RobbiSimulator.utils.Observer;
+import com.JayPi4c.RobbiSimulator.utils.SceneManager;
 import com.JayPi4c.RobbiSimulator.utils.SoundManager;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
@@ -213,12 +214,15 @@ public class MainStageController implements Observer {
 			if (!mainStage.getChangeCursorMenuItem().isSelected())
 				mainStage.getScene().setCursor(Cursor.DEFAULT);
 		});
-		mainStage.getDarkModeMenuItem().selectedProperty().addListener((obs, oldVal, newVal) -> {
+		mainStage.getDarkModeMenuItem().selectedProperty().bindBidirectional(SceneManager.darkmodeProperty());
+		SceneManager.darkmodeProperty().addListener((obs, oldVal, newVal) -> {
 			if (Boolean.TRUE.equals(newVal)) {
-				mainStage.getScene().getStylesheets().add("css/dark-theme.css");
+				mainStage.getScene().getStylesheets().add(SceneManager.getDarkmodeCss());
 			} else
-				mainStage.getScene().getStylesheets().remove("css/dark-theme.css");
+				mainStage.getScene().getStylesheets().remove(SceneManager.getDarkmodeCss());
 		});
+		if (SceneManager.getDarkmode())
+			mainStage.getScene().getStylesheets().add(SceneManager.getDarkmodeCss());
 		mainStage.getEnableSoundsMenuItem().selectedProperty().bindBidirectional(SoundManager.soundProperty());
 		mainStage.getInfoMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
