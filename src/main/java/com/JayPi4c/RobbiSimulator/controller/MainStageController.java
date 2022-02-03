@@ -60,6 +60,7 @@ public class MainStageController implements Observer {
 	private MainStage mainStage;
 
 	private boolean changeCursor = false;
+	private boolean soundsEnabled = false;
 
 	private RadioMenuItem selectedRadioMenuItem = null;
 
@@ -227,6 +228,11 @@ public class MainStageController implements Observer {
 			} else
 				mainStage.getScene().getStylesheets().remove("css/dark-theme.css");
 		});
+
+		mainStage.getEnableSoundsMenuItem().selectedProperty().addListener((obs, oldVal, newVal) -> {
+			soundsEnabled = newVal;
+		});
+
 		mainStage.getInfoMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 						I18nUtils.i18n("Menu.window.info.content"), mainStage, Modality.WINDOW_MODAL,
@@ -395,6 +401,15 @@ public class MainStageController implements Observer {
 	 */
 	public void setChangeCursor(boolean flag) {
 		this.changeCursor = flag;
+	}
+
+	/**
+	 * Getter for the soundsEnabled attribute
+	 * 
+	 * @return true if the sounds are enabled, false otherwise
+	 */
+	public boolean isSoundsEnabled() {
+		return soundsEnabled;
 	}
 
 	/**

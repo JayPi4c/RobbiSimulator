@@ -217,6 +217,15 @@ public class SimulationController {
 	}
 
 	/**
+	 * Forwards the information if sounds are enabled.
+	 * 
+	 * @return true if sounds are enabled, false otherwise
+	 */
+	protected boolean soundsEnabled() {
+		return stage.getMainStageController().isSoundsEnabled();
+	}
+
+	/**
 	 * Maps the given value, which ranges between istart and istop on a value which
 	 * ranges between ostart and ostop.
 	 * 
