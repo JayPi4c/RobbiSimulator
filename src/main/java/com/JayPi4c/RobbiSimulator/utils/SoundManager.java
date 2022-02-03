@@ -38,16 +38,38 @@ public class SoundManager {
 		mediaPlayer.play();
 	}
 
+	/**
+	 * ObjectProperty to allow bindings
+	 * 
+	 * @return The ObjectProperty
+	 */
 	public static ObjectProperty<Boolean> soundProperty() {
 		return sound;
 	}
 
+	/**
+	 * Getter for the current sound flag.
+	 * 
+	 * @return the current sound setting
+	 */
 	public static boolean getSound() {
 		return sound.get();
 	}
 
+	/**
+	 * Setter for the current sound flag.
+	 * 
+	 * @param flag the new value
+	 */
 	public static void setSound(boolean flag) {
 		soundProperty().set(flag);
+	}
+
+	/**
+	 * Private constructor to hide the implicit one.
+	 */
+	private SoundManager() {
+
 	}
 
 }
