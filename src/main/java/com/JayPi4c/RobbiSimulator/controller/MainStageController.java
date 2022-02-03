@@ -77,23 +77,19 @@ public class MainStageController implements Observer {
 		this.mainStage.getProgram().addObserver(this);
 
 		mainStage.setTitle(I18nUtils.i18n("Main.title") + ": " + mainStage.getProgram().getName());
+
 		mainStage.setOnCloseRequest(e -> {
 			mainStage.getProgram().save(mainStage.getTextArea().getText());
 			ProgramController.close(mainStage.getProgram().getName());
 		});
 
-		// editor actions
+		// editor (menuBar)
 		mainStage.getNewEditorMenuItem().setOnAction(e -> ProgramController.createAndShow(mainStage));
-		mainStage.getNewButtonToolbar().onActionProperty().bind(mainStage.getNewEditorMenuItem().onActionProperty());
-
 		mainStage.getOpenEditorMenuItem().setOnAction(e -> ProgramController.openProgram(mainStage));
-		mainStage.getLoadButtonToolbar().onActionProperty().bind(mainStage.getOpenEditorMenuItem().onActionProperty());
-
 		mainStage.getSaveEditorMenuItem().setOnAction(e -> {
 			mainStage.getProgram().save(mainStage.getTextArea().getText());
 			mainStage.setTitle(getTitle(mainStage.getProgram()));
 		});
-		mainStage.getSaveButtonToolbar().onActionProperty().bind(mainStage.getSaveEditorMenuItem().onActionProperty());
 
 		mainStage.getCompileEditorMenuItem().setOnAction(e -> {
 			mainStage.getSimulationController().stopSimulation();
@@ -102,9 +98,9 @@ public class MainStageController implements Observer {
 			mainStage.setTitle(getTitle(program));
 			ProgramController.compile(program, mainStage);
 		});
-		mainStage.getCompileButtonToolbar().onActionProperty()
-				.bind(mainStage.getCompileEditorMenuItem().onActionProperty());
-
+		// TODO print editor content
+		mainStage.getPrintEditorMenuItem().setOnAction(
+				e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, "Not yet implemented", mainStage));
 		mainStage.getQuitEditorMenuItem().setOnAction(e -> {
 			Program program = mainStage.getProgram();
 			logger.info("exiting {}", program.getName());
@@ -112,13 +108,34 @@ public class MainStageController implements Observer {
 			ProgramController.close(program.getName());
 			mainStage.close();
 		});
+		// Territory (menuBar)
+		// save -> TerritorySaveController
+		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
+			String extension = ".png";
+			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.png.description"), extension);
+			if (file == null)
+				return;
 
+			if (!saveAsImage(file, extension)) {
+				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
+						mainStage);
+			}
+		});
+		mainStage.getSaveAsGifMenuItem().setOnAction(e -> {
+			String extension = ".gif";
+			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.gif.description"), extension);
+			if (file == null)
+				return;
+
+			if (!saveAsImage(file, extension)) {
+				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
+						mainStage);
+			}
+		});
+		mainStage.getPrintTerritoryMenuItem().setOnAction(e -> printTerritory());
 		mainStage.getChangeSizeTerritoryMenuItem()
 				.setOnAction(new ChangeTerritorySizeHandler(mainStage, mainStage.getTerritory()));
-		mainStage.getChangeSizeButtonToolbar().onActionProperty()
-				.bind(mainStage.getChangeSizeTerritoryMenuItem().onActionProperty());
 
-		// set radio button actions
 		mainStage.getPlaceRobbiTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuRobbiImage, ButtonState.ROBBI));
 		mainStage.getPlaceHollowTerritoryRadioMenuItem()
@@ -135,40 +152,47 @@ public class MainStageController implements Observer {
 				.setOnAction(getRadioHandler(MainStage.menuNutImage, ButtonState.NUT));
 		mainStage.getDeleteFieldRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuDeleteImage, ButtonState.CLEAR));
-
-		// set toolbar button actions
-		mainStage.getPlaceRobbiToggleButtonToolbar()
-				.setOnAction(getButtonHandler(MainStage.menuRobbiImage, ButtonState.ROBBI));
-		mainStage.getPlaceHollowToggleButtonToolbar()
-				.setOnAction(getButtonHandler(MainStage.menuHollowImage, ButtonState.HOLLOW));
-		mainStage.getPlacePileOfScrapToggleButtonToolbar()
-				.setOnAction(getButtonHandler(MainStage.menuPileOfScrapImage, ButtonState.PILE_OF_SCRAP));
-		mainStage.getPlaceStockpileToggleButtonToolbar()
-				.setOnAction(getButtonHandler(MainStage.menuStockpileImage, ButtonState.STOCKPILE));
-		mainStage.getPlaceAccuToggleButtonToolbar()
-				.setOnAction(getButtonHandler(MainStage.menuAccuImage, ButtonState.ACCU));
-		mainStage.getPlaceScrewToggleButtonToolbar()
-				.setOnAction(getButtonHandler(MainStage.menuScrewImage, ButtonState.SCREW));
-		mainStage.getPlaceNutToggleButtonToolbar()
-				.setOnAction(getButtonHandler(MainStage.menuNutImage, ButtonState.NUT));
-		mainStage.getDeleteFieldToggleButtonToolbar()
-				.setOnAction(getButtonHandler(MainStage.menuDeleteImage, ButtonState.CLEAR));
-
-		// set robbi menuitem actions
+		// Robbi (menuBar)
+		mainStage.getMoveMenuItem().setOnAction(e -> {
+			try {
+				mainStage.getTerritory().getRobbi().vor();
+			} catch (HollowAheadException ex) {
+				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+			}
+		});
+		mainStage.getTurnLeftMenuItem().setOnAction(e -> mainStage.getTerritory().getRobbi().linksUm());
+		mainStage.getPutMenuItem().setOnAction(e -> {
+			try {
+				mainStage.getTerritory().getRobbi().legeAb();
+			} catch (BagIsEmptyException | TileIsFullException ex) {
+				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+			}
+		});
+		mainStage.getTakeMenuItem().setOnAction(e -> {
+			try {
+				mainStage.getTerritory().getRobbi().nehmeAuf();
+			} catch (NoItemException | BagIsFullException ex) {
+				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+			}
+		});
+		mainStage.getPushPileOfScrapMenuItem().setOnAction(e -> {
+			try {
+				mainStage.getTerritory().getRobbi().schiebeSchrotthaufen();
+			} catch (NoPileOfScrapAheadException | TileBlockedException ex) {
+				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+			}
+		});
 		mainStage.getItemPresentMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 						I18nUtils.i18n("Execution.information.itemPresent")
 								+ mainStage.getTerritory().getRobbi().gegenstandDa(),
 						mainStage));
-
 		mainStage.getIsStockpileMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 				I18nUtils.i18n("Execution.information.stockpile") + mainStage.getTerritory().getRobbi().istLagerplatz(),
 				mainStage));
-
 		mainStage.getHollowAheadMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 				I18nUtils.i18n("Execution.information.hollow") + mainStage.getTerritory().getRobbi().vornKuhle(),
 				mainStage));
-
 		mainStage.getPileOfScrapAheadMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 						I18nUtils.i18n("Execution.information.pileOfScrap")
@@ -178,45 +202,11 @@ public class MainStageController implements Observer {
 		mainStage.getIsBagFullMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 				I18nUtils.i18n("Execution.information.bag") + mainStage.getTerritory().getRobbi().istTascheVoll(),
 				mainStage));
-
-		mainStage.getPushPileOfScrapMenuItem().setOnAction(e -> {
-			try {
-				mainStage.getTerritory().getRobbi().schiebeSchrotthaufen();
-			} catch (NoPileOfScrapAheadException | TileBlockedException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
-			}
-		});
-		mainStage.getMoveMenuItem().setOnAction(e -> {
-			try {
-				mainStage.getTerritory().getRobbi().vor();
-			} catch (HollowAheadException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
-			}
-		});
-		mainStage.getRobbiMoveButtonToolbar().onActionProperty().bind(mainStage.getMoveMenuItem().onActionProperty());
-
-		mainStage.getTurnLeftMenuItem().setOnAction(e -> mainStage.getTerritory().getRobbi().linksUm());
-		mainStage.getRobbiTurnLeftButtonToolbar().onActionProperty()
-				.bind(mainStage.getTurnLeftMenuItem().onActionProperty());
-
-		mainStage.getPutMenuItem().setOnAction(e -> {
-			try {
-				mainStage.getTerritory().getRobbi().legeAb();
-			} catch (BagIsEmptyException | TileIsFullException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
-			}
-		});
-		mainStage.getRobbiPutButtonToolbar().onActionProperty().bind(mainStage.getPutMenuItem().onActionProperty());
-
-		mainStage.getTakeMenuItem().setOnAction(e -> {
-			try {
-				mainStage.getTerritory().getRobbi().nehmeAuf();
-			} catch (NoItemException | BagIsFullException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
-			}
-		});
-		mainStage.getRobbiTakeButtonToolbar().onActionProperty().bind(mainStage.getTakeMenuItem().onActionProperty());
-
+		// simualtion (menuBar) -> SimualtionController
+		// examples (menuBar) -> ExamplesController
+		// tutor (menuBar) -> TutorController / StudentController
+		// window (menuBar)
+		// language -> LangaugeController
 		mainStage.getChangeCursorMenuItem().setOnAction(e -> {
 			setChangeCursor(mainStage.getChangeCursorMenuItem().isSelected());
 			if (!mainStage.getChangeCursorMenuItem().isSelected())
@@ -228,11 +218,9 @@ public class MainStageController implements Observer {
 			} else
 				mainStage.getScene().getStylesheets().remove("css/dark-theme.css");
 		});
-
 		mainStage.getEnableSoundsMenuItem().selectedProperty().addListener((obs, oldVal, newVal) -> {
 			soundsEnabled = newVal;
 		});
-
 		mainStage.getInfoMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 						I18nUtils.i18n("Menu.window.info.content"), mainStage, Modality.WINDOW_MODAL,
@@ -250,72 +238,40 @@ public class MainStageController implements Observer {
 					I18nUtils.i18n("Menu.window.libraries.header"));
 		});
 
-		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
-			String extension = ".png";
-			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.png.description"), extension);
-			if (file == null)
-				return;
+		// Editor (toolbar)
+		mainStage.getNewButtonToolbar().onActionProperty().bind(mainStage.getNewEditorMenuItem().onActionProperty());
+		mainStage.getLoadButtonToolbar().onActionProperty().bind(mainStage.getOpenEditorMenuItem().onActionProperty());
+		mainStage.getSaveButtonToolbar().onActionProperty().bind(mainStage.getSaveEditorMenuItem().onActionProperty());
+		mainStage.getCompileButtonToolbar().onActionProperty()
+				.bind(mainStage.getCompileEditorMenuItem().onActionProperty());
+		// Territory (toolbar)
+		mainStage.getChangeSizeButtonToolbar().onActionProperty()
+				.bind(mainStage.getChangeSizeTerritoryMenuItem().onActionProperty());
+		mainStage.getPlaceRobbiToggleButtonToolbar()
+				.setOnAction(getButtonHandler(MainStage.menuRobbiImage, ButtonState.ROBBI));
+		mainStage.getPlaceHollowToggleButtonToolbar()
+				.setOnAction(getButtonHandler(MainStage.menuHollowImage, ButtonState.HOLLOW));
+		mainStage.getPlacePileOfScrapToggleButtonToolbar()
+				.setOnAction(getButtonHandler(MainStage.menuPileOfScrapImage, ButtonState.PILE_OF_SCRAP));
+		mainStage.getPlaceStockpileToggleButtonToolbar()
+				.setOnAction(getButtonHandler(MainStage.menuStockpileImage, ButtonState.STOCKPILE));
+		mainStage.getPlaceAccuToggleButtonToolbar()
+				.setOnAction(getButtonHandler(MainStage.menuAccuImage, ButtonState.ACCU));
+		mainStage.getPlaceScrewToggleButtonToolbar()
+				.setOnAction(getButtonHandler(MainStage.menuScrewImage, ButtonState.SCREW));
+		mainStage.getPlaceNutToggleButtonToolbar()
+				.setOnAction(getButtonHandler(MainStage.menuNutImage, ButtonState.NUT));
+		mainStage.getDeleteFieldToggleButtonToolbar()
+				.setOnAction(getButtonHandler(MainStage.menuDeleteImage, ButtonState.CLEAR));
+		// Robbi (Toolbar)
+		mainStage.getRobbiMoveButtonToolbar().onActionProperty().bind(mainStage.getMoveMenuItem().onActionProperty());
+		mainStage.getRobbiTurnLeftButtonToolbar().onActionProperty()
+				.bind(mainStage.getTurnLeftMenuItem().onActionProperty());
+		mainStage.getRobbiPutButtonToolbar().onActionProperty().bind(mainStage.getPutMenuItem().onActionProperty());
+		mainStage.getRobbiTakeButtonToolbar().onActionProperty().bind(mainStage.getTakeMenuItem().onActionProperty());
+		// Simulation (Toolbar) -> SimulationController
 
-			if (!saveAsImage(file, extension)) {
-				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
-						mainStage);
-			}
-		});
-
-		mainStage.getSaveAsGifMenuItem().setOnAction(e -> {
-			String extension = ".gif";
-			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.gif.description"), extension);
-			if (file == null)
-				return;
-
-			if (!saveAsImage(file, extension)) {
-				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
-						mainStage);
-			}
-		});
-
-		mainStage.getPrintTerritoryMenuItem().setOnAction(e -> {
-
-			PrinterJob printerJob = PrinterJob.createPrinterJob();
-
-			if (printerJob != null) {
-				boolean flag = printerJob.showPrintDialog(mainStage);
-				if (!flag)
-					return;
-				TerritoryPanel node = mainStage.getTerritoryPanel();
-
-				// scale the node
-				// https://www.tabnine.com/code/java/methods/javafx.print.PageLayout/getPrintableWidth
-				PageLayout pageLayout = printerJob.getJobSettings().getPageLayout();
-				double scaleX = 1.0;
-				if (pageLayout.getPrintableWidth() < node.getBoundsInParent().getWidth()) {
-					scaleX = pageLayout.getPrintableWidth() / node.getBoundsInParent().getWidth();
-				}
-				double scaleY = 1.0;
-				if (pageLayout.getPrintableHeight() < node.getBoundsInParent().getHeight()) {
-					scaleY = pageLayout.getPrintableHeight() / node.getBoundsInParent().getHeight();
-				}
-				double scaleXY = Double.min(scaleX, scaleY);
-				Scale scale = new Scale(scaleXY, scaleXY);
-				node.getTransforms().add(scale);
-				// Print the node
-				flag = printerJob.printPage(node);
-				node.getTransforms().remove(scale);
-				if (flag) {
-					// End the printer job
-					if (!printerJob.endJob()) {
-						logger.debug("Could not end printerJob");
-					}
-				} else {
-					logger.info("Printing failed or cancled");
-				}
-			} else {
-				logger.info("Failed to create printerJob");
-				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.print.error"), mainStage);
-			}
-		});
-
-		// content Panel
+		// editor Panel
 		mainStage.getTextArea().textProperty().addListener((observalble, oldVal, newVal) -> {
 			Program program = mainStage.getProgram();
 			boolean before = program.isEdited();
@@ -323,10 +279,6 @@ public class MainStageController implements Observer {
 			if (before != program.isEdited())
 				mainStage.setTitle(getTitle(program));
 		});
-
-		// TODO print editor content
-		mainStage.getPrintEditorMenuItem().setOnAction(
-				e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, "Not yet implemented", mainStage));
 
 	}
 
@@ -391,6 +343,50 @@ public class MainStageController implements Observer {
 		builder.append(I18nUtils.i18n("Main.title")).append(": ").append(program.getName())
 				.append((program.isEdited() ? "*" : ""));
 		return builder.toString();
+	}
+
+	/**
+	 * Sends the territory to a printer in order to print it.
+	 */
+	private void printTerritory() {
+
+		PrinterJob printerJob = PrinterJob.createPrinterJob();
+
+		if (printerJob != null) {
+			boolean flag = printerJob.showPrintDialog(mainStage);
+			if (!flag)
+				return;
+			TerritoryPanel node = mainStage.getTerritoryPanel();
+
+			// scale the node
+			// https://www.tabnine.com/code/java/methods/javafx.print.PageLayout/getPrintableWidth
+			PageLayout pageLayout = printerJob.getJobSettings().getPageLayout();
+			double scaleX = 1.0;
+			if (pageLayout.getPrintableWidth() < node.getBoundsInParent().getWidth()) {
+				scaleX = pageLayout.getPrintableWidth() / node.getBoundsInParent().getWidth();
+			}
+			double scaleY = 1.0;
+			if (pageLayout.getPrintableHeight() < node.getBoundsInParent().getHeight()) {
+				scaleY = pageLayout.getPrintableHeight() / node.getBoundsInParent().getHeight();
+			}
+			double scaleXY = Double.min(scaleX, scaleY);
+			Scale scale = new Scale(scaleXY, scaleXY);
+			node.getTransforms().add(scale);
+			// Print the node
+			flag = printerJob.printPage(node);
+			node.getTransforms().remove(scale);
+			if (flag) {
+				// End the printer job
+				if (!printerJob.endJob()) {
+					logger.debug("Could not end printerJob");
+				}
+			} else {
+				logger.info("Printing failed or cancled");
+			}
+		} else {
+			logger.info("Failed to create printerJob");
+			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.print.error"), mainStage);
+		}
 	}
 
 	/**
