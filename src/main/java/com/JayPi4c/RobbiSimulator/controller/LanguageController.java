@@ -102,6 +102,7 @@ public class LanguageController {
 		mainStage.getChangeCursorMenuItem().textProperty().bind(createBinding("Menu.window.changeCursor"));
 		mainStage.getWindowMenu().textProperty().bind(createBinding("Menu.window"));
 		mainStage.getDarkModeMenuItem().textProperty().bind(createBinding("Menu.window.darkmode"));
+		mainStage.getEnableSoundsMenuItem().textProperty().bind(createBinding("Menu.window.enableSounds"));
 		mainStage.getLibraryMenuItem().textProperty().bind(createBinding("Menu.window.libraries"));
 		mainStage.getInfoMenuItem().textProperty().bind(createBinding("Menu.window.info"));
 

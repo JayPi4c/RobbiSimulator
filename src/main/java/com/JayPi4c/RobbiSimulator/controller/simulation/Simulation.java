@@ -11,6 +11,7 @@ import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 import com.JayPi4c.RobbiSimulator.utils.Observer;
+import com.JayPi4c.RobbiSimulator.utils.SoundManager;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
@@ -64,14 +65,16 @@ public class Simulation extends Thread implements Observer {
 			Method main = territory.getRobbi().getClass().getDeclaredMethod("main");
 			main.setAccessible(true);
 			main.invoke(territory.getRobbi());
-		} catch (StopException e) {
-			logger.debug("Simulation stopped");
-		} catch (RobbiException re) {
-			logger.debug("Simulation stopped with exception: {}", re.getMessage());
-			Platform.runLater(() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent));
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
 				| SecurityException e) {
-			e.printStackTrace();
+			if (e.getCause() instanceof StopException) {
+				logger.debug("Simulation stopped");
+			} else if (e.getCause() instanceof RobbiException re) {
+				logger.debug("Simulation stopped with exception: {}", re.getMessage());
+				SoundManager.playWarnSound();
+				Platform.runLater(() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent));
+			} else
+				e.printStackTrace();
 		} finally {
 			stop = true;
 			territory.removeObserver(this);

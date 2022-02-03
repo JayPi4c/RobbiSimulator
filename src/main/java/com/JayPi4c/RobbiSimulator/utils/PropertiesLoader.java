@@ -33,6 +33,9 @@ public class PropertiesLoader {
 	/**
 	 * Loads the properties and stores them in an Object.
 	 * 
+	 * If the simulator.properties file can't be found, default values will be
+	 * loaded.
+	 * 
 	 * @return true if the initialization was successful, false otherwise
 	 */
 	public static boolean initialize() {
@@ -41,6 +44,7 @@ public class PropertiesLoader {
 			properties.load(in);
 			return true;
 		} catch (IOException e) {
+			loadDefaultProperties();
 			return false;
 		}
 	}
@@ -52,10 +56,29 @@ public class PropertiesLoader {
 	 */
 	public static boolean isTutor() {
 		try {
-			return properties.getProperty("role").equalsIgnoreCase("Tutor");
+			return properties.getProperty("role").equalsIgnoreCase("tutor");
 		} catch (NullPointerException e) {
+			properties.put("role", "student");
 			return false;
 		}
+	}
+
+	/**
+	 * Getter for the sounds property.
+	 * 
+	 * @return true if the sounds property is set to true
+	 */
+	public static boolean getSounds() {
+		return Boolean.parseBoolean(properties.getProperty("sounds"));
+	}
+
+	/**
+	 * Getter for the sounds property.
+	 * 
+	 * @return true if the sounds property is set to true
+	 */
+	public static boolean getDarkmode() {
+		return Boolean.parseBoolean(properties.getProperty("darkmode"));
 	}
 
 	/**
@@ -65,11 +88,13 @@ public class PropertiesLoader {
 	 *         propterty is found
 	 */
 	public static String getTutorhost() {
-		try {
-			return properties.getProperty("tutorhost");
-		} catch (NullPointerException e) {
-			return "localhost";
+		String key = "tutorhost";
+		String host = properties.getProperty(key);
+		if (host == null) {
+			host = "localhost";
+			properties.put(key, host);
 		}
+		return host;
 	}
 
 	/**
@@ -81,7 +106,8 @@ public class PropertiesLoader {
 		try {
 			return Integer.parseInt(properties.getProperty("tutorport"));
 		} catch (NumberFormatException | NullPointerException e) {
-			return -1;
+			properties.put("tutorport", "3579");
+			return 3579;
 		}
 	}
 
@@ -96,6 +122,7 @@ public class PropertiesLoader {
 			return new Locale(parts[0], parts[1]);
 		} catch (IndexOutOfBoundsException | NullPointerException e) {
 			logger.debug("Failed to load locale from properties");
+			properties.put("lang", Locale.GERMANY.toString());
 			return Locale.GERMANY;
 		}
 	}
@@ -107,12 +134,27 @@ public class PropertiesLoader {
 	 */
 	public static boolean finish() {
 		properties.put("lang", I18nUtils.getBundle().getLocale().toString());
+		properties.put("sounds", Boolean.toString(SoundManager.getSound()));
+		properties.put("darkmode", Boolean.toString(SceneManager.getDarkmode()));
 		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {
 			properties.store(fos, COMMENTS);
 			return true;
 		} catch (IOException e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Loads initial values in the properties object. This is needed if the
+	 * application failed to load properties from the file.
+	 */
+	private static void loadDefaultProperties() {
+		properties.put("lang", Locale.GERMANY.toString());
+		properties.put("role", "student");
+		properties.put("tutorport", "3579");
+		properties.put("tutorhost", "localhost");
+		properties.put("sounds", Boolean.toString(false));
+		properties.put("darkmode", Boolean.toString(false));
 	}
 
 }

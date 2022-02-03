@@ -164,6 +164,7 @@ public class MainStage extends Stage {
 	private MenuItem germanLanguageMenuItem;
 	private CheckMenuItem changeCursorMenuItem;
 	private CheckMenuItem darkModeMenuItem;
+	private CheckMenuItem enableSoundsMenuItem;
 	private MenuItem infoMenuItem;
 	private MenuItem libraryMenuItem;
 	private Menu windowMenu;
@@ -565,14 +566,15 @@ public class MainStage extends Stage {
 				germanLanguageMenuItem);
 
 		changeCursorMenuItem = new CheckMenuItem(I18nUtils.i18n("Menu.window.changeCursor"));
-
 		// https://stackoverflow.com/a/49159612/13670629
 		darkModeMenuItem = new CheckMenuItem(I18nUtils.i18n("Menu.window.darkmode"));
+		enableSoundsMenuItem = new CheckMenuItem(I18nUtils.i18n("Menu.window.enableSounds"));
+
 		infoMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.info"));
 		libraryMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.libraries"));
 
 		windowMenu = new Menu(I18nUtils.i18n("Menu.window"), null, languageMenu, changeCursorMenuItem, darkModeMenuItem,
-				new SeparatorMenuItem(), infoMenuItem, libraryMenuItem);
+				enableSoundsMenuItem, new SeparatorMenuItem(), infoMenuItem, libraryMenuItem);
 	}
 
 	/**
@@ -1518,6 +1520,15 @@ public class MainStage extends Stage {
 	 */
 	public CheckMenuItem getDarkModeMenuItem() {
 		return darkModeMenuItem;
+	}
+
+	/**
+	 * Getter for the enableSoudsMenuItem.
+	 * 
+	 * @return the enableSoundsMenuItem for this state
+	 */
+	public CheckMenuItem getEnableSoundsMenuItem() {
+		return enableSoundsMenuItem;
 	}
 
 	/**

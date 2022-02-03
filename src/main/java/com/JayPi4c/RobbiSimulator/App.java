@@ -46,9 +46,10 @@ public class App extends Application {
 		logger.debug("Initializing properties...");
 		if (PropertiesLoader.initialize()) {
 			logger.debug("Loaded properties successfully");
-			I18nUtils.setBundle(ResourceBundle.getBundle("lang.messages", PropertiesLoader.getLocale()));
 		} else
 			logger.debug("Failed to load properties.");
+
+		I18nUtils.setBundle(ResourceBundle.getBundle("lang.messages", PropertiesLoader.getLocale()));
 
 		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {
