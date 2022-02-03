@@ -63,6 +63,10 @@ public class PropertiesLoader {
 		}
 	}
 
+	public static boolean getSounds() {
+		return Boolean.parseBoolean(properties.getProperty("sounds"));
+	}
+
 	/**
 	 * Getter for the tutorhost.
 	 * 
@@ -114,6 +118,7 @@ public class PropertiesLoader {
 	 */
 	public static boolean finish() {
 		properties.put("lang", I18nUtils.getBundle().getLocale().toString());
+		properties.put("sounds", Boolean.toString(SoundManager.getSound()));
 		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {
 			properties.store(fos, COMMENTS);
 			return true;
@@ -131,6 +136,8 @@ public class PropertiesLoader {
 		properties.put("role", "student");
 		properties.put("tutorport", "3579");
 		properties.put("tutorhost", "localhost");
+		properties.put("sounds", Boolean.toString(false));
+		properties.put("darkmode", Boolean.toString(false));
 	}
 
 }

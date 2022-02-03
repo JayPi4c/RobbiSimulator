@@ -24,6 +24,7 @@ import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 import com.JayPi4c.RobbiSimulator.utils.Observer;
+import com.JayPi4c.RobbiSimulator.utils.SoundManager;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
@@ -218,9 +219,7 @@ public class MainStageController implements Observer {
 			} else
 				mainStage.getScene().getStylesheets().remove("css/dark-theme.css");
 		});
-		mainStage.getEnableSoundsMenuItem().selectedProperty().addListener((obs, oldVal, newVal) -> {
-			soundsEnabled = newVal;
-		});
+		mainStage.getEnableSoundsMenuItem().selectedProperty().bindBidirectional(SoundManager.soundProperty());
 		mainStage.getInfoMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 						I18nUtils.i18n("Menu.window.info.content"), mainStage, Modality.WINDOW_MODAL,
