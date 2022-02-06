@@ -1,7 +1,7 @@
 package com.JayPi4c.RobbiSimulator.view;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.LanguageController;
@@ -51,7 +51,7 @@ import javafx.stage.Stage;
  *
  */
 public class MainStage extends Stage {
-	private static final Logger logger = LogManager.getLogger(MainStage.class);
+	private static final Logger logger = LoggerFactory.getLogger(MainStage.class);
 
 	private Territory territory;
 

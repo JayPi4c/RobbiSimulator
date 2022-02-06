@@ -6,8 +6,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
@@ -25,7 +25,7 @@ import javafx.scene.control.Alert.AlertType;
  *
  */
 public class StudentController {
-	private static Logger logger = LogManager.getLogger(StudentController.class);
+	private static Logger logger = LoggerFactory.getLogger(StudentController.class);
 
 	private int requestID;
 

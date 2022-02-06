@@ -1,7 +1,7 @@
 package com.JayPi4c.RobbiSimulator.controller.simulation;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.model.TerritoryState;
@@ -20,7 +20,7 @@ import javafx.scene.control.ToggleButton;
  */
 public class SimulationController {
 
-	private static final Logger logger = LogManager.getLogger(SimulationController.class);
+	private static final Logger logger = LoggerFactory.getLogger(SimulationController.class);
 
 	private static final int MIN_SPEED = 100;
 	private static final int MAX_SPEED = 2500;
