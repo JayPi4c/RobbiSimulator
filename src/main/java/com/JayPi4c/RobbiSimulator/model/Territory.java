@@ -284,6 +284,9 @@ public class Territory extends Observable implements Serializable {
 	 * @param x         robbis x position
 	 * @param y         robbis y positions
 	 * @param facing    robbis facing
+	 * @throws InvalidTerritoryException if it is impossible to create the territory
+	 *                                   with the given information
+	 * 
 	 */
 	public void update(Territory territory, Item item, int x, int y, DIRECTION facing)
 			throws InvalidTerritoryException {
@@ -494,6 +497,7 @@ public class Territory extends Observable implements Serializable {
 	 * new objects.
 	 * 
 	 * @param stream InputStream of the XML-encoded territory
+	 * @return true if the territory was build successfully, false otherwise
 	 */
 	public boolean fromXML(InputStream stream) {
 		try {

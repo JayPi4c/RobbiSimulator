@@ -25,7 +25,13 @@ public class Tutor extends UnicastRemoteObject implements ITutor {
 	private static final Logger logger = LoggerFactory.getLogger(Tutor.class);
 
 	private transient Queue<Request> requests;
+	/**
+	 * ID of the latest request. Will increment after a request arrived.
+	 */
 	private int currentID = 0;
+	/**
+	 * Map to hold answers accessible by their id
+	 */
 	private Map<Integer, Answer> answers;
 
 	/**
