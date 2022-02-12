@@ -14,7 +14,10 @@ import javafx.scene.media.MediaPlayer;
  *
  */
 public class SoundManager {
-
+	/**
+	 * The boolean on which elements can bind in order to be updated if sound is
+	 * deactivated /activated
+	 */
 	private static final ObjectProperty<Boolean> sound = new SimpleObjectProperty<>(PropertiesLoader.getSounds());
 
 	private static Media warningSound = null;

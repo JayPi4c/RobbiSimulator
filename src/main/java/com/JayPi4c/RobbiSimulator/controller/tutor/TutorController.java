@@ -36,6 +36,9 @@ public class TutorController {
 	private static final int NO_ID = -1;
 	private int currentID = NO_ID;
 
+	/**
+	 * Code to bind a tutor instance to the RMI instance.
+	 */
 	public static final String TUTOR_CODE = "Tutor";
 
 	/**

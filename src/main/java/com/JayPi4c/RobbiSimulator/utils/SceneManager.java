@@ -10,6 +10,10 @@ import javafx.beans.property.SimpleObjectProperty;
  *
  */
 public class SceneManager {
+	/**
+	 * The boolean on which elements can bind in order to be updated on darkmode
+	 * change.
+	 */
 	private static final ObjectProperty<Boolean> darkmode = new SimpleObjectProperty<>(PropertiesLoader.getDarkmode());
 
 	/**
