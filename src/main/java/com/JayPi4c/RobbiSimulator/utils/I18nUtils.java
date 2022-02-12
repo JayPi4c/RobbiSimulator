@@ -13,6 +13,10 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public class I18nUtils {
 
+	/**
+	 * The resource bundle on which elements can bind in order to be updated on
+	 * language change.
+	 */
 	private static final ObjectProperty<ResourceBundle> bundle = new SimpleObjectProperty<>();
 
 	/**
@@ -41,9 +45,9 @@ public class I18nUtils {
 	}
 
 	/**
-	 * Setter for the current locale.
+	 * Setter for the current resourceBundle.
 	 * 
-	 * @param locale the new locale
+	 * @param bundle the new bundle
 	 */
 	public static void setBundle(ResourceBundle bundle) {
 		bundleProperty().set(bundle);
