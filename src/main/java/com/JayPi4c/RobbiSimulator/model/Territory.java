@@ -17,8 +17,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 
@@ -34,7 +34,7 @@ public class Territory extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LogManager.getLogger(Territory.class);
+	private static final Logger logger = LoggerFactory.getLogger(Territory.class);
 
 	private transient Robbi robbi;
 

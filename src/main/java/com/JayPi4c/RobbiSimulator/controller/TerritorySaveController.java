@@ -14,8 +14,8 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.model.Accu;
@@ -49,7 +49,7 @@ import javafx.stage.FileChooser;
  */
 public class TerritorySaveController {
 
-	private static final Logger logger = LogManager.getLogger(TerritorySaveController.class);
+	private static final Logger logger = LoggerFactory.getLogger(TerritorySaveController.class);
 
 	private static final String DEFAULT_SERIALISATION_FILE_EXTENSION = ".ter";
 	private static final String DEFAULT_XML_FILE_EXTENSION = ".rsxml";

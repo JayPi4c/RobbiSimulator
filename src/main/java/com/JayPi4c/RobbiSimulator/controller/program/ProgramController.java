@@ -31,8 +31,8 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
@@ -65,7 +65,7 @@ import javafx.stage.Window;
  */
 public class ProgramController {
 
-	private static final Logger logger = LogManager.getLogger(ProgramController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProgramController.class);
 	/**
 	 * Constant String with the Path name for the programs directory.
 	 */

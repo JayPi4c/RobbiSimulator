@@ -3,8 +3,8 @@ package com.JayPi4c.RobbiSimulator.controller.simulation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.model.RobbiException;
 import com.JayPi4c.RobbiSimulator.model.Territory;
@@ -26,7 +26,7 @@ import javafx.stage.Window;
  */
 public class Simulation extends Thread implements Observer {
 
-	private static final Logger logger = LogManager.getLogger(Simulation.class);
+	private static final Logger logger = LoggerFactory.getLogger(Simulation.class);
 
 	private Territory territory;
 	private SimulationController simController;

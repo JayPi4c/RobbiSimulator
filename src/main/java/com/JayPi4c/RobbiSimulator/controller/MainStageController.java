@@ -7,9 +7,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.derby.tools.sysinfo;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Layout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
@@ -55,7 +54,7 @@ import javafx.stage.Modality;
  */
 public class MainStageController implements Observer {
 
-	private static final Logger logger = LogManager.getLogger(MainStageController.class);
+	private static final Logger logger = LoggerFactory.getLogger(MainStageController.class);
 
 	private ButtonState buttonState;
 
@@ -231,12 +230,11 @@ public class MainStageController implements Observer {
 		mainStage.getLibraryMenuItem().setOnAction(e -> {
 			String javaFxVersion = System.getProperty("javafx.version");
 			String javaVersion = System.getProperty("java.version");
-			String log4JVersion = Layout.class.getPackage().getImplementationVersion();
 			String derbyVersion = sysinfo.getVersionString();
 			String jaxbVersion = JAXBContext.class.getPackage().getImplementationVersion();
 			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
 					String.format(I18nUtils.i18n("Menu.window.libraries.content"), javaVersion, javaFxVersion,
-							log4JVersion, derbyVersion, jaxbVersion),
+							derbyVersion, jaxbVersion),
 					mainStage, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
 					I18nUtils.i18n("Menu.window.libraries.header"));
 		});

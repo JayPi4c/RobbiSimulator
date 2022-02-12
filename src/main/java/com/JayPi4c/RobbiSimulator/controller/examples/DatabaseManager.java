@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.util.Pair;
 
@@ -24,7 +24,7 @@ import javafx.util.Pair;
  *
  */
 public class DatabaseManager {
-	private static final Logger logger = LogManager.getLogger(DatabaseManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
 	private static DatabaseManager dbManager;
 	private static boolean initialized = false;
 
@@ -237,7 +237,7 @@ public class DatabaseManager {
 			Connection conn = DriverManager.getConnection("jdbc:derby:" + DB_NAME + ";create=false");
 			return Optional.ofNullable(conn);
 		} catch (SQLException e) {
-			logger.debug(e);
+			logger.debug(e.toString());
 			return Optional.empty();
 		}
 	}
@@ -249,6 +249,8 @@ public class DatabaseManager {
 	 */
 	public static boolean initialize() {
 		logger.debug("initialize database");
+		// System.setProperty("derby.system.home", ".");
+		System.setProperty("derby.stream.error.file", "logs/derby.log"); // make sure logfile is in logs folder
 		try {
 			DriverManager.registerDriver(new EmbeddedDriver());
 		} catch (SQLException e) {

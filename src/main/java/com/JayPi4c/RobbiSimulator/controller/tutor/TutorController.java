@@ -8,8 +8,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
@@ -26,7 +26,7 @@ import javafx.scene.control.Alert.AlertType;
  *
  */
 public class TutorController {
-	private static final Logger logger = LogManager.getLogger(TutorController.class);
+	private static final Logger logger = LoggerFactory.getLogger(TutorController.class);
 
 	private static Tutor tutor;
 	private static Registry registry;

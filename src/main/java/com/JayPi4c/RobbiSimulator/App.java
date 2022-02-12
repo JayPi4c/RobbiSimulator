@@ -2,8 +2,8 @@ package com.JayPi4c.RobbiSimulator;
 
 import java.util.ResourceBundle;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
@@ -28,7 +28,7 @@ import javafx.stage.Stage;
  */
 public class App extends Application {
 
-	private static final Logger logger = LogManager.getLogger(App.class);
+	private static final Logger logger = LoggerFactory.getLogger(App.class);
 
 	/**
 	 * Application entry point

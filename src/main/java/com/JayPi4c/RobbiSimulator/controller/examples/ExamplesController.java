@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
@@ -42,7 +42,7 @@ import javafx.util.Pair;
  *
  */
 public class ExamplesController {
-	private static final Logger logger = LogManager.getLogger(ExamplesController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ExamplesController.class);
 
 	private MainStage stage;
 
