@@ -7,9 +7,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.derby.tools.sysinfo;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.Layout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
@@ -24,6 +23,8 @@ import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 import com.JayPi4c.RobbiSimulator.utils.Observer;
+import com.JayPi4c.RobbiSimulator.utils.SceneManager;
+import com.JayPi4c.RobbiSimulator.utils.SoundManager;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
@@ -53,13 +54,14 @@ import javafx.stage.Modality;
  */
 public class MainStageController implements Observer {
 
-	private static final Logger logger = LogManager.getLogger(MainStageController.class);
+	private static final Logger logger = LoggerFactory.getLogger(MainStageController.class);
 
 	private ButtonState buttonState;
 
 	private MainStage mainStage;
 
 	private boolean changeCursor = false;
+	private boolean soundsEnabled = false;
 
 	private RadioMenuItem selectedRadioMenuItem = null;
 
@@ -76,23 +78,19 @@ public class MainStageController implements Observer {
 		this.mainStage.getProgram().addObserver(this);
 
 		mainStage.setTitle(I18nUtils.i18n("Main.title") + ": " + mainStage.getProgram().getName());
+
 		mainStage.setOnCloseRequest(e -> {
 			mainStage.getProgram().save(mainStage.getTextArea().getText());
 			ProgramController.close(mainStage.getProgram().getName());
 		});
 
-		// editor actions
+		// editor (menuBar)
 		mainStage.getNewEditorMenuItem().setOnAction(e -> ProgramController.createAndShow(mainStage));
-		mainStage.getNewButtonToolbar().onActionProperty().bind(mainStage.getNewEditorMenuItem().onActionProperty());
-
 		mainStage.getOpenEditorMenuItem().setOnAction(e -> ProgramController.openProgram(mainStage));
-		mainStage.getLoadButtonToolbar().onActionProperty().bind(mainStage.getOpenEditorMenuItem().onActionProperty());
-
 		mainStage.getSaveEditorMenuItem().setOnAction(e -> {
 			mainStage.getProgram().save(mainStage.getTextArea().getText());
 			mainStage.setTitle(getTitle(mainStage.getProgram()));
 		});
-		mainStage.getSaveButtonToolbar().onActionProperty().bind(mainStage.getSaveEditorMenuItem().onActionProperty());
 
 		mainStage.getCompileEditorMenuItem().setOnAction(e -> {
 			mainStage.getSimulationController().stopSimulation();
@@ -101,9 +99,9 @@ public class MainStageController implements Observer {
 			mainStage.setTitle(getTitle(program));
 			ProgramController.compile(program, mainStage);
 		});
-		mainStage.getCompileButtonToolbar().onActionProperty()
-				.bind(mainStage.getCompileEditorMenuItem().onActionProperty());
-
+		// TODO print editor content
+		mainStage.getPrintEditorMenuItem().setOnAction(
+				e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, "Not yet implemented", mainStage));
 		mainStage.getQuitEditorMenuItem().setOnAction(e -> {
 			Program program = mainStage.getProgram();
 			logger.info("exiting {}", program.getName());
@@ -111,13 +109,34 @@ public class MainStageController implements Observer {
 			ProgramController.close(program.getName());
 			mainStage.close();
 		});
+		// Territory (menuBar)
+		// save -> TerritorySaveController
+		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
+			String extension = ".png";
+			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.png.description"), extension);
+			if (file == null)
+				return;
 
+			if (!saveAsImage(file, extension)) {
+				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
+						mainStage);
+			}
+		});
+		mainStage.getSaveAsGifMenuItem().setOnAction(e -> {
+			String extension = ".gif";
+			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.gif.description"), extension);
+			if (file == null)
+				return;
+
+			if (!saveAsImage(file, extension)) {
+				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
+						mainStage);
+			}
+		});
+		mainStage.getPrintTerritoryMenuItem().setOnAction(e -> printTerritory());
 		mainStage.getChangeSizeTerritoryMenuItem()
 				.setOnAction(new ChangeTerritorySizeHandler(mainStage, mainStage.getTerritory()));
-		mainStage.getChangeSizeButtonToolbar().onActionProperty()
-				.bind(mainStage.getChangeSizeTerritoryMenuItem().onActionProperty());
 
-		// set radio button actions
 		mainStage.getPlaceRobbiTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuRobbiImage, ButtonState.ROBBI));
 		mainStage.getPlaceHollowTerritoryRadioMenuItem()
@@ -134,8 +153,101 @@ public class MainStageController implements Observer {
 				.setOnAction(getRadioHandler(MainStage.menuNutImage, ButtonState.NUT));
 		mainStage.getDeleteFieldRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuDeleteImage, ButtonState.CLEAR));
+		// Robbi (menuBar)
+		mainStage.getMoveMenuItem().setOnAction(e -> {
+			try {
+				mainStage.getTerritory().getRobbi().vor();
+			} catch (HollowAheadException ex) {
+				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+			}
+		});
+		mainStage.getTurnLeftMenuItem().setOnAction(e -> mainStage.getTerritory().getRobbi().linksUm());
+		mainStage.getPutMenuItem().setOnAction(e -> {
+			try {
+				mainStage.getTerritory().getRobbi().legeAb();
+			} catch (BagIsEmptyException | TileIsFullException ex) {
+				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+			}
+		});
+		mainStage.getTakeMenuItem().setOnAction(e -> {
+			try {
+				mainStage.getTerritory().getRobbi().nehmeAuf();
+			} catch (NoItemException | BagIsFullException ex) {
+				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+			}
+		});
+		mainStage.getPushPileOfScrapMenuItem().setOnAction(e -> {
+			try {
+				mainStage.getTerritory().getRobbi().schiebeSchrotthaufen();
+			} catch (NoPileOfScrapAheadException | TileBlockedException ex) {
+				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+			}
+		});
+		mainStage.getItemPresentMenuItem()
+				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+						I18nUtils.i18n("Execution.information.itemPresent")
+								+ mainStage.getTerritory().getRobbi().gegenstandDa(),
+						mainStage));
+		mainStage.getIsStockpileMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+				I18nUtils.i18n("Execution.information.stockpile") + mainStage.getTerritory().getRobbi().istLagerplatz(),
+				mainStage));
+		mainStage.getHollowAheadMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+				I18nUtils.i18n("Execution.information.hollow") + mainStage.getTerritory().getRobbi().vornKuhle(),
+				mainStage));
+		mainStage.getPileOfScrapAheadMenuItem()
+				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+						I18nUtils.i18n("Execution.information.pileOfScrap")
+								+ mainStage.getTerritory().getRobbi().vornSchrotthaufen(),
+						mainStage));
 
-		// set toolbar button actions
+		mainStage.getIsBagFullMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+				I18nUtils.i18n("Execution.information.bag") + mainStage.getTerritory().getRobbi().istTascheVoll(),
+				mainStage));
+		// simualtion (menuBar) -> SimualtionController
+		// examples (menuBar) -> ExamplesController
+		// tutor (menuBar) -> TutorController / StudentController
+		// window (menuBar)
+		// language -> LangaugeController
+		mainStage.getChangeCursorMenuItem().setOnAction(e -> {
+			setChangeCursor(mainStage.getChangeCursorMenuItem().isSelected());
+			if (!mainStage.getChangeCursorMenuItem().isSelected())
+				mainStage.getScene().setCursor(Cursor.DEFAULT);
+		});
+		mainStage.getDarkModeMenuItem().selectedProperty().bindBidirectional(SceneManager.darkmodeProperty());
+		SceneManager.darkmodeProperty().addListener((obs, oldVal, newVal) -> {
+			if (Boolean.TRUE.equals(newVal)) {
+				mainStage.getScene().getStylesheets().add(SceneManager.getDarkmodeCss());
+			} else
+				mainStage.getScene().getStylesheets().remove(SceneManager.getDarkmodeCss());
+		});
+		if (SceneManager.getDarkmode())
+			mainStage.getScene().getStylesheets().add(SceneManager.getDarkmodeCss());
+		mainStage.getEnableSoundsMenuItem().selectedProperty().bindBidirectional(SoundManager.soundProperty());
+		mainStage.getInfoMenuItem()
+				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+						I18nUtils.i18n("Menu.window.info.content"), mainStage, Modality.WINDOW_MODAL,
+						I18nUtils.i18n("Menu.window.info.title"), I18nUtils.i18n("Menu.window.info.header")));
+		mainStage.getLibraryMenuItem().setOnAction(e -> {
+			String javaFxVersion = System.getProperty("javafx.version");
+			String javaVersion = System.getProperty("java.version");
+			String derbyVersion = sysinfo.getVersionString();
+			String jaxbVersion = JAXBContext.class.getPackage().getImplementationVersion();
+			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
+					String.format(I18nUtils.i18n("Menu.window.libraries.content"), javaVersion, javaFxVersion,
+							derbyVersion, jaxbVersion),
+					mainStage, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
+					I18nUtils.i18n("Menu.window.libraries.header"));
+		});
+
+		// Editor (toolbar)
+		mainStage.getNewButtonToolbar().onActionProperty().bind(mainStage.getNewEditorMenuItem().onActionProperty());
+		mainStage.getLoadButtonToolbar().onActionProperty().bind(mainStage.getOpenEditorMenuItem().onActionProperty());
+		mainStage.getSaveButtonToolbar().onActionProperty().bind(mainStage.getSaveEditorMenuItem().onActionProperty());
+		mainStage.getCompileButtonToolbar().onActionProperty()
+				.bind(mainStage.getCompileEditorMenuItem().onActionProperty());
+		// Territory (toolbar)
+		mainStage.getChangeSizeButtonToolbar().onActionProperty()
+				.bind(mainStage.getChangeSizeTerritoryMenuItem().onActionProperty());
 		mainStage.getPlaceRobbiToggleButtonToolbar()
 				.setOnAction(getButtonHandler(MainStage.menuRobbiImage, ButtonState.ROBBI));
 		mainStage.getPlaceHollowToggleButtonToolbar()
@@ -152,164 +264,15 @@ public class MainStageController implements Observer {
 				.setOnAction(getButtonHandler(MainStage.menuNutImage, ButtonState.NUT));
 		mainStage.getDeleteFieldToggleButtonToolbar()
 				.setOnAction(getButtonHandler(MainStage.menuDeleteImage, ButtonState.CLEAR));
-
-		// set robbi menuitem actions
-		mainStage.getItemPresentMenuItem()
-				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						I18nUtils.i18n("Execution.information.itemPresent")
-								+ mainStage.getTerritory().getRobbi().gegenstandDa(),
-						mainStage));
-
-		mainStage.getIsStockpileMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-				I18nUtils.i18n("Execution.information.stockpile") + mainStage.getTerritory().getRobbi().istLagerplatz(),
-				mainStage));
-
-		mainStage.getHollowAheadMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-				I18nUtils.i18n("Execution.information.hollow") + mainStage.getTerritory().getRobbi().vornKuhle(),
-				mainStage));
-
-		mainStage.getPileOfScrapAheadMenuItem()
-				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						I18nUtils.i18n("Execution.information.pileOfScrap")
-								+ mainStage.getTerritory().getRobbi().vornSchrotthaufen(),
-						mainStage));
-
-		mainStage.getIsBagFullMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-				I18nUtils.i18n("Execution.information.bag") + mainStage.getTerritory().getRobbi().istTascheVoll(),
-				mainStage));
-
-		mainStage.getPushPileOfScrapMenuItem().setOnAction(e -> {
-			try {
-				mainStage.getTerritory().getRobbi().schiebeSchrotthaufen();
-			} catch (NoPileOfScrapAheadException | TileBlockedException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
-			}
-		});
-		mainStage.getMoveMenuItem().setOnAction(e -> {
-			try {
-				mainStage.getTerritory().getRobbi().vor();
-			} catch (HollowAheadException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
-			}
-		});
+		// Robbi (Toolbar)
 		mainStage.getRobbiMoveButtonToolbar().onActionProperty().bind(mainStage.getMoveMenuItem().onActionProperty());
-
-		mainStage.getTurnLeftMenuItem().setOnAction(e -> mainStage.getTerritory().getRobbi().linksUm());
 		mainStage.getRobbiTurnLeftButtonToolbar().onActionProperty()
 				.bind(mainStage.getTurnLeftMenuItem().onActionProperty());
-
-		mainStage.getPutMenuItem().setOnAction(e -> {
-			try {
-				mainStage.getTerritory().getRobbi().legeAb();
-			} catch (BagIsEmptyException | TileIsFullException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
-			}
-		});
 		mainStage.getRobbiPutButtonToolbar().onActionProperty().bind(mainStage.getPutMenuItem().onActionProperty());
-
-		mainStage.getTakeMenuItem().setOnAction(e -> {
-			try {
-				mainStage.getTerritory().getRobbi().nehmeAuf();
-			} catch (NoItemException | BagIsFullException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
-			}
-		});
 		mainStage.getRobbiTakeButtonToolbar().onActionProperty().bind(mainStage.getTakeMenuItem().onActionProperty());
+		// Simulation (Toolbar) -> SimulationController
 
-		mainStage.getChangeCursorMenuItem().setOnAction(e -> {
-			setChangeCursor(mainStage.getChangeCursorMenuItem().isSelected());
-			if (!mainStage.getChangeCursorMenuItem().isSelected())
-				mainStage.getScene().setCursor(Cursor.DEFAULT);
-		});
-		mainStage.getDarkModeMenuItem().selectedProperty().addListener((obs, oldVal, newVal) -> {
-			if (Boolean.TRUE.equals(newVal)) {
-				mainStage.getScene().getStylesheets().add("css/dark-theme.css");
-			} else
-				mainStage.getScene().getStylesheets().remove("css/dark-theme.css");
-		});
-		mainStage.getInfoMenuItem()
-				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						I18nUtils.i18n("Menu.window.info.content"), mainStage, Modality.WINDOW_MODAL,
-						I18nUtils.i18n("Menu.window.info.title"), I18nUtils.i18n("Menu.window.info.header")));
-		mainStage.getLibraryMenuItem().setOnAction(e -> {
-			String javaFxVersion = System.getProperty("javafx.version");
-			String javaVersion = System.getProperty("java.version");
-			String log4JVersion = Layout.class.getPackage().getImplementationVersion();
-			String derbyVersion = sysinfo.getVersionString();
-			String jaxbVersion = JAXBContext.class.getPackage().getImplementationVersion();
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-					String.format(I18nUtils.i18n("Menu.window.libraries.content"), javaVersion, javaFxVersion,
-							log4JVersion, derbyVersion, jaxbVersion),
-					mainStage, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
-					I18nUtils.i18n("Menu.window.libraries.header"));
-		});
-
-		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
-			String extension = ".png";
-			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.png.description"), extension);
-			if (file == null)
-				return;
-
-			if (!saveAsImage(file, extension)) {
-				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
-						mainStage);
-			}
-		});
-
-		mainStage.getSaveAsGifMenuItem().setOnAction(e -> {
-			String extension = ".gif";
-			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.gif.description"), extension);
-			if (file == null)
-				return;
-
-			if (!saveAsImage(file, extension)) {
-				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
-						mainStage);
-			}
-		});
-
-		mainStage.getPrintTerritoryMenuItem().setOnAction(e -> {
-
-			PrinterJob printerJob = PrinterJob.createPrinterJob();
-
-			if (printerJob != null) {
-				boolean flag = printerJob.showPrintDialog(mainStage);
-				if (!flag)
-					return;
-				TerritoryPanel node = mainStage.getTerritoryPanel();
-
-				// scale the node
-				// https://www.tabnine.com/code/java/methods/javafx.print.PageLayout/getPrintableWidth
-				PageLayout pageLayout = printerJob.getJobSettings().getPageLayout();
-				double scaleX = 1.0;
-				if (pageLayout.getPrintableWidth() < node.getBoundsInParent().getWidth()) {
-					scaleX = pageLayout.getPrintableWidth() / node.getBoundsInParent().getWidth();
-				}
-				double scaleY = 1.0;
-				if (pageLayout.getPrintableHeight() < node.getBoundsInParent().getHeight()) {
-					scaleY = pageLayout.getPrintableHeight() / node.getBoundsInParent().getHeight();
-				}
-				double scaleXY = Double.min(scaleX, scaleY);
-				Scale scale = new Scale(scaleXY, scaleXY);
-				node.getTransforms().add(scale);
-				// Print the node
-				flag = printerJob.printPage(node);
-				node.getTransforms().remove(scale);
-				if (flag) {
-					// End the printer job
-					if (!printerJob.endJob()) {
-						logger.debug("Could not end printerJob");
-					}
-				} else {
-					logger.info("Printing failed or cancled");
-				}
-			} else {
-				logger.info("Failed to create printerJob");
-				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.print.error"), mainStage);
-			}
-		});
-
-		// content Panel
+		// editor Panel
 		mainStage.getTextArea().textProperty().addListener((observalble, oldVal, newVal) -> {
 			Program program = mainStage.getProgram();
 			boolean before = program.isEdited();
@@ -317,12 +280,6 @@ public class MainStageController implements Observer {
 			if (before != program.isEdited())
 				mainStage.setTitle(getTitle(program));
 		});
-		// TODO set slider labels
-		// https://stackoverflow.com/questions/18447963/javafx-slider-text-as-tick-label
-
-		// TODO print editor content
-		mainStage.getPrintEditorMenuItem().setOnAction(
-				e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, "Not yet implemented", mainStage));
 
 	}
 
@@ -390,6 +347,50 @@ public class MainStageController implements Observer {
 	}
 
 	/**
+	 * Sends the territory to a printer in order to print it.
+	 */
+	private void printTerritory() {
+
+		PrinterJob printerJob = PrinterJob.createPrinterJob();
+
+		if (printerJob != null) {
+			boolean flag = printerJob.showPrintDialog(mainStage);
+			if (!flag)
+				return;
+			TerritoryPanel node = mainStage.getTerritoryPanel();
+
+			// scale the node
+			// https://www.tabnine.com/code/java/methods/javafx.print.PageLayout/getPrintableWidth
+			PageLayout pageLayout = printerJob.getJobSettings().getPageLayout();
+			double scaleX = 1.0;
+			if (pageLayout.getPrintableWidth() < node.getBoundsInParent().getWidth()) {
+				scaleX = pageLayout.getPrintableWidth() / node.getBoundsInParent().getWidth();
+			}
+			double scaleY = 1.0;
+			if (pageLayout.getPrintableHeight() < node.getBoundsInParent().getHeight()) {
+				scaleY = pageLayout.getPrintableHeight() / node.getBoundsInParent().getHeight();
+			}
+			double scaleXY = Double.min(scaleX, scaleY);
+			Scale scale = new Scale(scaleXY, scaleXY);
+			node.getTransforms().add(scale);
+			// Print the node
+			flag = printerJob.printPage(node);
+			node.getTransforms().remove(scale);
+			if (flag) {
+				// End the printer job
+				if (!printerJob.endJob()) {
+					logger.debug("Could not end printerJob");
+				}
+			} else {
+				logger.info("Printing failed or cancled");
+			}
+		} else {
+			logger.info("Failed to create printerJob");
+			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.print.error"), mainStage);
+		}
+	}
+
+	/**
 	 * updates the changeCursor variable to set if the cursor should change to the
 	 * selected state
 	 * 
@@ -397,6 +398,15 @@ public class MainStageController implements Observer {
 	 */
 	public void setChangeCursor(boolean flag) {
 		this.changeCursor = flag;
+	}
+
+	/**
+	 * Getter for the soundsEnabled attribute
+	 * 
+	 * @return true if the sounds are enabled, false otherwise
+	 */
+	public boolean isSoundsEnabled() {
+		return soundsEnabled;
 	}
 
 	/**

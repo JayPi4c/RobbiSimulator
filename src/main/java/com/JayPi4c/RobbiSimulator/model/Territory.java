@@ -17,8 +17,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 
@@ -34,7 +34,7 @@ public class Territory extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LogManager.getLogger(Territory.class);
+	private static final Logger logger = LoggerFactory.getLogger(Territory.class);
 
 	private transient Robbi robbi;
 
@@ -285,14 +285,22 @@ public class Territory extends Observable implements Serializable {
 	 * @param y         robbis y positions
 	 * @param facing    robbis facing
 	 */
-	public void update(Territory territory, Item item, int x, int y, DIRECTION facing) {
+	public void update(Territory territory, Item item, int x, int y, DIRECTION facing)
+			throws InvalidTerritoryException {
+		for (int i = 0; i < territory.numberOfColumns; i++) {
+			if (territory.tiles[i].length != territory.numberOfRows)
+				throw new InvalidTerritoryException();
+		}
 		synchronized (this) {
-			// TODO don't update if territory invalid
-			this.tiles = territory.tiles;
-			this.sizeChanged = true;
 			this.numberOfColumns = territory.numberOfColumns;
 			this.numberOfRows = territory.numberOfRows;
-			this.robbi.setPosition(x, y);
+			this.tiles = territory.tiles;
+			this.sizeChanged = true;
+			try {
+				this.robbi.setPosition(x, y);
+			} catch (Exception e) {
+				throw new InvalidTerritoryException();
+			}
 			this.robbi.setFacing(facing);
 			this.robbi.setItem(item);
 		}
@@ -481,11 +489,13 @@ public class Territory extends Observable implements Serializable {
 	}
 
 	/**
-	 * Updates this territory to the territory encoded as the XML-InputStream.
+	 * Updates this territory to the territory encoded as the XML-InputStream. <br>
+	 * It uses the StAX Cursor API, since it is more efficient by not creating any
+	 * new objects.
 	 * 
 	 * @param stream InputStream of the XML-encoded territory
 	 */
-	public void fromXML(InputStream stream) {
+	public boolean fromXML(InputStream stream) {
 		try {
 			Territory territory = new Territory();
 			int robbiX = 0;
@@ -562,11 +572,10 @@ public class Territory extends Observable implements Serializable {
 				}
 				parser.next();
 			}
-			// TODO: check if the new territory is valid
 			update(territory, robbiItem, robbiX, robbiY, robbiDirection);
+			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("Failed to load territory from XML-file");
+			return false;
 		} finally {
 			try {
 				stream.close();

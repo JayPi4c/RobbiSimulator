@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility-class for Properties.
@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
  *
  */
 public class PropertiesLoader {
-	private static final Logger logger = LogManager.getLogger(PropertiesLoader.class);
+	private static final Logger logger = LoggerFactory.getLogger(PropertiesLoader.class);
 	private static Properties properties;
 
 	private static final String DIR = System.getProperty("user.dir");
@@ -33,6 +33,9 @@ public class PropertiesLoader {
 	/**
 	 * Loads the properties and stores them in an Object.
 	 * 
+	 * If the simulator.properties file can't be found, default values will be
+	 * loaded.
+	 * 
 	 * @return true if the initialization was successful, false otherwise
 	 */
 	public static boolean initialize() {
@@ -41,6 +44,7 @@ public class PropertiesLoader {
 			properties.load(in);
 			return true;
 		} catch (IOException e) {
+			loadDefaultProperties();
 			return false;
 		}
 	}
@@ -51,16 +55,46 @@ public class PropertiesLoader {
 	 * @return true if the role is set to tutor, false otherwise
 	 */
 	public static boolean isTutor() {
-		return properties.getProperty("role").equalsIgnoreCase("Tutor");
+		try {
+			return properties.getProperty("role").equalsIgnoreCase("tutor");
+		} catch (NullPointerException e) {
+			properties.put("role", "student");
+			return false;
+		}
+	}
+
+	/**
+	 * Getter for the sounds property.
+	 * 
+	 * @return true if the sounds property is set to true
+	 */
+	public static boolean getSounds() {
+		return Boolean.parseBoolean(properties.getProperty("sounds"));
+	}
+
+	/**
+	 * Getter for the sounds property.
+	 * 
+	 * @return true if the sounds property is set to true
+	 */
+	public static boolean getDarkmode() {
+		return Boolean.parseBoolean(properties.getProperty("darkmode"));
 	}
 
 	/**
 	 * Getter for the tutorhost.
 	 * 
-	 * @return the tutorhost stored in the properties file
+	 * @return the tutorhost stored in the properties file, localhost if no
+	 *         propterty is found
 	 */
 	public static String getTutorhost() {
-		return properties.getProperty("tutorhost");
+		String key = "tutorhost";
+		String host = properties.getProperty(key);
+		if (host == null) {
+			host = "localhost";
+			properties.put(key, host);
+		}
+		return host;
 	}
 
 	/**
@@ -71,8 +105,9 @@ public class PropertiesLoader {
 	public static int getTutorport() {
 		try {
 			return Integer.parseInt(properties.getProperty("tutorport"));
-		} catch (NumberFormatException e) {
-			return -1;
+		} catch (NumberFormatException | NullPointerException e) {
+			properties.put("tutorport", "3579");
+			return 3579;
 		}
 	}
 
@@ -82,11 +117,12 @@ public class PropertiesLoader {
 	 * @return the locale stored in the properties file
 	 */
 	public static Locale getLocale() {
-		String[] parts = properties.getProperty("lang").split("_");
 		try {
+			String[] parts = properties.getProperty("lang").split("_");
 			return new Locale(parts[0], parts[1]);
-		} catch (IndexOutOfBoundsException e) {
+		} catch (IndexOutOfBoundsException | NullPointerException e) {
 			logger.debug("Failed to load locale from properties");
+			properties.put("lang", Locale.GERMANY.toString());
 			return Locale.GERMANY;
 		}
 	}
@@ -97,13 +133,28 @@ public class PropertiesLoader {
 	 * @return true, if the saving was successful, false otherwise
 	 */
 	public static boolean finish() {
-		properties.put("lang", I18nUtils.getLocale().toString());
+		properties.put("lang", I18nUtils.getBundle().getLocale().toString());
+		properties.put("sounds", Boolean.toString(SoundManager.getSound()));
+		properties.put("darkmode", Boolean.toString(SceneManager.getDarkmode()));
 		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {
 			properties.store(fos, COMMENTS);
 			return true;
 		} catch (IOException e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Loads initial values in the properties object. This is needed if the
+	 * application failed to load properties from the file.
+	 */
+	private static void loadDefaultProperties() {
+		properties.put("lang", Locale.GERMANY.toString());
+		properties.put("role", "student");
+		properties.put("tutorport", "3579");
+		properties.put("tutorhost", "localhost");
+		properties.put("sounds", Boolean.toString(false));
+		properties.put("darkmode", Boolean.toString(false));
 	}
 
 }

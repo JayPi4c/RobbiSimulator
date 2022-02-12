@@ -1,14 +1,17 @@
 package com.JayPi4c.RobbiSimulator.controller.simulation;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-import com.JayPi4c.RobbiSimulator.model.Robbi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.JayPi4c.RobbiSimulator.model.RobbiException;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 import com.JayPi4c.RobbiSimulator.utils.Observer;
+import com.JayPi4c.RobbiSimulator.utils.SoundManager;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
@@ -23,7 +26,7 @@ import javafx.stage.Window;
  */
 public class Simulation extends Thread implements Observer {
 
-	private static final Logger logger = LogManager.getLogger(Simulation.class);
+	private static final Logger logger = LoggerFactory.getLogger(Simulation.class);
 
 	private Territory territory;
 	private SimulationController simController;
@@ -59,13 +62,19 @@ public class Simulation extends Thread implements Observer {
 		logger.info("Simulation started");
 		territory.addObserver(this);
 		try {
-			Robbi robbi = territory.getRobbi();
-			robbi.main();
-		} catch (StopException e) {
-			logger.debug("Simulation stopped");
-		} catch (RobbiException re) {
-			logger.debug("Simulation stopped with exception: {}", re.getMessage());
-			Platform.runLater(() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent));
+			Method main = territory.getRobbi().getClass().getDeclaredMethod("main");
+			main.setAccessible(true);
+			main.invoke(territory.getRobbi());
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			if (e.getCause() instanceof StopException) {
+				logger.debug("Simulation stopped");
+			} else if (e.getCause() instanceof RobbiException re) {
+				logger.debug("Simulation stopped with exception: {}", re.getMessage());
+				SoundManager.playWarnSound();
+				Platform.runLater(() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent));
+			} else
+				e.printStackTrace();
 		} finally {
 			stop = true;
 			territory.removeObserver(this);

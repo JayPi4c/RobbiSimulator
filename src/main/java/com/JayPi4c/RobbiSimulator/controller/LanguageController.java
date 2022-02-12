@@ -1,6 +1,7 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
@@ -29,11 +30,11 @@ public class LanguageController {
 		this.stage = mainStage;
 
 		mainStage.getGermanLanguageMenuItem().setOnAction(e -> {
-			I18nUtils.setLocale(Locale.GERMANY);
+			I18nUtils.setBundle(getBundle(Locale.GERMANY));
 			updateTitle();
 		});
 		mainStage.getEnglishLanguageMenuItem().setOnAction(e -> {
-			I18nUtils.setLocale(Locale.UK);
+			I18nUtils.setBundle(getBundle(Locale.UK));
 			updateTitle();
 		});
 
@@ -101,6 +102,7 @@ public class LanguageController {
 		mainStage.getChangeCursorMenuItem().textProperty().bind(createBinding("Menu.window.changeCursor"));
 		mainStage.getWindowMenu().textProperty().bind(createBinding("Menu.window"));
 		mainStage.getDarkModeMenuItem().textProperty().bind(createBinding("Menu.window.darkmode"));
+		mainStage.getEnableSoundsMenuItem().textProperty().bind(createBinding("Menu.window.enableSounds"));
 		mainStage.getLibraryMenuItem().textProperty().bind(createBinding("Menu.window.libraries"));
 		mainStage.getInfoMenuItem().textProperty().bind(createBinding("Menu.window.info"));
 
@@ -155,7 +157,7 @@ public class LanguageController {
 	 * @return a binding for the provided key
 	 */
 	private StringBinding createBinding(String key) {
-		return Bindings.createStringBinding(() -> I18nUtils.i18n(key), I18nUtils.localeProperty());
+		return Bindings.createStringBinding(() -> I18nUtils.i18n(key), I18nUtils.bundleProperty());
 	}
 
 	/**
@@ -168,6 +170,10 @@ public class LanguageController {
 		Tooltip tt = new Tooltip();
 		tt.textProperty().bind(createBinding(key));
 		return tt;
+	}
+
+	private static ResourceBundle getBundle(Locale locale) {
+		return ResourceBundle.getBundle("lang.messages", locale);
 	}
 
 	/**

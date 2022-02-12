@@ -1,7 +1,9 @@
 package com.JayPi4c.RobbiSimulator;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.ResourceBundle;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
@@ -26,7 +28,7 @@ import javafx.stage.Stage;
  */
 public class App extends Application {
 
-	private static final Logger logger = LogManager.getLogger(App.class);
+	private static final Logger logger = LoggerFactory.getLogger(App.class);
 
 	/**
 	 * Application entry point
@@ -44,9 +46,10 @@ public class App extends Application {
 		logger.debug("Initializing properties...");
 		if (PropertiesLoader.initialize()) {
 			logger.debug("Loaded properties successfully");
-			I18nUtils.setLocale(PropertiesLoader.getLocale());
 		} else
 			logger.debug("Failed to load properties.");
+
+		I18nUtils.setBundle(ResourceBundle.getBundle("lang.messages", PropertiesLoader.getLocale()));
 
 		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {

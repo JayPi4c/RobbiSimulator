@@ -1,7 +1,7 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
  * @author Jonas Pohl
  */
 public class Robbi {
-	private static final Logger logger = LogManager.getLogger(Robbi.class);
+	private static final Logger logger = LoggerFactory.getLogger(Robbi.class);
 
 	/**
 	 * Attribute to store the territory in which robbi is living
@@ -46,7 +46,7 @@ public class Robbi {
 	 * The main-Method which will be overwritten by every custom Robbi
 	 * implementation. When starting a simulation, this method will be called.
 	 */
-	public void main() {
+	void main() {
 		// will be overritten
 		logger.error("Please overrite the main-method");
 	}

@@ -31,8 +31,8 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
@@ -65,11 +65,11 @@ import javafx.stage.Window;
  */
 public class ProgramController {
 
-	private static final Logger logger = LogManager.getLogger(ProgramController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProgramController.class);
 	/**
 	 * Constant String with the Path name for the programs directory.
 	 */
-	public static final String PATH_TO_PROGRAMS = "programs"; // TODO make path relative to jar directory
+	public static final String PATH_TO_PROGRAMS = "programs";
 	/**
 	 * Constant String for the Default Robbi File name.
 	 */
@@ -89,12 +89,12 @@ public class ProgramController {
 	 * and load into the simulator. This String will not be shown in the editor
 	 * content.
 	 */
-	public static final String PREFIX_TEMPLATE = "import com.JayPi4c.RobbiSimulator.utils.annotations.*;public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{public ";
+	public static final String PREFIX_TEMPLATE = "import com.JayPi4c.RobbiSimulator.utils.annotations.*;public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{";
 	/**
 	 * Constant String for the editor postfix, to close the class and make it
 	 * compilable. This postfix will not be shown in the editor content.
 	 */
-	public static final String POSTFIX_TEMPLATE = "}";
+	public static final String POSTFIX_TEMPLATE = System.lineSeparator() + "}";
 
 	private static HashMap<String, Stage> programs;
 
@@ -425,7 +425,6 @@ public class ProgramController {
 	 *                   relative to it
 	 */
 	public static void compile(Program program, boolean showAlerts, Window parent) {
-		// TODO compile program with independent method and attribute order
 		JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
 		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
