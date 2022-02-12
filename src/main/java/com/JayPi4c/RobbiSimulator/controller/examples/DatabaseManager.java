@@ -249,6 +249,8 @@ public class DatabaseManager {
 	 */
 	public static boolean initialize() {
 		logger.debug("initialize database");
+		// System.setProperty("derby.system.home", ".");
+		System.setProperty("derby.stream.error.file", "logs/derby.log"); // make sure logfile is in logs folder
 		try {
 			DriverManager.registerDriver(new EmbeddedDriver());
 		} catch (SQLException e) {
