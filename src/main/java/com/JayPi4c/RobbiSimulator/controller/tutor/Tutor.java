@@ -67,7 +67,7 @@ public class Tutor extends UnicastRemoteObject implements ITutor {
 	 * 
 	 * @return Optional of the oldest request or an empty Optional.
 	 */
-	public Optional<Request> getNewRequest() {
+	public synchronized Optional<Request> getNewRequest() {
 		if (requests.isEmpty())
 			return Optional.empty();
 		return Optional.ofNullable(requests.poll());
@@ -79,7 +79,7 @@ public class Tutor extends UnicastRemoteObject implements ITutor {
 	 * @param id     the id for the answer
 	 * @param answer the actual answer
 	 */
-	public void setAnswer(int id, Answer answer) {
+	public synchronized void setAnswer(int id, Answer answer) {
 		answers.put(id, answer);
 	}
 

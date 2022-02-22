@@ -173,8 +173,10 @@ public class SimulationController {
 	 * user.
 	 */
 	public void finish() {
-		disableButtonStates(false, true, true);
-		startToolbar.setSelected(false);
+		Platform.runLater(() -> {
+			disableButtonStates(false, true, true);
+			startToolbar.setSelected(false);
+		});
 	}
 
 	/**
