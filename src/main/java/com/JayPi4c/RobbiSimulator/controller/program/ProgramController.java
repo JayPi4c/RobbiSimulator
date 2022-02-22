@@ -653,6 +653,32 @@ public class ProgramController {
 	}
 
 	/**
+	 * Loads a new Robbi Instance from the classfile.
+	 * 
+	 * @param name the name of the Robbi-Class
+	 * @return An Optional with the Robbi instance or an empty optional if the
+	 *         loading failed.
+	 */
+	public static Optional<Robbi> getNewRobbi(String name) {
+		Optional<Robbi> robbi = loadNewRobbi(name);
+		if (robbi.isPresent()) {
+			Robbi r = robbi.get();
+			Diagnostics diag = new Diagnostics();
+			if (!hasValidAnnotations(r, diag)) {
+				logger.debug("{} has no valid annotations.", name);
+			} else {
+				if (overwritesMainMethod(r)) {
+					return Optional.of(r);
+				} else {
+					logger.error("The custom Robbi class does not overwrite the main-Method");
+				}
+			}
+		} else
+			logger.error("Failed to load new Robbi instance...");
+		return Optional.empty();
+	}
+
+	/**
 	 * Removes the program from the programsList in order to make sure it can be
 	 * reopened later
 	 * 

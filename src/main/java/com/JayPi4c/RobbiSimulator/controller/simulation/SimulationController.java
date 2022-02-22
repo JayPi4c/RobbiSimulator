@@ -1,8 +1,12 @@
 package com.JayPi4c.RobbiSimulator.controller.simulation;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
+import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.model.TerritoryState;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
@@ -96,6 +100,11 @@ public class SimulationController {
 	 */
 	private void start() {
 		logger.debug("Starting new simulation");
+		Optional<Robbi> r = ProgramController.getNewRobbi(stage.getProgram().getName());
+		if (r.isPresent())
+			territory.setRobbi(r.get());
+		else
+			logger.debug("Could not initialize Robbi");
 		territoryState = territory.save();
 		simulation = new Simulation(territory, this, stage);
 		simulation.setDaemon(true); // program should exit even if simulation is running
