@@ -9,6 +9,8 @@ import java.io.IOException;
 
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 
+import lombok.Getter;
+
 /**
  * This class contains the contents, the name of program and whether it is
  * edited or not
@@ -16,6 +18,7 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * @author Jonas Pohl
  *
  */
+@Getter
 public class Program extends Observable {
 	private String name;
 
@@ -50,30 +53,6 @@ public class Program extends Observable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * 
-	 * @return the file corresponding to this program
-	 */
-	public File getFile() {
-		return file;
-	}
-
-	/**
-	 * 
-	 * @return the name of the program
-	 */
-	public String getName() {
-		return this.name;
-	}
-
-	/**
-	 * 
-	 * @return the real content of the editor
-	 */
-	public String getEditorContent() {
-		return this.editorContent;
 	}
 
 	/**
@@ -123,15 +102,6 @@ public class Program extends Observable {
 	 */
 	public void setEdited(boolean flag) {
 		edited = flag;
-	}
-
-	/**
-	 * returns whether the editor-content has changed
-	 * 
-	 * @return true if content is edited, false otherwise
-	 */
-	public boolean isEdited() {
-		return edited;
 	}
 
 	/**

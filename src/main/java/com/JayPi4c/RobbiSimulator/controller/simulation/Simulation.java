@@ -16,6 +16,8 @@ import com.JayPi4c.RobbiSimulator.utils.SoundManager;
 import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Window;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This Simulation class is a separate thread that runs the code of robbis
@@ -32,9 +34,13 @@ public class Simulation extends Thread implements Observer {
 	private SimulationController simController;
 	private Window parent;
 
-	private volatile boolean stop;
-	private volatile boolean pause;
-
+	@Getter
+	@Setter
+	private volatile boolean stopped;
+	@Getter
+	@Setter
+	private volatile boolean paused;
+	@Getter
 	private final Object lock = new Object();
 
 	/**
@@ -48,8 +54,8 @@ public class Simulation extends Thread implements Observer {
 		this.territory = territory;
 		this.simController = simController;
 		this.parent = parent;
-		stop = false;
-		pause = false;
+		stopped = false;
+		paused = false;
 	}
 
 	/**
@@ -76,7 +82,7 @@ public class Simulation extends Thread implements Observer {
 			} else
 				e.printStackTrace();
 		} finally {
-			stop = true;
+			stopped = true;
 			territory.removeObserver(this);
 			simController.finish();
 			logger.info("Simulation done.");
@@ -102,9 +108,9 @@ public class Simulation extends Thread implements Observer {
 			logger.debug("Stopping simulation during sleep");
 			Thread.currentThread().interrupt();
 		}
-		if (this.stop)
+		if (this.stopped)
 			throw new StopException();
-		while (this.pause)
+		while (this.paused)
 			synchronized (lock) {
 				try {
 					lock.wait();
@@ -112,54 +118,9 @@ public class Simulation extends Thread implements Observer {
 					Thread.currentThread().interrupt();
 				}
 			}
-		if (stop)
+		if (stopped)
 			throw new StopException();
 
-	}
-
-	/**
-	 * Sets the simulations stop flag
-	 * 
-	 * @param flag the new value for the stop attribute
-	 */
-	public void setStop(boolean flag) {
-		stop = flag;
-	}
-
-	/**
-	 * Returns the current value of the stop attribute
-	 * 
-	 * @return the current stop attribute
-	 */
-	public boolean getStop() {
-		return stop;
-	}
-
-	/**
-	 * Sets the simulations pause flag
-	 * 
-	 * @param flag the new value for the pause attribute
-	 */
-	public void setPause(boolean flag) {
-		this.pause = flag;
-	}
-
-	/**
-	 * Returns the current value of the pause attribute
-	 * 
-	 * @return the current pazse attribute
-	 */
-	public boolean getPause() {
-		return this.pause;
-	}
-
-	/**
-	 * Gets the lock instance for the simulation to synchronize on.
-	 * 
-	 * @return the simulations lock object
-	 */
-	public Object getLock() {
-		return lock;
 	}
 
 }

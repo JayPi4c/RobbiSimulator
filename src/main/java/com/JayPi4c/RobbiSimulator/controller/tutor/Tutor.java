@@ -5,12 +5,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lombok.EqualsAndHashCode;
 
 /**
  * ITutor implementation to handle the RMI invocations.
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
  * @author Jonas Pohl
  *
  */
+@EqualsAndHashCode(callSuper = true)
 public class Tutor extends UnicastRemoteObject implements ITutor {
 
 	private static final long serialVersionUID = 4722167139215525516L;
@@ -81,27 +83,6 @@ public class Tutor extends UnicastRemoteObject implements ITutor {
 	 */
 	public synchronized void setAnswer(int id, Answer answer) {
 		answers.put(id, answer);
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Objects.hash(answers, currentID, requests);
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Tutor other = (Tutor) obj;
-		return Objects.equals(answers, other.answers) && currentID == other.currentID
-				&& Objects.equals(requests, other.requests);
 	}
 
 }

@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.util.Pair;
+import lombok.Getter;
 
 /**
  * DatabaseManager to manage all database related tasks.
@@ -26,6 +27,7 @@ import javafx.util.Pair;
 public class DatabaseManager {
 	private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
 	private static DatabaseManager dbManager;
+	@Getter
 	private static boolean initialized = false;
 
 	private static final String DB_NAME = "robbiDB";
@@ -347,15 +349,6 @@ public class DatabaseManager {
 				}
 			}
 		});
-	}
-
-	/**
-	 * Getter to check if the initialization finished successfully.
-	 * 
-	 * @return true if the manager is initialized, false otherwise
-	 */
-	public static boolean isInitialized() {
-		return initialized;
 	}
 
 	/**

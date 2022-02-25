@@ -15,6 +15,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
+import lombok.Getter;
 
 /**
  * Controller to handle all actions belonging to the simulation.
@@ -33,7 +34,7 @@ public class SimulationController {
 
 	private MainStage stage;
 	private Territory territory;
-
+	@Getter
 	private volatile int speed;
 
 	private MenuItem resetMenuItem;
@@ -117,7 +118,7 @@ public class SimulationController {
 	 */
 	private void pause() {
 		logger.debug("Pausing simulation");
-		simulation.setPause(true);
+		simulation.setPaused(true);
 		disableButtonStates(false, true, false);
 	}
 
@@ -126,7 +127,7 @@ public class SimulationController {
 	 */
 	private void resume() {
 		logger.debug("Resuming simulation");
-		simulation.setPause(false);
+		simulation.setPaused(false);
 		synchronized (simulation.getLock()) {
 			simulation.getLock().notifyAll();
 		}
@@ -138,8 +139,8 @@ public class SimulationController {
 	 */
 	private void stop() {
 		logger.debug("Stopping simulation");
-		simulation.setStop(true);
-		simulation.setPause(false);
+		simulation.setStopped(true);
+		simulation.setPaused(false);
 		simulation.interrupt();
 		synchronized (simulation.getLock()) {
 			simulation.getLock().notifyAll();
@@ -165,7 +166,7 @@ public class SimulationController {
 	 * @return true if the simulation is not null or not stopped
 	 */
 	private boolean isSimulationRunning() {
-		return !(simulation == null || simulation.getStop());
+		return !(simulation == null || simulation.isStopped());
 	}
 
 	/**
@@ -216,15 +217,6 @@ public class SimulationController {
 	 */
 	public void setSpeed(double speed) {
 		this.speed = (int) map(speed, MainStage.MIN_SPEED_VALUE, MainStage.MAX_SPEED_VALUE, MAX_SPEED, MIN_SPEED);
-	}
-
-	/**
-	 * Getter for the speed attribute.
-	 * 
-	 * @return the speed attribute
-	 */
-	public int getSpeed() {
-		return speed;
 	}
 
 	/**

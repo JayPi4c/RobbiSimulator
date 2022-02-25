@@ -45,6 +45,8 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This controller contains all the settings for the mainStage
@@ -60,7 +62,9 @@ public class MainStageController implements Observer {
 
 	private MainStage mainStage;
 
+	@Setter
 	private boolean changeCursor = false;
+	@Getter
 	private boolean soundsEnabled = false;
 
 	private RadioMenuItem selectedRadioMenuItem = null;
@@ -388,25 +392,6 @@ public class MainStageController implements Observer {
 			logger.info("Failed to create printerJob");
 			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.print.error"), mainStage);
 		}
-	}
-
-	/**
-	 * updates the changeCursor variable to set if the cursor should change to the
-	 * selected state
-	 * 
-	 * @param flag true if the cursor should change, false otherwise
-	 */
-	public void setChangeCursor(boolean flag) {
-		this.changeCursor = flag;
-	}
-
-	/**
-	 * Getter for the soundsEnabled attribute
-	 * 
-	 * @return true if the sounds are enabled, false otherwise
-	 */
-	public boolean isSoundsEnabled() {
-		return soundsEnabled;
 	}
 
 	/**

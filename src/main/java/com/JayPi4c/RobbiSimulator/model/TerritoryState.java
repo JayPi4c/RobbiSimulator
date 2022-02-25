@@ -2,6 +2,7 @@ package com.JayPi4c.RobbiSimulator.model;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import lombok.Getter;
 
 /**
  * Territory State to store all state relevant attributes in order to apply the
@@ -11,6 +12,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlRootElement
+@Getter
 public class TerritoryState {
 	@XmlElement
 	private int numberOfColumns;
@@ -20,7 +22,7 @@ public class TerritoryState {
 	@XmlElement
 	private Tile[][] tiles;
 	@XmlElement
-	private RobbiState robbi;
+	private RobbiState robbiState;
 
 	/**
 	 * Constructor to create a Territory state. Creates an independet copy of the
@@ -55,7 +57,7 @@ public class TerritoryState {
 
 			}
 		}
-		this.robbi = new RobbiState(robbi.getX(), robbi.getY(), robbi.getFacing(), robbi.getItem());
+		this.robbiState = new RobbiState(robbi.getX(), robbi.getY(), robbi.getFacing(), robbi.getItem());
 	}
 
 	/**
@@ -64,42 +66,6 @@ public class TerritoryState {
 	@SuppressWarnings("unused")
 	private TerritoryState() {
 		// needed for JAXB
-	}
-
-	/**
-	 * Getter for the number of columns.
-	 * 
-	 * @return number of columns
-	 */
-	public int getNumberOfColumns() {
-		return numberOfColumns;
-	}
-
-	/**
-	 * Getter for the number of rows.
-	 * 
-	 * @return number of rows
-	 */
-	public int getNumberOfRows() {
-		return numberOfRows;
-	}
-
-	/**
-	 * Getter for the independent tiles array, representing the territory.
-	 * 
-	 * @return the territory tiles array
-	 */
-	public Tile[][] getTiles() {
-		return tiles;
-	}
-
-	/**
-	 * Getter for the robbiState.
-	 * 
-	 * @return the robbiState
-	 */
-	public RobbiState getRobbiState() {
-		return robbi;
 	}
 
 }

@@ -3,6 +3,10 @@ package com.JayPi4c.RobbiSimulator.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Synchronized;
+
 /**
  * 
  * This is the actor class of the simulator. All public functions in this class
@@ -16,24 +20,30 @@ public class Robbi {
 	/**
 	 * Attribute to store the territory in which robbi is living
 	 */
+	@Setter
 	private Territory territory;
 	/**
 	 * Attribute to store robbis x position in the territory
 	 */
+	@Getter
 	private volatile int x;
 	/**
 	 * Attribute to store robbis y position in the territory
 	 */
+	@Getter
 	private volatile int y;
 	/**
 	 * Attribute to store robbis item
 	 */
-	private Item inBag = null;
+	@Getter(onMethod_ = { @Synchronized("territory") })
+	@Setter(onMethod_ = { @Synchronized("territory") })
+	private Item item = null;
 
 	/**
 	 * Attribute to store robbis facing
 	 */
-	private volatile DIRECTION direction;
+	@Getter
+	private volatile DIRECTION facing;
 
 	/**
 	 * Constructor to create a custom robbi via class-loader
@@ -60,7 +70,7 @@ public class Robbi {
 		this.territory = t;
 		this.x = 0;
 		this.y = 0;
-		this.direction = DIRECTION.EAST;
+		this.facing = DIRECTION.EAST;
 	}
 
 	// ============= HELPER ================
@@ -83,71 +93,13 @@ public class Robbi {
 	}
 
 	/**
-	 * Get Robbis X Position
-	 * 
-	 * @return robbis x postion
-	 */
-	int getX() {
-		return x;
-	}
-
-	/**
-	 * Get Robbis Y Position
-	 * 
-	 * @return robbis y position
-	 */
-	int getY() {
-		return y;
-	}
-
-	/**
-	 * Getter for robbis facing.
-	 * 
-	 * @return robbis current facing
-	 */
-	DIRECTION getFacing() {
-		return this.direction;
-	}
-
-	/**
-	 * Getter for the item robbi is currently holding.
-	 * 
-	 * @return the item in robbis bag.
-	 */
-	Item getItem() {
-		synchronized (territory) {
-			return inBag;
-		}
-	}
-
-	/**
-	 * Puts the given Item in Robbis bag.
-	 * 
-	 * @param item the item to put into robbis bag
-	 */
-	void setItem(Item item) {
-		synchronized (territory) {
-			this.inBag = item;
-		}
-	}
-
-	/**
-	 * Setter for the territory.
-	 * 
-	 * @param t the new territory
-	 */
-	void setTerritory(Territory t) {
-		this.territory = t;
-	}
-
-	/**
 	 * Updates the facing of robbi to the given facing.
 	 * 
 	 * @param facing robbis new facing
 	 */
 	void setFacing(DIRECTION facing) {
 		synchronized (territory) {
-			this.direction = facing;
+			this.facing = facing;
 		}
 	}
 
@@ -159,7 +111,7 @@ public class Robbi {
 	public final void vor() {
 		synchronized (territory) {
 			Tile t;
-			switch (direction) {
+			switch (facing) {
 			case NORTH:
 				t = territory.getTile(x, y - 1);
 				if (t instanceof Hollow)
@@ -213,7 +165,7 @@ public class Robbi {
 	 */
 	public final void linksUm() {
 		synchronized (territory) {
-			direction = direction.next();
+			facing = facing.next();
 		}
 		territory.setChanged();
 		territory.notifyAllObservers();
@@ -224,10 +176,10 @@ public class Robbi {
 	 */
 	public final void legeAb() {
 		synchronized (territory) {
-			if (inBag == null)
+			if (item == null)
 				throw new BagIsEmptyException();
-			if (territory.placeItem(inBag, x, y))
-				inBag = null;
+			if (territory.placeItem(item, x, y))
+				item = null;
 			else
 				throw new TileIsFullException();
 		}
@@ -243,10 +195,10 @@ public class Robbi {
 			Item item = territory.getItem(x, y);
 			if (item == null)
 				throw new NoItemException();
-			if (inBag != null) {
+			if (this.item != null) {
 				throw new BagIsFullException();
 			}
-			inBag = territory.removeItem(x, y);
+			this.item = territory.removeItem(x, y);
 		}
 		territory.setChanged();
 		territory.notifyAllObservers();
@@ -263,12 +215,12 @@ public class Robbi {
 				territory.activateNotification();
 				throw new NoPileOfScrapAheadException();
 			}
-			int dx = switch (direction) {
+			int dx = switch (facing) {
 			case EAST -> x + 2;
 			case WEST -> x - 2;
 			default -> x;
 			};
-			int dy = switch (direction) {
+			int dy = switch (facing) {
 			case NORTH -> y - 2;
 			case SOUTH -> y + 2;
 			default -> y;
@@ -283,12 +235,12 @@ public class Robbi {
 					territory.clearTile(dx, dy);
 				else
 					territory.placePileOfScrap(dx, dy);
-				int px = switch (direction) {
+				int px = switch (facing) {
 				case EAST -> x + 1;
 				case WEST -> x - 1;
 				default -> x;
 				};
-				int py = switch (direction) {
+				int py = switch (facing) {
 				case NORTH -> y - 1;
 				case SOUTH -> y + 1;
 				default -> y;
@@ -329,12 +281,12 @@ public class Robbi {
 	 */
 	public final boolean vornKuhle() {
 		synchronized (territory) {
-			int dx = switch (direction) {
+			int dx = switch (facing) {
 			case EAST -> x + 1;
 			case WEST -> x - 1;
 			default -> x;
 			};
-			int dy = switch (direction) {
+			int dy = switch (facing) {
 			case NORTH -> y - 1;
 			case SOUTH -> y + 1;
 			default -> y;
@@ -350,12 +302,12 @@ public class Robbi {
 	 */
 	public final boolean vornSchrotthaufen() {
 		synchronized (territory) {
-			int dx = switch (direction) {
+			int dx = switch (facing) {
 			case EAST -> x + 1;
 			case WEST -> x - 1;
 			default -> x;
 			};
-			int dy = switch (direction) {
+			int dy = switch (facing) {
 			case NORTH -> y - 1;
 			case SOUTH -> y + 1;
 			default -> y;
@@ -371,7 +323,7 @@ public class Robbi {
 	 */
 	public final boolean istTascheVoll() {
 		synchronized (territory) {
-			return inBag != null;
+			return item != null;
 		}
 	}
 
@@ -381,7 +333,7 @@ public class Robbi {
 	 * Prints robbis current facing into the console.
 	 */
 	void print() {
-		switch (direction) {
+		switch (facing) {
 		case NORTH:
 			System.out.print("^");
 			break;
