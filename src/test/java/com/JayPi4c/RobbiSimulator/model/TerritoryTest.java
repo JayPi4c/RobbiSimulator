@@ -53,4 +53,68 @@ class TerritoryTest {
 		assertTrue(state.getTiles()[0][0].getItem() instanceof Accu);
 	}
 
+	@Test
+	void testChangeSize() {
+		Territory territory = new Territory();
+		territory.changeSize(4, 2);
+		assertEquals(4, territory.getNumCols());
+		assertEquals(2, territory.getNumRows());
+	}
+
+	@Test
+	void testPlaceAccu() {
+		Territory territory = new Territory();
+		territory.changeSize(4, 2);
+		territory.placeAccu(0, 1);
+		assertTrue(territory.getTile(0, 1).getItem() instanceof Accu);
+	}
+
+	@Test
+	void testPlaceNut() {
+		Territory territory = new Territory();
+		territory.changeSize(4, 2);
+		territory.placeNut(0, 1);
+		assertTrue(territory.getTile(0, 1).getItem() instanceof Nut);
+	}
+
+	@Test
+	void testPlaceScrew() {
+		Territory territory = new Territory();
+		territory.changeSize(4, 2);
+		territory.placeScrew(0, 1);
+		assertTrue(territory.getTile(0, 1).getItem() instanceof Screw);
+	}
+
+	@Test
+	void testPlaceRobbi() {
+		Territory territory = new Territory();
+		territory.changeSize(4, 2);
+		territory.placeRobbi(0, 1);
+		assertEquals(0, territory.getRobbiX());
+		assertEquals(1, territory.getRobbiY());
+	}
+
+	@Test
+	void testPlaceStockpile() {
+		Territory territory = new Territory();
+		territory.changeSize(4, 2);
+		territory.placeStockpile(0, 1);
+		assertTrue(territory.getTile(0, 1) instanceof Stockpile);
+	}
+
+	@Test
+	void testPlaceHollow() {
+		Territory territory = new Territory();
+		territory.changeSize(4, 2);
+		territory.placeHollow(0, 1);
+		assertTrue(territory.getTile(0, 1) instanceof Hollow);
+	}
+
+	@Test
+	void testPlacePileOfScrap() {
+		Territory territory = new Territory();
+		territory.changeSize(4, 2);
+		territory.placePileOfScrap(0, 1);
+		assertTrue(territory.getTile(0, 1) instanceof PileOfScrap);
+	}
 }

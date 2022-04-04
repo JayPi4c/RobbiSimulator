@@ -1,5 +1,6 @@
 package com.JayPi4c.RobbiSimulator.utils;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.ObjectProperty;
@@ -50,6 +51,7 @@ public class I18nUtils {
 	 * @param bundle the new bundle
 	 */
 	public static void setBundle(ResourceBundle bundle) {
+		Locale.setDefault(bundle.getLocale());
 		bundleProperty().set(bundle);
 	}
 
