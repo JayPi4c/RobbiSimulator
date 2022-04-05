@@ -7,8 +7,7 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utility-class for Properties.
@@ -16,8 +15,9 @@ import org.slf4j.LoggerFactory;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class PropertiesLoader {
-	private static final Logger logger = LoggerFactory.getLogger(PropertiesLoader.class);
+
 	private static Properties properties;
 
 	private static final String DIR = System.getProperty("user.dir");

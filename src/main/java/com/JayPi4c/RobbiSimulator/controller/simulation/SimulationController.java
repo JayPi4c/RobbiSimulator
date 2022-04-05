@@ -2,9 +2,6 @@ package com.JayPi4c.RobbiSimulator.controller.simulation;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.model.Territory;
@@ -16,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller to handle all actions belonging to the simulation.
@@ -23,9 +21,8 @@ import lombok.Getter;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class SimulationController {
-
-	private static final Logger logger = LoggerFactory.getLogger(SimulationController.class);
 
 	private static final int MIN_SPEED = 100;
 	private static final int MAX_SPEED = 2500;

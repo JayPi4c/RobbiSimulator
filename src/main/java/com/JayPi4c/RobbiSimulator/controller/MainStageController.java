@@ -6,10 +6,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.apache.derby.tools.sysinfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.model.BagIsEmptyException;
@@ -27,6 +23,8 @@ import com.JayPi4c.RobbiSimulator.utils.SceneManager;
 import com.JayPi4c.RobbiSimulator.utils.SoundManager;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
+
+import org.apache.derby.tools.sysinfo;
 
 import jakarta.xml.bind.JAXBContext;
 import javafx.embed.swing.SwingFXUtils;
@@ -47,6 +45,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This controller contains all the settings for the mainStage
@@ -54,9 +53,8 @@ import lombok.Setter;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class MainStageController implements Observer {
-
-	private static final Logger logger = LoggerFactory.getLogger(MainStageController.class);
 
 	private ButtonState buttonState;
 

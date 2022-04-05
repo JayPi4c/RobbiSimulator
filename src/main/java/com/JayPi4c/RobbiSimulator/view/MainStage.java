@@ -1,8 +1,5 @@
 package com.JayPi4c.RobbiSimulator.view;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.LanguageController;
 import com.JayPi4c.RobbiSimulator.controller.MainStageController;
@@ -43,6 +40,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is the mainStage of the application and holds all GUI elements
@@ -51,9 +49,9 @@ import lombok.Getter;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 @Getter
 public class MainStage extends Stage {
-	private static final Logger logger = LoggerFactory.getLogger(MainStage.class);
 
 	private Territory territory;
 

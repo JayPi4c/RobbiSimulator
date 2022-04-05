@@ -3,9 +3,6 @@ package com.JayPi4c.RobbiSimulator.controller.simulation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.model.RobbiException;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
@@ -18,6 +15,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Window;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This Simulation class is a separate thread that runs the code of robbis
@@ -26,9 +24,8 @@ import lombok.Setter;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class Simulation extends Thread implements Observer {
-
-	private static final Logger logger = LoggerFactory.getLogger(Simulation.class);
 
 	private Territory territory;
 	private SimulationController simController;

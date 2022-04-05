@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
@@ -34,6 +31,7 @@ import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This controller contains all settings for the examples menus.
@@ -41,8 +39,8 @@ import javafx.util.Pair;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class ExamplesController {
-	private static final Logger logger = LoggerFactory.getLogger(ExamplesController.class);
 
 	private MainStage stage;
 

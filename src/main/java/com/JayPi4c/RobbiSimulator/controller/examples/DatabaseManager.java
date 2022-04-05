@@ -12,11 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javafx.util.Pair;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * DatabaseManager to manage all database related tasks.
@@ -24,8 +23,8 @@ import lombok.Getter;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class DatabaseManager {
-	private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
 	private static DatabaseManager dbManager;
 	@Getter
 	private static boolean initialized = false;

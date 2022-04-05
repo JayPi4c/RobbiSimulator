@@ -8,9 +8,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
@@ -18,6 +15,7 @@ import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.scene.control.Alert.AlertType;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller to handle actions of a tutor.
@@ -25,8 +23,8 @@ import javafx.scene.control.Alert.AlertType;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class TutorController {
-	private static final Logger logger = LoggerFactory.getLogger(TutorController.class);
 
 	private static Tutor tutor;
 	private static Registry registry;

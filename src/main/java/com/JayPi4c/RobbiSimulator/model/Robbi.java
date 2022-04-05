@@ -1,11 +1,9 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -14,8 +12,8 @@ import lombok.Synchronized;
  * 
  * @author Jonas Pohl
  */
+@Slf4j
 public class Robbi {
-	private static final Logger logger = LoggerFactory.getLogger(Robbi.class);
 
 	/**
 	 * Attribute to store the territory in which robbi is living

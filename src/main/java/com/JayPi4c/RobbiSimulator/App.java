@@ -2,9 +2,6 @@ package com.JayPi4c.RobbiSimulator;
 
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
@@ -16,6 +13,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -26,9 +24,8 @@ import javafx.stage.Stage;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class App extends Application {
-
-	private static final Logger logger = LoggerFactory.getLogger(App.class);
 
 	/**
 	 * Application entry point

@@ -14,9 +14,6 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.model.Accu;
 import com.JayPi4c.RobbiSimulator.model.DIRECTION;
@@ -39,6 +36,7 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller to handle all territory save action. It handles load and save
@@ -47,9 +45,8 @@ import javafx.stage.FileChooser;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class TerritorySaveController {
-
-	private static final Logger logger = LoggerFactory.getLogger(TerritorySaveController.class);
 
 	private static final String DEFAULT_SERIALISATION_FILE_EXTENSION = ".ter";
 	private static final String DEFAULT_XML_FILE_EXTENSION = ".rsxml";

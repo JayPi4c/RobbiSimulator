@@ -8,10 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ITutor implementation to handle the RMI invocations.
@@ -19,12 +17,11 @@ import lombok.EqualsAndHashCode;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 @EqualsAndHashCode(callSuper = true)
 public class Tutor extends UnicastRemoteObject implements ITutor {
 
 	private static final long serialVersionUID = 4722167139215525516L;
-
-	private static final Logger logger = LoggerFactory.getLogger(Tutor.class);
 
 	private transient Queue<Request> requests;
 	/**
