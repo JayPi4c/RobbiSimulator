@@ -14,12 +14,8 @@ import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXButton.ButtonType;
-import com.jfoenix.controls.JFXDrawer;
-import com.jfoenix.controls.JFXDrawersStack;
-import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleNode;
-import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -44,9 +40,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -188,16 +182,7 @@ public class MainStage extends Stage {
 
 	private MenuBar menubar;
 
-	// drawer
-	private JFXDrawer drawer;
-	private StackPane drawerPane;
-	private VBox drawerContent;
-	private Label drawerLabel;
-	private JFXDrawersStack drawersStack;
-
 	// Tool bar
-	private JFXHamburger hamburger;
-
 	private Button newButtonToolbar;
 	private Button loadButtonToolbar;
 
@@ -377,7 +362,6 @@ public class MainStage extends Stage {
 		buttonState = new ButtonState();
 
 		createMenuBar();
-		createDrawers();
 		createToolbar();
 		createContentPane();
 		createMessageLabel();
@@ -385,10 +369,7 @@ public class MainStage extends Stage {
 		VBox.setVgrow(splitPane, Priority.ALWAYS);
 		var vBox = new VBox(menubar, toolbar, splitPane, messageLabel);
 
-		drawersStack = new JFXDrawersStack();
-		drawersStack.setContent(vBox);
-
-		mainStageScene = new Scene(drawersStack);
+		mainStageScene = new Scene(vBox);
 		setScene(mainStageScene);
 
 		setMinWidth(MIN_WIDTH);
@@ -616,29 +597,6 @@ public class MainStage extends Stage {
 		menubar = new MenuBar(editorMenu, territoryMenu, robbiMenu, simulationMenu, examplesMenu, tutorMenu,
 				windowMenu);
 	}
-	
-	private JFXDrawersStack subDrawersStack;
-	private JFXButton drawerButton;
-	private void createDrawers(){
-		logger.debug("Create drawers");
-
-		drawer = new JFXDrawer();
-		drawerPane = new StackPane();
-		drawerContent = new VBox(drawerButton = new JFXButton("Hello World"));
-		drawerPane.getChildren().addAll(drawerContent);
-		drawer.setSidePane(drawerPane);
-		drawer.setDefaultDrawerSize(150);
-        drawer.setResizeContent(true);
-        drawer.setOverLayVisible(false);
-        drawer.setResizableOnDrag(true);
-		
-		subDrawersStack = new JFXDrawersStack();
-		// subDrawersStack.setContent(drawerContent);
-		drawerButton.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-			logger.debug("Drawer button pressed");
-		});
-	}
-
 
 	/**
 	 * Creates a toolbar for direct-access to the most important features.
@@ -646,19 +604,8 @@ public class MainStage extends Stage {
 	private void createToolbar() {
 		logger.debug("Create toolbar");
 
-		hamburger = new JFXHamburger();
-		HamburgerBackArrowBasicTransition burgerTask = new HamburgerBackArrowBasicTransition(hamburger);
-		burgerTask.setRate(-1);
-		hamburger.addEventHandler(MouseEvent.MOUSE_PRESSED, (e) -> {
-			burgerTask.setRate(burgerTask.getRate() * -1);
-			burgerTask.play();
-			logger.debug("Toggle menu");
-			drawersStack.toggle(drawer);
-		});
-
-
 		newButtonToolbar = new JFXButton(null, new ImageView(newImage));
-		((JFXButton)newButtonToolbar).setButtonType(ButtonType.RAISED);
+		((JFXButton) newButtonToolbar).setButtonType(ButtonType.RAISED);
 
 		loadButtonToolbar = new JFXButton(null, new ImageView(openImage));
 
@@ -671,7 +618,7 @@ public class MainStage extends Stage {
 		var placeGroupToolbar = new ToggleGroup();
 
 		placeRobbiToggleButtonToolbar = new JFXToggleNode();
-		placeRobbiToggleButtonToolbar.setGraphic(new ImageView(menuRobbiImage));	
+		placeRobbiToggleButtonToolbar.setGraphic(new ImageView(menuRobbiImage));
 		placeRobbiToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		placeRobbiToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeRobbiTerritoryRadioMenuItem.selectedProperty());
@@ -743,7 +690,7 @@ public class MainStage extends Stage {
 
 		speedSliderToolbar = new JFXSlider(MIN_SPEED_VALUE, MAX_SPEED_VALUE, (MIN_SPEED_VALUE + MAX_SPEED_VALUE) / 2d);
 
-		toolbar = new ToolBar(hamburger, newButtonToolbar, loadButtonToolbar, new Separator(), saveButtonToolbar,
+		toolbar = new ToolBar(newButtonToolbar, loadButtonToolbar, new Separator(), saveButtonToolbar,
 				compileButtonToolbar, new Separator(), changeSizeButtonToolbar, placeRobbiToggleButtonToolbar,
 				placeHollowToggleButtonToolbar, placePileOfScrapToggleButtonToolbar, placeStockpileToggleButtonToolbar,
 				placeAccuToggleButtonToolbar, placeScrewToggleButtonToolbar, placeNutToggleButtonToolbar,

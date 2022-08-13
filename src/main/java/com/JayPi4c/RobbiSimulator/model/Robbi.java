@@ -1,6 +1,8 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -13,42 +15,36 @@ import lombok.extern.slf4j.Slf4j;
  * @author Jonas Pohl
  */
 @Slf4j
+@NoArgsConstructor
 public class Robbi {
 
 	/**
 	 * Attribute to store the territory in which robbi is living
 	 */
-	@Setter
+	@Setter(value = AccessLevel.PACKAGE)
 	private Territory territory;
 	/**
 	 * Attribute to store robbis x position in the territory
 	 */
-	@Getter
+	@Getter(value = AccessLevel.PACKAGE)
 	private volatile int x;
 	/**
 	 * Attribute to store robbis y position in the territory
 	 */
-	@Getter
+	@Getter(value = AccessLevel.PACKAGE)
 	private volatile int y;
 	/**
 	 * Attribute to store robbis item
 	 */
-	@Getter(onMethod_ = { @Synchronized("territory") })
-	@Setter(onMethod_ = { @Synchronized("territory") })
+	@Getter(value = AccessLevel.PACKAGE, onMethod_ = { @Synchronized("territory") })
+	@Setter(value = AccessLevel.PACKAGE, onMethod_ = { @Synchronized("territory") })
 	private Item item = null;
 
 	/**
 	 * Attribute to store robbis facing
 	 */
-	@Getter
+	@Getter(value = AccessLevel.PACKAGE)
 	private volatile DIRECTION facing;
-
-	/**
-	 * Constructor to create a custom robbi via class-loader
-	 */
-	public Robbi() {
-		// needed for class-loader
-	}
 
 	/**
 	 * The main-Method which will be overwritten by every custom Robbi
