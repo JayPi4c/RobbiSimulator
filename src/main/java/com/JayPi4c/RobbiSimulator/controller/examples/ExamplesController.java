@@ -56,23 +56,23 @@ public class ExamplesController {
 			Optional<List<String>> tags = enterTags();
 			tags.ifPresentOrElse(ts -> {
 				String territoryXML = stage.getTerritory().toXML().toString();
-				if (!DatabaseManager.getDatabaseManager().store(stage.getProgram().getName(),
+				if (!ExampleService.store(stage.getProgram().getName(),
 						stage.getProgram().getEditorContent(), territoryXML, ts))
 					logger.debug("Could not save example in database");
 			}, () -> logger.debug("No tags were entered"));
 		});
 
 		stage.getLoadExampleMenuItem().setOnAction(e -> {
-			Optional<List<String>> tagsOpt = DatabaseManager.getDatabaseManager().getAllTags();
+			Optional<List<String>> tagsOpt = ExampleService.getAllTags();
 			tagsOpt.ifPresentOrElse(tags -> {
 				Optional<String> s = showTagSelection(tags);
 				s.ifPresentOrElse(selectedTag -> {
-					Optional<List<Pair<Integer, String>>> programsOpt = DatabaseManager.getDatabaseManager()
+					Optional<List<Pair<Integer, String>>> programsOpt = ExampleService
 							.query(selectedTag);
 					if (programsOpt.isPresent()) {
 						Optional<Integer> idOpt = showProgramSelection(programsOpt.get());
 						idOpt.ifPresentOrElse(id -> {
-							Optional<Example> exOpt = DatabaseManager.getDatabaseManager().loadExample(id);
+							Optional<Example> exOpt = ExampleService.loadExample(id);
 							exOpt.ifPresentOrElse(Example::load,
 									() -> logger.debug("Could not load example from database"));
 						}, () -> logger.debug("No example selected"));

@@ -2,7 +2,6 @@ package com.JayPi4c.RobbiSimulator;
 
 import java.util.ResourceBundle;
 
-import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
@@ -57,12 +56,6 @@ public class App extends Application {
 		}
 		logger.debug("loading Program Controller successfully");
 
-		logger.debug("Connecting to Database");
-		if (DatabaseManager.initialize())
-			logger.debug("Connecting to Database successfully");
-		else
-			logger.debug("Connecting to Database failed");
-
 		if (PropertiesLoader.isTutor()) {
 			logger.debug("Starting Tutor RMI server");
 			if (TutorController.initialize())
@@ -82,9 +75,6 @@ public class App extends Application {
 
 	@Override
 	public void stop() {
-		logger.debug("Closing Database Connection");
-		DatabaseManager.getDatabaseManager().shutDown();
-		logger.debug("Closing Database Connection successfully");
 
 		if (PropertiesLoader.isTutor()) {
 			logger.debug("Stopping Tutor-Server.");
