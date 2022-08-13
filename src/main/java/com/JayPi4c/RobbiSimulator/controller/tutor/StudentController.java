@@ -6,9 +6,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
@@ -17,6 +14,7 @@ import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.scene.control.Alert.AlertType;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller to handle actions of a student.
@@ -24,8 +22,8 @@ import javafx.scene.control.Alert.AlertType;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class StudentController {
-	private static Logger logger = LoggerFactory.getLogger(StudentController.class);
 
 	private int requestID;
 

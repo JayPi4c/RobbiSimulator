@@ -2,13 +2,10 @@ package com.JayPi4c.RobbiSimulator;
 
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
+import com.JayPi4c.RobbiSimulator.utils.HibernateUtils;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 
@@ -16,6 +13,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -26,9 +24,8 @@ import javafx.stage.Stage;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class App extends Application {
-
-	private static final Logger logger = LoggerFactory.getLogger(App.class);
 
 	/**
 	 * Application entry point
@@ -60,12 +57,6 @@ public class App extends Application {
 		}
 		logger.debug("loading Program Controller successfully");
 
-		logger.debug("Connecting to Database");
-		if (DatabaseManager.initialize())
-			logger.debug("Connecting to Database successfully");
-		else
-			logger.debug("Connecting to Database failed");
-
 		if (PropertiesLoader.isTutor()) {
 			logger.debug("Starting Tutor RMI server");
 			if (TutorController.initialize())
@@ -85,9 +76,9 @@ public class App extends Application {
 
 	@Override
 	public void stop() {
-		logger.debug("Closing Database Connection");
-		DatabaseManager.getDatabaseManager().shutDown();
-		logger.debug("Closing Database Connection successfully");
+
+		logger.debug("Shutting down database connection");
+		HibernateUtils.shutdown();
 
 		if (PropertiesLoader.isTutor()) {
 			logger.debug("Stopping Tutor-Server.");

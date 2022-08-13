@@ -1,8 +1,5 @@
 package com.JayPi4c.RobbiSimulator.view;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.LanguageController;
 import com.JayPi4c.RobbiSimulator.controller.MainStageController;
@@ -15,6 +12,10 @@ import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXButton.ButtonType;
+import com.jfoenix.controls.JFXSlider;
+import com.jfoenix.controls.JFXToggleNode;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -43,6 +44,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is the mainStage of the application and holds all GUI elements
@@ -51,9 +53,9 @@ import lombok.Getter;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 @Getter
 public class MainStage extends Stage {
-	private static final Logger logger = LoggerFactory.getLogger(MainStage.class);
 
 	private Territory territory;
 
@@ -160,7 +162,7 @@ public class MainStage extends Stage {
 	private MenuItem saveExampleMenuItem;
 	private Menu examplesMenu;
 
-	// window Meun
+	// window Menu
 	private Menu languageMenu;
 	private MenuItem englishLanguageMenuItem;
 	private MenuItem germanLanguageMenuItem;
@@ -602,79 +604,91 @@ public class MainStage extends Stage {
 	private void createToolbar() {
 		logger.debug("Create toolbar");
 
-		newButtonToolbar = new Button(null, new ImageView(newImage));
+		newButtonToolbar = new JFXButton(null, new ImageView(newImage));
+		((JFXButton) newButtonToolbar).setButtonType(ButtonType.RAISED);
 
-		loadButtonToolbar = new Button(null, new ImageView(openImage));
+		loadButtonToolbar = new JFXButton(null, new ImageView(openImage));
 
-		saveButtonToolbar = new Button(null, new ImageView(saveImage));
+		saveButtonToolbar = new JFXButton(null, new ImageView(saveImage));
 
-		compileButtonToolbar = new Button(null, new ImageView(compileImage));
+		compileButtonToolbar = new JFXButton(null, new ImageView(compileImage));
 
-		changeSizeButtonToolbar = new Button(null, new ImageView(terrainImage));
+		changeSizeButtonToolbar = new JFXButton(null, new ImageView(terrainImage));
 
 		var placeGroupToolbar = new ToggleGroup();
 
-		placeRobbiToggleButtonToolbar = new ToggleButton(null, new ImageView(menuRobbiImage));
+		placeRobbiToggleButtonToolbar = new JFXToggleNode();
+		placeRobbiToggleButtonToolbar.setGraphic(new ImageView(menuRobbiImage));
 		placeRobbiToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		placeRobbiToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeRobbiTerritoryRadioMenuItem.selectedProperty());
 
-		placeHollowToggleButtonToolbar = new ToggleButton(null, new ImageView(menuHollowImage));
+		placeHollowToggleButtonToolbar = new JFXToggleNode();
+		placeHollowToggleButtonToolbar.setGraphic(new ImageView(menuHollowImage));
 		placeHollowToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		placeHollowToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeHollowTerritoryRadioMenuItem.selectedProperty());
 
-		placePileOfScrapToggleButtonToolbar = new ToggleButton(null, new ImageView(menuPileOfScrapImage));
+		placePileOfScrapToggleButtonToolbar = new JFXToggleNode();
+		placePileOfScrapToggleButtonToolbar.setGraphic(new ImageView(menuPileOfScrapImage));
 		placePileOfScrapToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		placePileOfScrapToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placePileOfScrapTerritoryRadioMenuItem.selectedProperty());
 
-		placeStockpileToggleButtonToolbar = new ToggleButton(null, new ImageView(menuStockpileImage));
+		placeStockpileToggleButtonToolbar = new JFXToggleNode();
+		placeStockpileToggleButtonToolbar.setGraphic(new ImageView(menuStockpileImage));
 		placeStockpileToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		placeStockpileToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeStockpileTerritoryRadioMenuItem.selectedProperty());
 
-		placeAccuToggleButtonToolbar = new ToggleButton(null, new ImageView(menuAccuImage));
+		placeAccuToggleButtonToolbar = new JFXToggleNode();
+		placeAccuToggleButtonToolbar.setGraphic(new ImageView(menuAccuImage));
 		placeAccuToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		placeAccuToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeAccuTerritoryRadioMenuItem.selectedProperty());
 
-		placeScrewToggleButtonToolbar = new ToggleButton(null, new ImageView(menuScrewImage));
+		placeScrewToggleButtonToolbar = new JFXToggleNode();
+		placeScrewToggleButtonToolbar.setGraphic(new ImageView(menuScrewImage));
 		placeScrewToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		placeScrewToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeScrewTerritoryRadioMenuItem.selectedProperty());
 
-		placeNutToggleButtonToolbar = new ToggleButton(null, new ImageView(menuNutImage));
+		placeNutToggleButtonToolbar = new JFXToggleNode();
+		placeNutToggleButtonToolbar.setGraphic(new ImageView(menuNutImage));
 		placeNutToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		placeNutToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(placeNutTerritoryRadioMenuItem.selectedProperty());
 
-		deleteFieldToggleButtonToolbar = new ToggleButton(null, new ImageView(menuDeleteImage));
+		deleteFieldToggleButtonToolbar = new JFXToggleNode();
+		deleteFieldToggleButtonToolbar.setGraphic(new ImageView(menuDeleteImage));
 		deleteFieldToggleButtonToolbar.setToggleGroup(placeGroupToolbar);
 		deleteFieldToggleButtonToolbar.selectedProperty()
 				.bindBidirectional(deleteFieldRadioMenuItem.selectedProperty());
 
-		robbiMoveButtonToolbar = new Button(null, new ImageView(robbiMove));
+		robbiMoveButtonToolbar = new JFXButton(null, new ImageView(robbiMove));
 
-		robbiTurnLeftButtonToolbar = new Button(null, new ImageView(robbiTurnLeft));
+		robbiTurnLeftButtonToolbar = new JFXButton(null, new ImageView(robbiTurnLeft));
 
-		robbiPutButtonToolbar = new Button(null, new ImageView(robbiPut));
+		robbiPutButtonToolbar = new JFXButton(null, new ImageView(robbiPut));
 
-		robbiTakeButtonToolbar = new Button(null, new ImageView(robbiTake));
+		robbiTakeButtonToolbar = new JFXButton(null, new ImageView(robbiTake));
 
-		resetButtonToolbar = new Button(null, new ImageView(resetImage));
+		resetButtonToolbar = new JFXButton(null, new ImageView(resetImage));
 
 		var simulationGroupToolbar = new ToggleGroup();
-		startToggleButtonToolbar = new ToggleButton(null, new ImageView(menuStartImage));
+		startToggleButtonToolbar = new JFXToggleNode();
+		startToggleButtonToolbar.setGraphic(new ImageView(menuStartImage));
 		startToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
 
-		pauseToggleButtonToolbar = new ToggleButton(null, new ImageView(menuPauseImage));
+		pauseToggleButtonToolbar = new JFXToggleNode();
+		pauseToggleButtonToolbar.setGraphic(new ImageView(menuPauseImage));
 		pauseToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
 
-		stopToggleButtonToolbar = new ToggleButton(null, new ImageView(menuStopImage));
+		stopToggleButtonToolbar = new JFXToggleNode();
+		stopToggleButtonToolbar.setGraphic(new ImageView(menuStopImage));
 		stopToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
 
-		speedSliderToolbar = new Slider(MIN_SPEED_VALUE, MAX_SPEED_VALUE, (MIN_SPEED_VALUE + MAX_SPEED_VALUE) / 2d);
+		speedSliderToolbar = new JFXSlider(MIN_SPEED_VALUE, MAX_SPEED_VALUE, (MIN_SPEED_VALUE + MAX_SPEED_VALUE) / 2d);
 
 		toolbar = new ToolBar(newButtonToolbar, loadButtonToolbar, new Separator(), saveButtonToolbar,
 				compileButtonToolbar, new Separator(), changeSizeButtonToolbar, placeRobbiToggleButtonToolbar,
