@@ -8,10 +8,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Utility class to manage the Hibernate SessionFactory.
+ * 
+ * @author Jonas Pohl
+ * @since 1.0.0
+ */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HibernateUtils {
-    
+
+    /**
+     * The session factory to interact with the database via hibernate.
+     */
     @Getter
     private static final SessionFactory sessionFactory;
 
@@ -25,6 +34,9 @@ public class HibernateUtils {
         }
     }
 
+    /**
+     * Utility function to shutdown the database connection.
+     */
     public static void shutdown() {
         getSessionFactory().close();
     }

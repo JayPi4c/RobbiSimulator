@@ -12,10 +12,26 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Service to easily access examples from the database using the HibernateUtils
+ * class.
+ * 
+ * @author Jonas Pohl
+ * @since 1.0.0
+ */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExampleService {
 
+	/**
+	 * Method to store an example with its tags in the database.
+	 * 
+	 * @param programName   the name of the program
+	 * @param editorContent the code in the editor
+	 * @param territoryXML  the territory encoded in XML
+	 * @param tags          the tags related to this example
+	 * @return true if the example was stored successfully, false otherwise
+	 */
 	public static boolean store(String programName, String editorContent, String territoryXML, List<String> tags) {
 		Example example = new Example();
 		example.setProgramName(programName);
@@ -34,6 +50,12 @@ public class ExampleService {
 		}
 	}
 
+	/**
+	 * Method to get all examples identified by id and programName by their tag.
+	 * 
+	 * @param tag the tag to search the examples for
+	 * @return List of examples as pairs of id and programName
+	 */
 	public static Optional<List<Pair<Integer, String>>> query(String tag) {
 		try (Session session = HibernateUtils.getSessionFactory().openSession()) {
 			List<Example> allExamples = session.createQuery("from Example", Example.class).list();
@@ -44,6 +66,13 @@ public class ExampleService {
 		}
 	}
 
+	/**
+	 * Loads an example from the database by the given id.
+	 * 
+	 * @param id the ID of the example to load
+	 * @return Optional containing the example or an empty Optional if no example
+	 *         could be found
+	 */
 	public static Optional<Example> loadExample(int id) {
 		Example example;
 		try (Session session = HibernateUtils.getSessionFactory().openSession()) {
@@ -54,6 +83,11 @@ public class ExampleService {
 		return Optional.ofNullable(example);
 	}
 
+	/**
+	 * Method to load all distinct tags from the database.
+	 * 
+	 * @return List of all distinct tags stored in the database
+	 */
 	public static Optional<List<String>> getAllTags() {
 		List<String> tags;
 		try (Session session = HibernateUtils.getSessionFactory().openSession()) {

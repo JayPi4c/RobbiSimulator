@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
+import com.JayPi4c.RobbiSimulator.utils.HibernateUtils;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 
@@ -75,6 +76,9 @@ public class App extends Application {
 
 	@Override
 	public void stop() {
+
+		logger.debug("Shutting down database connection");
+		HibernateUtils.shutdown();
 
 		if (PropertiesLoader.isTutor()) {
 			logger.debug("Stopping Tutor-Server.");
