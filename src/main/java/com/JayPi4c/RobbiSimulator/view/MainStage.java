@@ -3,6 +3,7 @@ package com.JayPi4c.RobbiSimulator.view;
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.LanguageController;
 import com.JayPi4c.RobbiSimulator.controller.MainStageController;
+import com.JayPi4c.RobbiSimulator.controller.SnackbarController;
 import com.JayPi4c.RobbiSimulator.controller.TerritorySaveController;
 import com.JayPi4c.RobbiSimulator.controller.examples.ExamplesController;
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
@@ -20,7 +21,6 @@ import com.jfoenix.controls.JFXToggleNode;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -69,6 +69,7 @@ public class MainStage extends Stage {
 	private StudentController studenController;
 	private TutorController tutorController;
 	private LanguageController languageController;
+	private SnackbarController snackbarController;
 
 	/**
 	 * Constant for the minimum value for the speed slider.
@@ -219,9 +220,6 @@ public class MainStage extends Stage {
 	private TerritoryPanel territoryPanel;
 	private SplitPane splitPane;
 
-	// Message Label
-	private Label messageLabel;
-
 	private Scene mainStageScene;
 
 	/**
@@ -364,10 +362,9 @@ public class MainStage extends Stage {
 		createMenuBar();
 		createToolbar();
 		createContentPane();
-		createMessageLabel();
 
 		VBox.setVgrow(splitPane, Priority.ALWAYS);
-		var vBox = new VBox(menubar, toolbar, splitPane, messageLabel);
+		var vBox = new VBox(menubar, toolbar, splitPane);
 
 		mainStageScene = new Scene(vBox);
 		setScene(mainStageScene);
@@ -377,6 +374,7 @@ public class MainStage extends Stage {
 		setHeight(HEIGHT);
 		getIcons().add(menuRobbiImage);
 
+		snackbarController = new SnackbarController(vBox);
 		mainStageController = new MainStageController(this, buttonState);
 		simulationController = new SimulationController(this, territory);
 		territorySaveController = new TerritorySaveController(this);
@@ -719,14 +717,6 @@ public class MainStage extends Stage {
 				.addListener((observable, oldValue, newValue) -> territoryPanel.center(newValue));// credits: Dibo
 
 		splitPane = new SplitPane(textArea, territoryScrollPane);
-	}
-
-	/**
-	 * Create a bottom label to give additional information.
-	 */
-	private void createMessageLabel() {
-		logger.debug("Create message label");
-		messageLabel = new Label(I18nUtils.i18n("Messages.label.greeting"));
 	}
 
 }

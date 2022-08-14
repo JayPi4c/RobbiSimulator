@@ -33,10 +33,12 @@ public class LanguageController {
 		mainStage.getGermanLanguageMenuItem().setOnAction(e -> {
 			I18nUtils.setBundle(getBundle(Locale.GERMANY));
 			updateTitle();
+			mainStage.getSnackbarController().showMessage("Sprache geändert");
 		});
 		mainStage.getEnglishLanguageMenuItem().setOnAction(e -> {
 			I18nUtils.setBundle(getBundle(Locale.UK));
 			updateTitle();
+			mainStage.getSnackbarController().showMessage("Language changed");
 		});
 
 		// text bindings
@@ -134,8 +136,6 @@ public class LanguageController {
 		mainStage.getPauseToggleButtonToolbar().setTooltip(createTooltip("Toolbar.action.pause"));
 		mainStage.getStopToggleButtonToolbar().setTooltip(createTooltip("Toolbar.action.stop"));
 		mainStage.getSpeedSliderToolbar().setTooltip(createTooltip("Toolbar.action.speed"));
-
-		mainStage.getMessageLabel().textProperty().bind(createBinding("Messages.label.greeting"));
 
 		mainStage.getExamplesMenu().textProperty().bind(createBinding("Menu.examples"));
 		mainStage.getLoadExampleMenuItem().textProperty().bind(createBinding("Menu.examples.load"));
