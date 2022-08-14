@@ -2,7 +2,9 @@ package com.JayPi4c.RobbiSimulator.model;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Territory State to store all state relevant attributes in order to apply the
@@ -13,7 +15,9 @@ import lombok.Getter;
  */
 @XmlRootElement
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TerritoryState {
+
 	@XmlElement
 	private int numberOfColumns;
 	@XmlElement
@@ -58,14 +62,6 @@ public class TerritoryState {
 			}
 		}
 		this.robbiState = new RobbiState(robbi.getX(), robbi.getY(), robbi.getFacing(), robbi.getItem());
-	}
-
-	/**
-	 * This constructor is needed for JAXB to work.
-	 */
-	@SuppressWarnings("unused")
-	private TerritoryState() {
-		// needed for JAXB
 	}
 
 }

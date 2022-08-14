@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PropertiesLoader {
 
 	private static Properties properties;
@@ -23,12 +26,6 @@ public class PropertiesLoader {
 	private static final String DIR = System.getProperty("user.dir");
 	private static final String FILE = "/simulator.properties";
 	private static final String COMMENTS = "role=student OR tutor";
-
-	/**
-	 * Private constructor to hide the implicit one.
-	 */
-	private PropertiesLoader() {
-	}
 
 	/**
 	 * Loads the properties and stores them in an Object.

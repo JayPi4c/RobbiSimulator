@@ -50,6 +50,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -59,9 +61,10 @@ import lombok.extern.slf4j.Slf4j;
  * Application start
  * 
  * @author Jonas Pohl
- *
+ * 
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProgramController {
 
 	/**
@@ -95,9 +98,6 @@ public class ProgramController {
 	public static final String POSTFIX_TEMPLATE = System.lineSeparator() + "}";
 
 	private static HashMap<String, Stage> programs;
-
-	private ProgramController() {
-	}
 
 	/**
 	 * Initializes the Application on startup and makes sure the programs folder and
@@ -626,7 +626,7 @@ public class ProgramController {
 		if (Robbi.class != robbi.getClass()) {
 			methods.addAll(Arrays.asList(robbi.getClass().getDeclaredMethods()));
 		}
-		return methods.toArray(new Method[0]);
+		return methods.toArray(Method[]::new);
 	}
 
 	/**

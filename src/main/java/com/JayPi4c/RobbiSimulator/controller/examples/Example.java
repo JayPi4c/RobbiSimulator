@@ -52,4 +52,5 @@ public class Example {
 	public void load() {
 		ProgramController.createAndShow(programName, code, territory);
 	}
+
 }

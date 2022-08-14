@@ -18,6 +18,7 @@ import javafx.scene.control.Tooltip;
  *
  */
 public class LanguageController {
+
 	private MainStage stage;
 
 	/**

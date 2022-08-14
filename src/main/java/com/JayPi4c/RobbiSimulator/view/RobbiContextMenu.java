@@ -147,7 +147,7 @@ public class RobbiContextMenu extends ContextMenu {
 			if (Modifier.isPublic(m.getModifiers()) && !isMainMethod(m))
 				methods.add(m);
 		}
-		return methods.toArray(new Method[0]);
+		return methods.toArray(Method[]::new);
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class RobbiContextMenu extends ContextMenu {
 			}
 		}
 
-		return methods.toArray(new Method[0]);
+		return methods.toArray(Method[]::new);
 	}
 
 	/**

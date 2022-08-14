@@ -31,6 +31,7 @@ public class SimulationController {
 
 	private MainStage stage;
 	private Territory territory;
+
 	@Getter
 	private volatile int speed;
 

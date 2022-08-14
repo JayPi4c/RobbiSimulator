@@ -61,7 +61,7 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 					}
 				}
 			}
-			Object[] arr = args.toArray(new Object[0]);
+			Object[] arr = args.toArray(Object[]::new);
 			Object result = this.method.invoke(this.territory.getRobbi(), arr);
 
 			if (result != null) {
@@ -94,27 +94,27 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 	private boolean addToList(List<Object> args, Parameter p, String val) {
 		try {
 			switch (p.getType().getName()) {
-			case "int":
-				args.add(Integer.parseInt(val));
-				break;
-			case "boolean":
-				args.add(Boolean.parseBoolean(val));
-				break;
-			case "char":
-				args.add(val.subSequence(0, 1));
-				break;
-			case "double":
-				args.add(Double.parseDouble(val));
-				break;
-			case "float":
-				args.add(Float.parseFloat(val));
-				break;
-			case "long":
-				args.add(Long.parseLong(val));
-				break;
-			case "String":
-			default:
-				args.add(val);
+				case "int":
+					args.add(Integer.parseInt(val));
+					break;
+				case "boolean":
+					args.add(Boolean.parseBoolean(val));
+					break;
+				case "char":
+					args.add(val.subSequence(0, 1));
+					break;
+				case "double":
+					args.add(Double.parseDouble(val));
+					break;
+				case "float":
+					args.add(Float.parseFloat(val));
+					break;
+				case "long":
+					args.add(Long.parseLong(val));
+					break;
+				case "String":
+				default:
+					args.add(val);
 			}
 		} catch (IllegalArgumentException e) {
 			AlertHelper.showAlertAndWait(AlertType.ERROR,

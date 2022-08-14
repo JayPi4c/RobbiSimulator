@@ -51,4 +51,5 @@ public class Diagnostics {
 	public record Diagnostic(String type, String value) {
 
 	}
+
 }

@@ -63,34 +63,34 @@ public class TerritoryEventHandler implements EventHandler<MouseEvent> {
 		} else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
 			if (!robbiDragged) {
 				switch (buttonState.getSelected()) {
-				case ButtonState.ROBBI:
-					territory.placeRobbi(col, row);
-					break;
-				case ButtonState.HOLLOW:
-					territory.placeHollow(col, row);
-					break;
-				case ButtonState.PILE_OF_SCRAP:
-					territory.placePileOfScrap(col, row);
-					break;
-				case ButtonState.STOCKPILE:
-					territory.placeStockpile(col, row);
-					break;
-				case ButtonState.ACCU:
-					territory.placeAccu(col, row);
-					break;
-				case ButtonState.SCREW:
-					territory.placeScrew(col, row);
-					break;
-				case ButtonState.NUT:
-					territory.placeNut(col, row);
-					break;
-				case ButtonState.CLEAR:
-					territory.clearTile(col, row);
-					break;
-				case ButtonState.NONE:
-					// fall through
-				default:
-					// Do nothing
+					case ButtonState.ROBBI:
+						territory.placeRobbi(col, row);
+						break;
+					case ButtonState.HOLLOW:
+						territory.placeHollow(col, row);
+						break;
+					case ButtonState.PILE_OF_SCRAP:
+						territory.placePileOfScrap(col, row);
+						break;
+					case ButtonState.STOCKPILE:
+						territory.placeStockpile(col, row);
+						break;
+					case ButtonState.ACCU:
+						territory.placeAccu(col, row);
+						break;
+					case ButtonState.SCREW:
+						territory.placeScrew(col, row);
+						break;
+					case ButtonState.NUT:
+						territory.placeNut(col, row);
+						break;
+					case ButtonState.CLEAR:
+						territory.clearTile(col, row);
+						break;
+					case ButtonState.NONE:
+						// fall through
+					default:
+						// Do nothing
 				}
 			}
 			robbiDragged = false;

@@ -5,6 +5,8 @@ import java.util.ResourceBundle;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Utility-Class to support internationalization.
@@ -12,6 +14,7 @@ import javafx.beans.property.SimpleObjectProperty;
  * @author Jonas Pohl
  *
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class I18nUtils {
 
 	/**
@@ -19,13 +22,6 @@ public class I18nUtils {
 	 * language change.
 	 */
 	private static final ObjectProperty<ResourceBundle> bundle = new SimpleObjectProperty<>();
-
-	/**
-	 * Private constructor to hide the implicit one.
-	 */
-	private I18nUtils() {
-
-	}
 
 	/**
 	 * ObjectProperty to allow bindings
@@ -64,4 +60,5 @@ public class I18nUtils {
 	public static String i18n(String key) {
 		return getBundle().getString(key);
 	}
+
 }

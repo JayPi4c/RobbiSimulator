@@ -56,8 +56,8 @@ public class ExamplesController {
 			Optional<List<String>> tags = enterTags();
 			tags.ifPresentOrElse(ts -> {
 				String territoryXML = stage.getTerritory().toXML().toString();
-				if (!ExampleService.store(stage.getProgram().getName(),
-						stage.getProgram().getEditorContent(), territoryXML, ts))
+				if (!ExampleService.store(stage.getProgram().getName(), stage.getProgram().getEditorContent(),
+						territoryXML, ts))
 					logger.debug("Could not save example in database");
 			}, () -> logger.debug("No tags were entered"));
 		});
@@ -67,8 +67,7 @@ public class ExamplesController {
 			tagsOpt.ifPresentOrElse(tags -> {
 				Optional<String> s = showTagSelection(tags);
 				s.ifPresentOrElse(selectedTag -> {
-					Optional<List<Pair<Integer, String>>> programsOpt = ExampleService
-							.query(selectedTag);
+					Optional<List<Pair<Integer, String>>> programsOpt = ExampleService.query(selectedTag);
 					if (programsOpt.isPresent()) {
 						Optional<Integer> idOpt = showProgramSelection(programsOpt.get());
 						idOpt.ifPresentOrElse(id -> {
