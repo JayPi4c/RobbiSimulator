@@ -130,7 +130,7 @@ public class PropertiesLoader {
 	 * @return true, if the saving was successful, false otherwise
 	 */
 	public static boolean finish() {
-		properties.put("lang", I18nUtils.getBundle().getLocale().toString());
+		properties.put("lang", I18nUtils.getLocale().toString());
 		properties.put("sounds", Boolean.toString(SoundManager.getSound()));
 		properties.put("darkmode", Boolean.toString(SceneManager.getDarkmode()));
 		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {

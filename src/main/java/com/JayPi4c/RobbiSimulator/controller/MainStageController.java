@@ -7,6 +7,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.derby.tools.sysinfo;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.Version;
 
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
@@ -25,6 +27,7 @@ import com.JayPi4c.RobbiSimulator.utils.SceneManager;
 import com.JayPi4c.RobbiSimulator.utils.SoundManager;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
+import com.jfoenix.utils.JFXUtilities;
 
 import jakarta.xml.bind.JAXBContext;
 import javafx.embed.swing.SwingFXUtils;
@@ -43,6 +46,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -234,9 +238,13 @@ public class MainStageController implements Observer {
 			String javaVersion = System.getProperty("java.version");
 			String derbyVersion = sysinfo.getVersionString();
 			String jaxbVersion = JAXBContext.class.getPackage().getImplementationVersion();
+			String hibernateVersion = Version.getVersionString();
+			String lombokVersion = Generated.class.getPackage().getImplementationVersion();
+			String log4jVersion = Logger.class.getPackage().getImplementationVersion();
+			String jfoenixVersion = JFXUtilities.class.getPackage().getImplementationVersion();
 			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-					String.format(I18nUtils.i18n("Menu.window.libraries.content"), javaVersion, javaFxVersion,
-							derbyVersion, jaxbVersion),
+					I18nUtils.i18n("Menu.window.libraries.content", javaVersion, javaFxVersion, jfoenixVersion,
+							derbyVersion, jaxbVersion, hibernateVersion, log4jVersion, lombokVersion),
 					mainStage, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
 					I18nUtils.i18n("Menu.window.libraries.header"));
 		});

@@ -1,15 +1,13 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
-import javafx.scene.control.Tooltip;
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.createBinding;
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.createTooltip;
 
 /**
  * Controller to handle the change of language.
@@ -31,12 +29,12 @@ public class LanguageController {
 		this.stage = mainStage;
 
 		mainStage.getGermanLanguageMenuItem().setOnAction(e -> {
-			I18nUtils.setBundle(getBundle(Locale.GERMANY));
+			I18nUtils.setLocale(Locale.GERMANY);
 			updateTitle();
 			mainStage.getSnackbarController().showMessage("Sprache geändert");
 		});
 		mainStage.getEnglishLanguageMenuItem().setOnAction(e -> {
-			I18nUtils.setBundle(getBundle(Locale.UK));
+			I18nUtils.setLocale(Locale.UK);
 			updateTitle();
 			mainStage.getSnackbarController().showMessage("Language changed");
 		});
@@ -149,32 +147,6 @@ public class LanguageController {
 			mainStage.getReceiveAnswerMenuItem().textProperty().bind(createBinding("Menu.tutor.receiveAnswer"));
 		}
 		mainStage.getTutorMenu().textProperty().bind(createBinding("Menu.tutor"));
-	}
-
-	/**
-	 * Helper to crate a new String Binding for the provided key.
-	 * 
-	 * @param key the key to be mapped on the resources
-	 * @return a binding for the provided key
-	 */
-	private StringBinding createBinding(String key) {
-		return Bindings.createStringBinding(() -> I18nUtils.i18n(key), I18nUtils.bundleProperty());
-	}
-
-	/**
-	 * Helper to create a new Tooltip with a text-binding to the provided key.
-	 * 
-	 * @param key the key to map the text to
-	 * @return a Tooltip with text-binding
-	 */
-	private Tooltip createTooltip(String key) {
-		Tooltip tt = new Tooltip();
-		tt.textProperty().bind(createBinding(key));
-		return tt;
-	}
-
-	private static ResourceBundle getBundle(Locale locale) {
-		return ResourceBundle.getBundle("lang.messages", locale);
 	}
 
 	/**
