@@ -53,8 +53,7 @@ public class StudentController {
 			Answer answer = tutor.getAnswer(requestID);
 			if (answer == null) {
 				logger.debug("Answer is not ready yet!");
-				AlertHelper.createAlert(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.receiveAnswer.information"),
-						stage);
+				stage.getSnackbarController().showMessage(I18nUtils.i18n("Menu.tutor.receiveAnswer.information"));
 				return;
 			}
 			stage.getProgram().setEditorContent(answer.code());
@@ -86,8 +85,9 @@ public class StudentController {
 			logger.debug("The request has ID {}.", requestID);
 			stage.getSendRequestMenuItem().setDisable(true);
 			stage.getReceiveAnswerMenuItem().setDisable(false);
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.sendRequest.information"),
-					stage);
+
+			stage.getSnackbarController().showMessage(I18nUtils.i18n("Menu.tutor.sendRequest.information"));
+
 		} catch (RemoteException | NotBoundException e) {
 			logger.debug("Failed to send request to tutor.");
 			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.sendRequest.error"), stage);

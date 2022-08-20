@@ -9,12 +9,10 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
-import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
-import javafx.scene.control.Alert.AlertType;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -66,10 +64,10 @@ public class TutorController {
 			currentID = request.id();
 			stage.getLoadRequestMenuItem().setDisable(true);
 			stage.getSaveAnswerMenuItem().setDisable(false);
+			stage.getSnackbarController().showMessage(I18nUtils.i18n("Menu.tutor.loadRequest.success", request.id()));
 		}, () -> {
 			logger.debug("no request available");
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.loadRequest.warning"),
-					stage);
+			stage.getSnackbarController().showMessage(I18nUtils.i18n("Menu.tutor.loadRequest.warning"));
 		});
 	}
 
@@ -84,7 +82,7 @@ public class TutorController {
 		currentID = NO_ID;
 		stage.getLoadRequestMenuItem().setDisable(false);
 		stage.getSaveAnswerMenuItem().setDisable(true);
-		AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.saveAnswer.information"), stage);
+		stage.getSnackbarController().showMessage(I18nUtils.i18n("Menu.tutor.saveAnswer.information"));
 	}
 
 	/**
