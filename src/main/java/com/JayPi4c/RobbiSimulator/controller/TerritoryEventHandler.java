@@ -1,12 +1,12 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
 import com.JayPi4c.RobbiSimulator.model.Territory;
+import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.RobbiContextMenu;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Window;
 
 /**
  * This class combines all functions needed to control the user interaction with
@@ -35,7 +35,7 @@ public class TerritoryEventHandler implements EventHandler<MouseEvent> {
 	 * @param parent         the parent window to show alerts relative to it
 	 */
 	public TerritoryEventHandler(Territory territory, TerritoryPanel territoryPanel, ButtonState buttonState,
-			Window parent) {
+			MainStage parent) {
 		this.territory = territory;
 		this.buttonState = buttonState;
 		territoryPanel.setOnContextMenuRequested(event -> {
@@ -63,34 +63,34 @@ public class TerritoryEventHandler implements EventHandler<MouseEvent> {
 		} else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
 			if (!robbiDragged) {
 				switch (buttonState.getSelected()) {
-					case ButtonState.ROBBI:
-						territory.placeRobbi(col, row);
-						break;
-					case ButtonState.HOLLOW:
-						territory.placeHollow(col, row);
-						break;
-					case ButtonState.PILE_OF_SCRAP:
-						territory.placePileOfScrap(col, row);
-						break;
-					case ButtonState.STOCKPILE:
-						territory.placeStockpile(col, row);
-						break;
-					case ButtonState.ACCU:
-						territory.placeAccu(col, row);
-						break;
-					case ButtonState.SCREW:
-						territory.placeScrew(col, row);
-						break;
-					case ButtonState.NUT:
-						territory.placeNut(col, row);
-						break;
-					case ButtonState.CLEAR:
-						territory.clearTile(col, row);
-						break;
-					case ButtonState.NONE:
-						// fall through
-					default:
-						// Do nothing
+				case ButtonState.ROBBI:
+					territory.placeRobbi(col, row);
+					break;
+				case ButtonState.HOLLOW:
+					territory.placeHollow(col, row);
+					break;
+				case ButtonState.PILE_OF_SCRAP:
+					territory.placePileOfScrap(col, row);
+					break;
+				case ButtonState.STOCKPILE:
+					territory.placeStockpile(col, row);
+					break;
+				case ButtonState.ACCU:
+					territory.placeAccu(col, row);
+					break;
+				case ButtonState.SCREW:
+					territory.placeScrew(col, row);
+					break;
+				case ButtonState.NUT:
+					territory.placeNut(col, row);
+					break;
+				case ButtonState.CLEAR:
+					territory.clearTile(col, row);
+					break;
+				case ButtonState.NONE:
+					// fall through
+				default:
+					// Do nothing
 				}
 			}
 			robbiDragged = false;

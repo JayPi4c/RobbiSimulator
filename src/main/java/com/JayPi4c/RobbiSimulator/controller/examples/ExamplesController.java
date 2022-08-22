@@ -1,12 +1,12 @@
 package com.JayPi4c.RobbiSimulator.controller.examples;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
-import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.application.Platform;
@@ -18,7 +18,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
@@ -79,8 +78,7 @@ public class ExamplesController {
 				}, () -> logger.debug("No tag selected"));
 			}, () -> {
 				logger.info("No tags are stored in database");
-				AlertHelper.showAlertAndWait(AlertType.WARNING, I18nUtils.i18n("Examples.load.dialog.tags.fail"),
-						stage);
+				stage.getSnackbarController().showMessage("Examples.load.dialog.tags.fail");
 			});
 
 		});
@@ -97,8 +95,8 @@ public class ExamplesController {
 	 */
 	public Optional<Integer> showProgramSelection(List<Pair<Integer, String>> programs) {
 		Dialog<Integer> dialog = new Dialog<>();
-		dialog.setTitle(I18nUtils.i18n("Examples.load.dialog.program.title"));
-		dialog.setHeaderText(I18nUtils.i18n("Examples.load.dialog.program.header"));
+		dialog.setTitle(i18n("Examples.load.dialog.program.title"));
+		dialog.setHeaderText(i18n("Examples.load.dialog.program.header"));
 		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -106,7 +104,7 @@ public class ExamplesController {
 		ComboBox<HideableItem<Pair<Integer, String>>> comboBox = createComboBoxWithAutoCompletionSupport(programs);
 		comboBox.getSelectionModel().select(0);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(I18nUtils.i18n("Examples.load.dialog.program.name")), comboBox);
+		grid.addRow(0, new Label(i18n("Examples.load.dialog.program.name")), comboBox);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(comboBox::requestFocus);
@@ -124,8 +122,8 @@ public class ExamplesController {
 	 */
 	public Optional<String> showTagSelection(List<String> tags) {
 		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(I18nUtils.i18n("Examples.load.dialog.tags.title"));
-		dialog.setHeaderText(I18nUtils.i18n("Examples.load.dialog.tags.header"));
+		dialog.setTitle(i18n("Examples.load.dialog.tags.title"));
+		dialog.setHeaderText(i18n("Examples.load.dialog.tags.header"));
 		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -133,7 +131,7 @@ public class ExamplesController {
 		ComboBox<HideableItem<String>> comboBox = createComboBoxWithAutoCompletionSupport(tags);
 		comboBox.getSelectionModel().select(0);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(I18nUtils.i18n("Examples.load.dialog.tags.name")), comboBox);
+		grid.addRow(0, new Label(i18n("Examples.load.dialog.tags.name")), comboBox);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(comboBox::requestFocus);
@@ -150,20 +148,20 @@ public class ExamplesController {
 	 */
 	private Optional<List<String>> enterTags() {
 		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(I18nUtils.i18n("Examples.save.tags.title"));
-		dialog.setHeaderText(I18nUtils.i18n("Examples.save.tags.header"));
+		dialog.setTitle(i18n("Examples.save.tags.title"));
+		dialog.setHeaderText(i18n("Examples.save.tags.header"));
 		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 		TextField tagsField = new TextField();
-		tagsField.setPromptText(I18nUtils.i18n("Examples.save.tags.prompt"));
+		tagsField.setPromptText(i18n("Examples.save.tags.prompt"));
 
 		tagsField.textProperty().addListener((observable, oldVal, newVal) -> dialog.getDialogPane()
 				.lookupButton(ButtonType.OK).setDisable(newVal.isBlank()));
 
 		dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(I18nUtils.i18n("Examples.save.tags.name")), tagsField);
+		grid.addRow(0, new Label(i18n("Examples.save.tags.name")), tagsField);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(tagsField::requestFocus);

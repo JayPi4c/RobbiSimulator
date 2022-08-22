@@ -1,5 +1,7 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
+
 /**
  * Abstract Exception class for almost all exceptions thrown in this
  * application.
@@ -12,12 +14,17 @@ public abstract class RobbiException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructor for a new RobbiException with the given message.
+	 * Constructor for a new RobbiException with the given message key.
 	 * 
-	 * @param msg a message to provide further details of the exception
+	 * @param key a key for a message to provide further details of the exception
 	 */
-	protected RobbiException(String msg) {
-		super(msg);
+	protected RobbiException(String key) {
+		super(key);
+	}
+
+	@Override
+	public String getLocalizedMessage() {
+		return I18nUtils.i18n(getMessage());
 	}
 
 }

@@ -1,13 +1,14 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.createBinding;
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.createTooltip;
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.util.Locale;
 
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
-
-import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.createBinding;
-import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.createTooltip;
 
 /**
  * Controller to handle the change of language.
@@ -31,12 +32,12 @@ public class LanguageController {
 		mainStage.getGermanLanguageMenuItem().setOnAction(e -> {
 			I18nUtils.setLocale(Locale.GERMANY);
 			updateTitle();
-			mainStage.getSnackbarController().showMessage("Sprache geändert");
+			mainStage.getSnackbarController().showMessage("language.changed");
 		});
 		mainStage.getEnglishLanguageMenuItem().setOnAction(e -> {
 			I18nUtils.setLocale(Locale.UK);
 			updateTitle();
-			mainStage.getSnackbarController().showMessage("Language changed");
+			mainStage.getSnackbarController().showMessage("language.changed");
 		});
 
 		// text bindings
@@ -153,8 +154,8 @@ public class LanguageController {
 	 * needed since the star (*) would mess with the binding property
 	 */
 	public void updateTitle() {
-		stage.setTitle(I18nUtils.i18n("Main.title") + ": " + stage.getProgram().getName()
-				+ (stage.getProgram().isEdited() ? "*" : ""));
+		stage.setTitle(
+				i18n("Main.title") + ": " + stage.getProgram().getName() + (stage.getProgram().isEdited() ? "*" : ""));
 	}
 
 }

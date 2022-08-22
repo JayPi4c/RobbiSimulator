@@ -1,5 +1,7 @@
 package com.JayPi4c.RobbiSimulator.controller.program;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -33,7 +35,6 @@ import javax.tools.ToolProvider;
 
 import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
@@ -173,13 +174,13 @@ public class ProgramController {
 	 */
 	private static Optional<String> getNameForProgram(Window parent) {
 		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(I18nUtils.i18n("New.dialog.title"));
-		dialog.setHeaderText(I18nUtils.i18n("New.dialog.header"));
+		dialog.setTitle(i18n("New.dialog.title"));
+		dialog.setHeaderText(i18n("New.dialog.header"));
 		dialog.initOwner(parent);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 		TextField nameField = new TextField();
-		nameField.setPromptText(I18nUtils.i18n("New.dialog.prompt"));
+		nameField.setPromptText(i18n("New.dialog.prompt"));
 
 		Collection<String> filenamesInDirectory = getFilenamesInDirectory();
 
@@ -192,7 +193,7 @@ public class ProgramController {
 
 		dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(I18nUtils.i18n("New.dialog.name")), nameField);
+		grid.addRow(0, new Label(i18n("New.dialog.name")), nameField);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(nameField::requestFocus);
@@ -257,10 +258,9 @@ public class ProgramController {
 				stage.close();
 			}
 
-			Alert alert = AlertHelper.createAlert(AlertType.INFORMATION, I18nUtils.i18n("Examples.duplication.message"),
-					null);
-			alert.setHeaderText(I18nUtils.i18n("Examples.duplication.header"));
-			alert.setTitle(I18nUtils.i18n("Examples.duplication.title"));
+			Alert alert = AlertHelper.createAlert(AlertType.INFORMATION, i18n("Examples.duplication.message"), null);
+			alert.setHeaderText(i18n("Examples.duplication.header"));
+			alert.setTitle(i18n("Examples.duplication.title"));
 			alert.getButtonTypes().remove(ButtonType.OK);
 			alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
 			Optional<ButtonType> result = alert.showAndWait();
@@ -374,10 +374,10 @@ public class ProgramController {
 	 */
 	public static void openProgram(Window parent) {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(I18nUtils.i18n("Open.dialog.title"));
+		fileChooser.setTitle(i18n("Open.dialog.title"));
 		fileChooser.setInitialDirectory(new File(PATH_TO_PROGRAMS));
-		fileChooser.getExtensionFilters().add(
-				new FileChooser.ExtensionFilter(I18nUtils.i18n("Open.dialog.filter"), "*" + DEFAULT_FILE_EXTENSION));
+		fileChooser.getExtensionFilters()
+				.add(new FileChooser.ExtensionFilter(i18n("Open.dialog.filter"), "*" + DEFAULT_FILE_EXTENSION));
 
 		File file = fileChooser.showOpenDialog(parent);
 		if (file != null) {
@@ -447,14 +447,13 @@ public class ProgramController {
 							diagnostic.getEndPosition());
 					if (showAlerts && !showedAlert) {
 						StringBuilder bobTheBuilder = new StringBuilder();
-						bobTheBuilder.append(
-								String.format(I18nUtils.i18n("Compilation.diagnostic.kind"), diagnostic.getKind()));
-						bobTheBuilder.append(String.format(I18nUtils.i18n("Compilation.diagnostic.CodeAndMessage"),
+						bobTheBuilder.append(String.format(i18n("Compilation.diagnostic.kind"), diagnostic.getKind()));
+						bobTheBuilder.append(String.format(i18n("Compilation.diagnostic.CodeAndMessage"),
 								diagnostic.getCode(), diagnostic.getMessage(null)));
-						bobTheBuilder.append(String.format(I18nUtils.i18n("Compilation.diagnostic.row"),
-								diagnostic.getLineNumber()));
+						bobTheBuilder
+								.append(String.format(i18n("Compilation.diagnostic.row"), diagnostic.getLineNumber()));
 						AlertHelper.showAlertAndWait(AlertType.ERROR, bobTheBuilder.toString(), parent,
-								Modality.WINDOW_MODAL, I18nUtils.i18n("Compilation.diagnostic.title"),
+								Modality.WINDOW_MODAL, i18n("Compilation.diagnostic.title"),
 								diagnostic.getKind().toString());
 						showedAlert = true;
 					}
@@ -477,13 +476,12 @@ public class ProgramController {
 						} else
 							logger.error("[Annotation Error]: Error has been found but could not be diagnosed.");
 						if (showAlerts) {
-							String msg = I18nUtils.i18n("Compilation.annotations.msg.default");
+							String msg = i18n("Compilation.annotations.msg.default");
 							if (val != null && type != null) {
-								msg = String.format(I18nUtils.i18n("Compilation.annotations.msg.info"), val, type);
+								msg = String.format(i18n("Compilation.annotations.msg.info"), val, type);
 							}
 							AlertHelper.showAlertAndWait(AlertType.WARNING, msg, parent, Modality.WINDOW_MODAL,
-									I18nUtils.i18n("Compilation.annotations.title"),
-									I18nUtils.i18n("Compilation.annotations.header"));
+									i18n("Compilation.annotations.title"), i18n("Compilation.annotations.header"));
 						}
 					} else {
 						if (overwritesMainMethod(r)) {
@@ -491,14 +489,15 @@ public class ProgramController {
 							MainStage s = (MainStage) programs.get(program.getName());
 							s.getTerritory().setRobbi(r);
 							if (showAlerts) {
+								// TODO change to snackbar
 								AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-										String.format(I18nUtils.i18n("Compilation.success.message"), program.getName()),
-										parent, Modality.WINDOW_MODAL, I18nUtils.i18n("Compilation.success.title"),
-										I18nUtils.i18n("Compilation.success.header"));
+										String.format(i18n("Compilation.success.message"), program.getName()), parent,
+										Modality.WINDOW_MODAL, i18n("Compilation.success.title"),
+										i18n("Compilation.success.header"));
 							}
 						} else {
-							AlertHelper.showAlertAndWait(AlertType.ERROR,
-									I18nUtils.i18n("Compilation.diagnostic.override"), parent);
+							AlertHelper.showAlertAndWait(AlertType.ERROR, i18n("Compilation.diagnostic.override"),
+									parent);
 							logger.error("The custom Robbi class does not overwrite the main-Method");
 						}
 					}

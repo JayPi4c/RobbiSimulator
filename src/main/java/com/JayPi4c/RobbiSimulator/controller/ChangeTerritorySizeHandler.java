@@ -1,10 +1,11 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.util.Optional;
 
 import com.JayPi4c.RobbiSimulator.model.Dimension;
 import com.JayPi4c.RobbiSimulator.model.Territory;
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -50,8 +51,8 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 	 */
 	private void createDialog() {
 		dialog = new Dialog<>();
-		dialog.setTitle(I18nUtils.i18n("ChangeSize.dialog.title"));
-		dialog.setHeaderText(I18nUtils.i18n("ChangeSize.dialog.header"));
+		dialog.setTitle(i18n("ChangeSize.dialog.title"));
+		dialog.setHeaderText(i18n("ChangeSize.dialog.header"));
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 		TextField rowField = new TextField();
@@ -62,8 +63,8 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 				.lookupButton(ButtonType.OK).setDisable(newVal.isEmpty() || !isValid(newVal)));
 
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(I18nUtils.i18n("ChangeSize.dialog.cols")), colField);
-		grid.addRow(1, new Label(I18nUtils.i18n("ChangeSize.dialog.rows")), rowField);
+		grid.addRow(0, new Label(i18n("ChangeSize.dialog.cols")), colField);
+		grid.addRow(1, new Label(i18n("ChangeSize.dialog.rows")), rowField);
 		grid.setHgap(20);
 		dialogPane.setContent(grid);
 		rowField.setText(Integer.toString(territory.getNumRows()));

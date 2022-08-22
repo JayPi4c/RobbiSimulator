@@ -53,7 +53,7 @@ public class StudentController {
 			Answer answer = tutor.getAnswer(requestID);
 			if (answer == null) {
 				logger.debug("Answer is not ready yet!");
-				stage.getSnackbarController().showMessage(I18nUtils.i18n("Menu.tutor.receiveAnswer.information"));
+				stage.getSnackbarController().showMessage("Menu.tutor.receiveAnswer.information");
 				return;
 			}
 			stage.getProgram().setEditorContent(answer.code());
@@ -64,8 +64,7 @@ public class StudentController {
 			stage.getReceiveAnswerMenuItem().setDisable(true);
 		} catch (RemoteException | NotBoundException e) {
 			logger.debug("Failed to fetch answer from tutor.");
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.receiveAnswer.error"),
-					stage);
+			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.tutor.receiveAnswer.error"), stage);
 		}
 	}
 
@@ -86,11 +85,11 @@ public class StudentController {
 			stage.getSendRequestMenuItem().setDisable(true);
 			stage.getReceiveAnswerMenuItem().setDisable(false);
 
-			stage.getSnackbarController().showMessage(I18nUtils.i18n("Menu.tutor.sendRequest.information"));
+			stage.getSnackbarController().showMessage("Menu.tutor.sendRequest.information");
 
 		} catch (RemoteException | NotBoundException e) {
 			logger.debug("Failed to send request to tutor.");
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.sendRequest.error"), stage);
+			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.tutor.sendRequest.error"), stage);
 		}
 	}
 

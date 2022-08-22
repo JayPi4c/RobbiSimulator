@@ -1,5 +1,7 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +22,6 @@ import com.JayPi4c.RobbiSimulator.model.NoPileOfScrapAheadException;
 import com.JayPi4c.RobbiSimulator.model.TileBlockedException;
 import com.JayPi4c.RobbiSimulator.model.TileIsFullException;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 import com.JayPi4c.RobbiSimulator.utils.Observer;
 import com.JayPi4c.RobbiSimulator.utils.SceneManager;
@@ -83,7 +84,7 @@ public class MainStageController implements Observer {
 		this.buttonState = buttonState;
 		this.mainStage.getProgram().addObserver(this);
 
-		mainStage.setTitle(I18nUtils.i18n("Main.title") + ": " + mainStage.getProgram().getName());
+		mainStage.setTitle(i18n("Main.title") + ": " + mainStage.getProgram().getName());
 
 		mainStage.setOnCloseRequest(e -> {
 			mainStage.getProgram().save(mainStage.getTextArea().getText());
@@ -106,8 +107,8 @@ public class MainStageController implements Observer {
 			ProgramController.compile(program, mainStage);
 		});
 		// TODO print editor content
-		mainStage.getPrintEditorMenuItem().setOnAction(
-				e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, "Not yet implemented", mainStage));
+		mainStage.getPrintEditorMenuItem()
+				.setOnAction(e -> mainStage.getSnackbarController().showMessage("not.implemented"));
 		mainStage.getQuitEditorMenuItem().setOnAction(e -> {
 			Program program = mainStage.getProgram();
 			logger.info("exiting {}", program.getName());
@@ -119,24 +120,22 @@ public class MainStageController implements Observer {
 		// save -> TerritorySaveController
 		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
 			String extension = ".png";
-			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.png.description"), extension);
+			File file = getFile(i18n("Menu.territory.saveAsPic.png.description"), extension);
 			if (file == null)
 				return;
 
 			if (!saveAsImage(file, extension)) {
-				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
-						mainStage);
+				mainStage.getSnackbarController().showMessage("Menu.territory.saveAsPic.error");
 			}
 		});
 		mainStage.getSaveAsGifMenuItem().setOnAction(e -> {
 			String extension = ".gif";
-			File file = getFile(I18nUtils.i18n("Menu.territory.saveAsPic.gif.description"), extension);
+			File file = getFile(i18n("Menu.territory.saveAsPic.gif.description"), extension);
 			if (file == null)
 				return;
 
 			if (!saveAsImage(file, extension)) {
-				AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.saveAsPic.error"),
-						mainStage);
+				mainStage.getSnackbarController().showMessage("Menu.territory.saveAsPic.error");
 			}
 		});
 		mainStage.getPrintTerritoryMenuItem().setOnAction(e -> printTerritory());
@@ -164,7 +163,7 @@ public class MainStageController implements Observer {
 			try {
 				mainStage.getTerritory().getRobbi().vor();
 			} catch (HollowAheadException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+				mainStage.getSnackbarController().showMessage(ex.getMessage());
 			}
 		});
 		mainStage.getTurnLeftMenuItem().setOnAction(e -> mainStage.getTerritory().getRobbi().linksUm());
@@ -172,48 +171,51 @@ public class MainStageController implements Observer {
 			try {
 				mainStage.getTerritory().getRobbi().legeAb();
 			} catch (BagIsEmptyException | TileIsFullException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+				mainStage.getSnackbarController().showMessage(ex.getMessage());
 			}
 		});
 		mainStage.getTakeMenuItem().setOnAction(e -> {
 			try {
 				mainStage.getTerritory().getRobbi().nehmeAuf();
 			} catch (NoItemException | BagIsFullException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+				mainStage.getSnackbarController().showMessage(ex.getMessage());
 			}
 		});
 		mainStage.getPushPileOfScrapMenuItem().setOnAction(e -> {
 			try {
 				mainStage.getTerritory().getRobbi().schiebeSchrotthaufen();
 			} catch (NoPileOfScrapAheadException | TileBlockedException ex) {
-				AlertHelper.showAlertAndWait(AlertType.WARNING, ex.getMessage(), mainStage);
+				mainStage.getSnackbarController().showMessage(ex.getMessage());
 			}
 		});
-		mainStage.getItemPresentMenuItem()
-				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						I18nUtils.i18n("Execution.information.itemPresent")
-								+ mainStage.getTerritory().getRobbi().gegenstandDa(),
-						mainStage));
-		mainStage.getIsStockpileMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-				I18nUtils.i18n("Execution.information.stockpile") + mainStage.getTerritory().getRobbi().istLagerplatz(),
-				mainStage));
-		mainStage.getHollowAheadMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-				I18nUtils.i18n("Execution.information.hollow") + mainStage.getTerritory().getRobbi().vornKuhle(),
-				mainStage));
-		mainStage.getPileOfScrapAheadMenuItem()
-				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						I18nUtils.i18n("Execution.information.pileOfScrap")
-								+ mainStage.getTerritory().getRobbi().vornSchrotthaufen(),
-						mainStage));
 
-		mainStage.getIsBagFullMenuItem().setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-				I18nUtils.i18n("Execution.information.bag") + mainStage.getTerritory().getRobbi().istTascheVoll(),
-				mainStage));
+		mainStage.getItemPresentMenuItem().setOnAction(e -> {
+			boolean itemPresent = mainStage.getTerritory().getRobbi().gegenstandDa();
+			mainStage.getSnackbarController().showMessage("Execution.information.itemPresent", itemPresent);
+		});
+		mainStage.getIsStockpileMenuItem().setOnAction(e -> {
+			boolean stockpilePresent = mainStage.getTerritory().getRobbi().istLagerplatz();
+			mainStage.getSnackbarController().showMessage("Execution.information.stockpile", stockpilePresent);
+		});
+		mainStage.getHollowAheadMenuItem().setOnAction(e -> {
+			boolean hollowAhead = mainStage.getTerritory().getRobbi().vornKuhle();
+			mainStage.getSnackbarController().showMessage("Execution.information.hollow", hollowAhead);
+		});
+		mainStage.getPileOfScrapAheadMenuItem().setOnAction(e -> {
+			boolean pileOfScrapAhead = mainStage.getTerritory().getRobbi().vornSchrotthaufen();
+			mainStage.getSnackbarController().showMessage("Execution.information.pileOfScrap", pileOfScrapAhead);
+		});
+		mainStage.getIsBagFullMenuItem().setOnAction(e -> {
+			boolean isBagFull = mainStage.getTerritory().getRobbi().istTascheVoll();
+			mainStage.getSnackbarController().showMessage("Execution.information.bag", isBagFull);
+		});
+
 		// simualtion (menuBar) -> SimualtionController
 		// examples (menuBar) -> ExamplesController
 		// tutor (menuBar) -> TutorController / StudentController
 		// window (menuBar)
 		// language -> LangaugeController
+
 		mainStage.getChangeCursorMenuItem().setOnAction(e -> {
 			setChangeCursor(mainStage.getChangeCursorMenuItem().isSelected());
 			if (!mainStage.getChangeCursorMenuItem().isSelected())
@@ -230,9 +232,9 @@ public class MainStageController implements Observer {
 			mainStage.getScene().getStylesheets().add(SceneManager.getDarkmodeCss());
 		mainStage.getEnableSoundsMenuItem().selectedProperty().bindBidirectional(SoundManager.soundProperty());
 		mainStage.getInfoMenuItem()
-				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-						I18nUtils.i18n("Menu.window.info.content"), mainStage, Modality.WINDOW_MODAL,
-						I18nUtils.i18n("Menu.window.info.title"), I18nUtils.i18n("Menu.window.info.header")));
+				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, i18n("Menu.window.info.content"),
+						mainStage, Modality.WINDOW_MODAL, i18n("Menu.window.info.title"),
+						i18n("Menu.window.info.header")));
 		mainStage.getLibraryMenuItem().setOnAction(e -> {
 			String javaFxVersion = System.getProperty("javafx.version");
 			String javaVersion = System.getProperty("java.version");
@@ -243,10 +245,10 @@ public class MainStageController implements Observer {
 			String log4jVersion = Logger.class.getPackage().getImplementationVersion();
 			String jfoenixVersion = JFXUtilities.class.getPackage().getImplementationVersion();
 			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-					I18nUtils.i18n("Menu.window.libraries.content", javaVersion, javaFxVersion, jfoenixVersion,
-							derbyVersion, jaxbVersion, hibernateVersion, log4jVersion, lombokVersion),
-					mainStage, Modality.WINDOW_MODAL, I18nUtils.i18n("Menu.window.libraries.title"),
-					I18nUtils.i18n("Menu.window.libraries.header"));
+					i18n("Menu.window.libraries.content", javaVersion, javaFxVersion, jfoenixVersion, derbyVersion,
+							jaxbVersion, hibernateVersion, log4jVersion, lombokVersion),
+					mainStage, Modality.WINDOW_MODAL, i18n("Menu.window.libraries.title"),
+					i18n("Menu.window.libraries.header"));
 		});
 
 		// Editor (toolbar)
@@ -351,7 +353,7 @@ public class MainStageController implements Observer {
 	 */
 	private String getTitle(Program program) {
 		StringBuilder builder = new StringBuilder();
-		builder.append(I18nUtils.i18n("Main.title")).append(": ").append(program.getName())
+		builder.append(i18n("Main.title")).append(": ").append(program.getName())
 				.append((program.isEdited() ? "*" : ""));
 		return builder.toString();
 	}
@@ -396,7 +398,7 @@ public class MainStageController implements Observer {
 			}
 		} else {
 			logger.info("Failed to create printerJob");
-			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Menu.territory.print.error"), mainStage);
+			AlertHelper.showAlertAndWait(AlertType.ERROR, i18n("Menu.territory.print.error"), mainStage);
 		}
 	}
 

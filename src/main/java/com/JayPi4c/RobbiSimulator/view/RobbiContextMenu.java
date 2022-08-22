@@ -21,7 +21,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
-import javafx.stage.Window;
 
 /**
  * Class to for the ContextMenu which opens, when clicked on robbi in the
@@ -41,7 +40,7 @@ public class RobbiContextMenu extends ContextMenu {
 	 * @param parent    the parent window in order to display the alerts relative to
 	 *                  the calling window
 	 */
-	public RobbiContextMenu(Territory territory, Window parent) {
+	public RobbiContextMenu(Territory territory, MainStage parent) {
 
 		for (Method method : getDefaultMethods()) {
 			MenuItem item = getMenuItem(method);
@@ -66,7 +65,7 @@ public class RobbiContextMenu extends ContextMenu {
 				if (method.getParameterCount() != 0 && !hasCorrectDefaultAnnotations(method)) {
 					item.setDisable(true);
 					// https://stackoverflow.com/a/43053529/13670629
-					Tooltip tooltip = new Tooltip(I18nUtils.i18n("Editor.contextMenu.tooltip"));
+					Tooltip tooltip = I18nUtils.createTooltip("Editor.contextMenu.tooltip");
 					Tooltip.install(item.getContent(), tooltip);
 
 				} else
