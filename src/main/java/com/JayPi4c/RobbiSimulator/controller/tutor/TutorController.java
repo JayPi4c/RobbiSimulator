@@ -75,7 +75,7 @@ public class TutorController {
 	 */
 	private void saveAnswer() {
 		logger.debug("Saving answer for id {}.", currentID);
-		stage.getProgram().save(stage.getTextArea().getText());
+		stage.getProgram().save(stage.getTextArea().getEditor().getDocument().getText());
 		tutor.setAnswer(currentID,
 				new Answer(stage.getProgram().getEditorContent(), stage.getTerritory().toXML().toString()));
 		currentID = NO_ID;

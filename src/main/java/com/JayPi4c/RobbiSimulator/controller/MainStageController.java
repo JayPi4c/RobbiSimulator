@@ -30,6 +30,7 @@ import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 import com.jfoenix.utils.JFXUtilities;
 
+import eu.mihosoft.monacofx.MonacoFX;
 import jakarta.xml.bind.JAXBContext;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -87,7 +88,7 @@ public class MainStageController implements Observer {
 		mainStage.setTitle(i18n("Main.title") + ": " + mainStage.getProgram().getName());
 
 		mainStage.setOnCloseRequest(e -> {
-			mainStage.getProgram().save(mainStage.getTextArea().getText());
+			mainStage.getProgram().save(mainStage.getTextArea().getEditor().getDocument().getText());
 			ProgramController.close(mainStage.getProgram().getName());
 		});
 
@@ -95,14 +96,14 @@ public class MainStageController implements Observer {
 		mainStage.getNewEditorMenuItem().setOnAction(e -> ProgramController.createAndShow(mainStage));
 		mainStage.getOpenEditorMenuItem().setOnAction(e -> ProgramController.openProgram(mainStage));
 		mainStage.getSaveEditorMenuItem().setOnAction(e -> {
-			mainStage.getProgram().save(mainStage.getTextArea().getText());
+			mainStage.getProgram().save(mainStage.getTextArea().getEditor().getDocument().getText());
 			mainStage.setTitle(getTitle(mainStage.getProgram()));
 		});
 
 		mainStage.getCompileEditorMenuItem().setOnAction(e -> {
 			mainStage.getSimulationController().stopSimulation();
 			Program program = mainStage.getProgram();
-			program.save(mainStage.getTextArea().getText());
+			program.save(mainStage.getTextArea().getEditor().getDocument().getText());
 			mainStage.setTitle(getTitle(program));
 			ProgramController.compile(program, mainStage);
 		});
@@ -112,7 +113,7 @@ public class MainStageController implements Observer {
 		mainStage.getQuitEditorMenuItem().setOnAction(e -> {
 			Program program = mainStage.getProgram();
 			logger.info("exiting {}", program.getName());
-			program.save(mainStage.getTextArea().getText());
+			program.save(mainStage.getTextArea().getEditor().getDocument().getText());
 			ProgramController.close(program.getName());
 			mainStage.close();
 		});
@@ -225,11 +226,16 @@ public class MainStageController implements Observer {
 		SceneManager.darkmodeProperty().addListener((obs, oldVal, newVal) -> {
 			if (Boolean.TRUE.equals(newVal)) {
 				mainStage.getScene().getStylesheets().add(SceneManager.getDarkmodeCss());
-			} else
+				mainStage.getTextArea().getEditor().setCurrentTheme("vs-dark");
+			} else {
 				mainStage.getScene().getStylesheets().remove(SceneManager.getDarkmodeCss());
+				mainStage.getTextArea().getEditor().setCurrentTheme("vs-light");
+			}
 		});
-		if (SceneManager.getDarkmode())
+		if (SceneManager.getDarkmode()) {
 			mainStage.getScene().getStylesheets().add(SceneManager.getDarkmodeCss());
+			mainStage.getTextArea().getEditor().setCurrentTheme("vs-dark");
+		}
 		mainStage.getEnableSoundsMenuItem().selectedProperty().bindBidirectional(SoundManager.soundProperty());
 		mainStage.getInfoMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, i18n("Menu.window.info.content"),
@@ -244,9 +250,10 @@ public class MainStageController implements Observer {
 			String lombokVersion = Generated.class.getPackage().getImplementationVersion();
 			String log4jVersion = Logger.class.getPackage().getImplementationVersion();
 			String jfoenixVersion = JFXUtilities.class.getPackage().getImplementationVersion();
+			String monacoFxVersion = MonacoFX.class.getPackage().getImplementationVersion();
 			AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-					i18n("Menu.window.libraries.content", javaVersion, javaFxVersion, jfoenixVersion, derbyVersion,
-							jaxbVersion, hibernateVersion, log4jVersion, lombokVersion),
+					i18n("Menu.window.libraries.content", javaVersion, javaFxVersion, jfoenixVersion, monacoFxVersion,
+							derbyVersion, jaxbVersion, hibernateVersion, log4jVersion, lombokVersion),
 					mainStage, Modality.WINDOW_MODAL, i18n("Menu.window.libraries.title"),
 					i18n("Menu.window.libraries.header"));
 		});
@@ -285,7 +292,7 @@ public class MainStageController implements Observer {
 		// Simulation (Toolbar) -> SimulationController
 
 		// editor Panel
-		mainStage.getTextArea().textProperty().addListener((observalble, oldVal, newVal) -> {
+		mainStage.getTextArea().getEditor().getDocument().textProperty().addListener((observalble, oldVal, newVal) -> {
 			Program program = mainStage.getProgram();
 			boolean before = program.isEdited();
 			program.setEdited(!newVal.equals(program.getEditorContent()));
@@ -458,7 +465,7 @@ public class MainStageController implements Observer {
 	@Override
 	public void update(Observable observable) {
 		if (observable instanceof Program program) {
-			mainStage.getTextArea().setText(program.getEditorContent());
+			mainStage.getTextArea().getEditor().getDocument().setText(program.getEditorContent());
 		}
 	}
 

@@ -78,7 +78,7 @@ public class StudentController {
 			ITutor tutor = (ITutor) registry.lookup(TutorController.TUTOR_CODE);
 			Program program = stage.getProgram();
 			program.setEdited(true);
-			program.save(stage.getTextArea().getText());
+			program.save(stage.getTextArea().getEditor().getDocument().getText());
 			stage.getLanguageController().updateTitle();
 			requestID = tutor.sendRequest(program.getEditorContent(), stage.getTerritory().toXML().toString());
 			logger.debug("The request has ID {}.", requestID);

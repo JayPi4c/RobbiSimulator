@@ -18,6 +18,7 @@ import com.jfoenix.controls.JFXButton.ButtonType;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleNode;
 
+import eu.mihosoft.monacofx.MonacoFX;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -31,7 +32,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
@@ -215,7 +215,7 @@ public class MainStage extends Stage {
 	private ToolBar toolbar;
 
 	// Content Pane
-	private TextArea textArea;
+	private MonacoFX textArea;
 	private ScrollPane territoryScrollPane;
 	private TerritoryPanel territoryPanel;
 	private SplitPane splitPane;
@@ -705,7 +705,9 @@ public class MainStage extends Stage {
 	private void createContentPane() {
 		logger.debug("Create content panel");
 
-		textArea = new TextArea(program.getEditorContent());
+		textArea = new MonacoFX();
+		textArea.getEditor().getDocument().setText(program.getEditorContent());
+		textArea.getEditor().setCurrentLanguage("java");
 		textArea.setMinWidth(250);
 
 		territoryPanel = new TerritoryPanel(this.territory, this.buttonState, this);

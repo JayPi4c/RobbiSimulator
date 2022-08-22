@@ -450,8 +450,8 @@ public class ProgramController {
 						bobTheBuilder.append(String.format(i18n("Compilation.diagnostic.kind"), diagnostic.getKind()));
 						bobTheBuilder.append(String.format(i18n("Compilation.diagnostic.CodeAndMessage"),
 								diagnostic.getCode(), diagnostic.getMessage(null)));
-						bobTheBuilder
-								.append(String.format(i18n("Compilation.diagnostic.row"), diagnostic.getLineNumber()));
+						bobTheBuilder.append(
+								String.format(i18n("Compilation.diagnostic.row"), diagnostic.getLineNumber() - 1));
 						AlertHelper.showAlertAndWait(AlertType.ERROR, bobTheBuilder.toString(), parent,
 								Modality.WINDOW_MODAL, i18n("Compilation.diagnostic.title"),
 								diagnostic.getKind().toString());
