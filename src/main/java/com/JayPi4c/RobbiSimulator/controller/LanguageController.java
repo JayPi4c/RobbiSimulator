@@ -44,6 +44,7 @@ public class LanguageController {
 		mainStage.getNewEditorMenuItem().textProperty().bind(createBinding("Menu.editor.new"));
 		mainStage.getSaveEditorMenuItem().textProperty().bind(createBinding("Menu.editor.save"));
 		mainStage.getOpenEditorMenuItem().textProperty().bind(createBinding("Menu.editor.open"));
+		mainStage.getFormatSourceCodeMenuItem().textProperty().bind(createBinding("Menu.editor.format"));
 		mainStage.getCompileEditorMenuItem().textProperty().bind(createBinding("Menu.editor.compile"));
 		mainStage.getPrintEditorMenuItem().textProperty().bind(createBinding("Menu.editor.print"));
 		mainStage.getQuitEditorMenuItem().textProperty().bind(createBinding("Menu.editor.quit"));

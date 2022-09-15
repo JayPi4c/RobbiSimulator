@@ -100,6 +100,12 @@ public class MainStageController implements Observer {
 			mainStage.setTitle(getTitle(mainStage.getProgram()));
 		});
 
+		mainStage.getFormatSourceCodeMenuItem().setOnAction(e -> {
+			mainStage.getSnackbarController().showMessage("not.implemented");
+			// For this the following PR should first be merged:
+			// https://github.com/miho/MonacoFX/pull/25
+		});
+
 		mainStage.getCompileEditorMenuItem().setOnAction(e -> {
 			mainStage.getSimulationController().stopSimulation();
 			Program program = mainStage.getProgram();

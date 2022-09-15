@@ -11,7 +11,6 @@ import com.JayPi4c.RobbiSimulator.controller.simulation.SimulationController;
 import com.JayPi4c.RobbiSimulator.controller.tutor.StudentController;
 import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.model.Territory;
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXButton.ButtonType;
@@ -45,6 +44,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
 
 /**
  * This class is the mainStage of the application and holds all GUI elements
@@ -105,6 +105,7 @@ public class MainStage extends Stage {
 	private MenuItem newEditorMenuItem;
 	private MenuItem saveEditorMenuItem;
 	private MenuItem openEditorMenuItem;
+	private MenuItem formatSourceCodeMenuItem;
 	private MenuItem compileEditorMenuItem;
 	private MenuItem printEditorMenuItem;
 
@@ -396,28 +397,32 @@ public class MainStage extends Stage {
 	 */
 	private void createEditor() {
 		logger.debug("Create editor entry for menubar");
-		newEditorMenuItem = new MenuItem(I18nUtils.i18n("Menu.editor.new"));
+		newEditorMenuItem = new MenuItem(i18n("Menu.editor.new"));
 		newEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 		newEditorMenuItem.setMnemonicParsing(true);
 		newEditorMenuItem.setGraphic(new ImageView(newImage));
-		saveEditorMenuItem = new MenuItem(I18nUtils.i18n("Menu.editor.save"));
+		saveEditorMenuItem = new MenuItem(i18n("Menu.editor.save"));
 		saveEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 		saveEditorMenuItem.setGraphic(new ImageView(saveImage));
-		openEditorMenuItem = new MenuItem(I18nUtils.i18n("Menu.editor.open"));
+		openEditorMenuItem = new MenuItem(i18n("Menu.editor.open"));
 		openEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
 		openEditorMenuItem.setGraphic(new ImageView(openImage));
-		compileEditorMenuItem = new MenuItem(I18nUtils.i18n("Menu.editor.compile"));
+
+		formatSourceCodeMenuItem = new MenuItem(i18n("Menu.editor.format"));
+		formatSourceCodeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T,KeyCombination.CONTROL_DOWN)); // T for tidy
+		
+		compileEditorMenuItem = new MenuItem(i18n("Menu.editor.compile"));
 		compileEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN));
 		compileEditorMenuItem.setGraphic(new ImageView(compileImage));
 
-		printEditorMenuItem = new MenuItem(I18nUtils.i18n("Menu.editor.print"));
+		printEditorMenuItem = new MenuItem(i18n("Menu.editor.print"));
 		printEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
 		printEditorMenuItem.setGraphic(new ImageView(printImage));
-		quitEditorMenuItem = new MenuItem(I18nUtils.i18n("Menu.editor.quit"));
+		quitEditorMenuItem = new MenuItem(i18n("Menu.editor.quit"));
 		quitEditorMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
-		editorMenu = new Menu(I18nUtils.i18n("Menu.editor"), null, newEditorMenuItem, openEditorMenuItem,
-				saveEditorMenuItem, new SeparatorMenuItem(), compileEditorMenuItem, printEditorMenuItem,
-				new SeparatorMenuItem(), quitEditorMenuItem);
+		editorMenu = new Menu(i18n("Menu.editor"), null, newEditorMenuItem, openEditorMenuItem,
+				saveEditorMenuItem, new SeparatorMenuItem(), formatSourceCodeMenuItem, compileEditorMenuItem,
+				printEditorMenuItem, new SeparatorMenuItem(), quitEditorMenuItem);
 		editorMenu.setMnemonicParsing(true);
 	}
 
@@ -426,53 +431,53 @@ public class MainStage extends Stage {
 	 */
 	private void createTerritory() {
 		logger.debug("Create territory entry for menubar");
-		saveXMLTerritoryMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.save.xml"));
-		saveJAXBTerritoryMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.save.jaxb"));
-		saveSerialTerritoryMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.save.serialize"));
+		saveXMLTerritoryMenuItem = new MenuItem(i18n("Menu.territory.save.xml"));
+		saveJAXBTerritoryMenuItem = new MenuItem(i18n("Menu.territory.save.jaxb"));
+		saveSerialTerritoryMenuItem = new MenuItem(i18n("Menu.territory.save.serialize"));
 
-		saveTerritoryMenu = new Menu(I18nUtils.i18n("Menu.territory.save"), null, saveXMLTerritoryMenuItem,
+		saveTerritoryMenu = new Menu(i18n("Menu.territory.save"), null, saveXMLTerritoryMenuItem,
 				saveJAXBTerritoryMenuItem, saveSerialTerritoryMenuItem);
-		loadXMLTerritoryMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.load.xml"));
-		loadJAXBTerritoryMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.load.jaxb"));
-		loadSerialTerritoryMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.load.deserialize"));
-		loadTerritoryMenu = new Menu(I18nUtils.i18n("Menu.territory.load"), null, loadXMLTerritoryMenuItem,
+		loadXMLTerritoryMenuItem = new MenuItem(i18n("Menu.territory.load.xml"));
+		loadJAXBTerritoryMenuItem = new MenuItem(i18n("Menu.territory.load.jaxb"));
+		loadSerialTerritoryMenuItem = new MenuItem(i18n("Menu.territory.load.deserialize"));
+		loadTerritoryMenu = new Menu(i18n("Menu.territory.load"), null, loadXMLTerritoryMenuItem,
 				loadJAXBTerritoryMenuItem, loadSerialTerritoryMenuItem);
 
-		saveAsPNGMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.saveAsPic.png"));
-		saveAsGifMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.saveAsPic.gif"));
-		saveAsPicMenu = new Menu(I18nUtils.i18n("Menu.territory.saveAsPic"), null, saveAsPNGMenuItem,
+		saveAsPNGMenuItem = new MenuItem(i18n("Menu.territory.saveAsPic.png"));
+		saveAsGifMenuItem = new MenuItem(i18n("Menu.territory.saveAsPic.gif"));
+		saveAsPicMenu = new Menu(i18n("Menu.territory.saveAsPic"), null, saveAsPNGMenuItem,
 				saveAsGifMenuItem);
 
-		printTerritoryMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.print"));
-		changeSizeTerritoryMenuItem = new MenuItem(I18nUtils.i18n("Menu.territory.size"));
+		printTerritoryMenuItem = new MenuItem(i18n("Menu.territory.print"));
+		changeSizeTerritoryMenuItem = new MenuItem(i18n("Menu.territory.size"));
 
 		placeGroupTerritoryMenu = new ToggleGroup();
 
-		placeRobbiTerritoryRadioMenuItem = new RadioMenuItem(I18nUtils.i18n("Menu.territory.place.robbi"));
+		placeRobbiTerritoryRadioMenuItem = new RadioMenuItem(i18n("Menu.territory.place.robbi"));
 		placeRobbiTerritoryRadioMenuItem.setToggleGroup(placeGroupTerritoryMenu);
 
-		placeHollowTerritoryRadioMenuItem = new RadioMenuItem(I18nUtils.i18n("Menu.territory.place.hollow"));
+		placeHollowTerritoryRadioMenuItem = new RadioMenuItem(i18n("Menu.territory.place.hollow"));
 		placeHollowTerritoryRadioMenuItem.setToggleGroup(placeGroupTerritoryMenu);
 
-		placePileOfScrapTerritoryRadioMenuItem = new RadioMenuItem(I18nUtils.i18n("Menu.territory.place.pileOfScrap"));
+		placePileOfScrapTerritoryRadioMenuItem = new RadioMenuItem(i18n("Menu.territory.place.pileOfScrap"));
 		placePileOfScrapTerritoryRadioMenuItem.setToggleGroup(placeGroupTerritoryMenu);
 
-		placeStockpileTerritoryRadioMenuItem = new RadioMenuItem(I18nUtils.i18n("Menu.territory.place.stockpile"));
+		placeStockpileTerritoryRadioMenuItem = new RadioMenuItem(i18n("Menu.territory.place.stockpile"));
 		placeStockpileTerritoryRadioMenuItem.setToggleGroup(placeGroupTerritoryMenu);
 
-		placeAccuTerritoryRadioMenuItem = new RadioMenuItem(I18nUtils.i18n("Menu.territory.place.accu"));
+		placeAccuTerritoryRadioMenuItem = new RadioMenuItem(i18n("Menu.territory.place.accu"));
 		placeAccuTerritoryRadioMenuItem.setToggleGroup(placeGroupTerritoryMenu);
 
-		placeScrewTerritoryRadioMenuItem = new RadioMenuItem(I18nUtils.i18n("Menu.territory.place.screw"));
+		placeScrewTerritoryRadioMenuItem = new RadioMenuItem(i18n("Menu.territory.place.screw"));
 		placeScrewTerritoryRadioMenuItem.setToggleGroup(placeGroupTerritoryMenu);
 
-		placeNutTerritoryRadioMenuItem = new RadioMenuItem(I18nUtils.i18n("Menu.territory.place.nut"));
+		placeNutTerritoryRadioMenuItem = new RadioMenuItem(i18n("Menu.territory.place.nut"));
 		placeNutTerritoryRadioMenuItem.setToggleGroup(placeGroupTerritoryMenu);
 
-		deleteFieldRadioMenuItem = new RadioMenuItem(I18nUtils.i18n("Menu.territory.delete"));
+		deleteFieldRadioMenuItem = new RadioMenuItem(i18n("Menu.territory.delete"));
 		deleteFieldRadioMenuItem.setToggleGroup(placeGroupTerritoryMenu);
 
-		territoryMenu = new Menu(I18nUtils.i18n("Menu.territory"), null, saveTerritoryMenu, loadTerritoryMenu,
+		territoryMenu = new Menu(i18n("Menu.territory"), null, saveTerritoryMenu, loadTerritoryMenu,
 				saveAsPicMenu, printTerritoryMenuItem, changeSizeTerritoryMenuItem, new SeparatorMenuItem(),
 				placeRobbiTerritoryRadioMenuItem, placeHollowTerritoryRadioMenuItem,
 				placePileOfScrapTerritoryRadioMenuItem, placeStockpileTerritoryRadioMenuItem,
@@ -486,26 +491,26 @@ public class MainStage extends Stage {
 	private void createRobbi() {
 		logger.debug("Create Robbi entry for menubar");
 		territoryMenu.setMnemonicParsing(true);
-		itemPresentMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.itemPresent"));
-		isStockpileMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.isStockpile"));
-		hollowAheadMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.hollowAhead"));
-		pileOfScrapAheadMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.pileOfScrapAhead"));
-		isBagFullMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.isBagFull"));
-		pushPileOfScrapMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.pushPileOfScrap"));
-		moveMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.move"));
+		itemPresentMenuItem = new MenuItem(i18n("Menu.robbi.itemPresent"));
+		isStockpileMenuItem = new MenuItem(i18n("Menu.robbi.isStockpile"));
+		hollowAheadMenuItem = new MenuItem(i18n("Menu.robbi.hollowAhead"));
+		pileOfScrapAheadMenuItem = new MenuItem(i18n("Menu.robbi.pileOfScrapAhead"));
+		isBagFullMenuItem = new MenuItem(i18n("Menu.robbi.isBagFull"));
+		pushPileOfScrapMenuItem = new MenuItem(i18n("Menu.robbi.pushPileOfScrap"));
+		moveMenuItem = new MenuItem(i18n("Menu.robbi.move"));
 		moveMenuItem.setAccelerator(
 				new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
-		turnLeftMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.turnLeft"));
+		turnLeftMenuItem = new MenuItem(i18n("Menu.robbi.turnLeft"));
 		turnLeftMenuItem.setAccelerator(
 				new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 
-		putMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.put"));
+		putMenuItem = new MenuItem(i18n("Menu.robbi.put"));
 		putMenuItem.setAccelerator(
 				new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
-		takeMenuItem = new MenuItem(I18nUtils.i18n("Menu.robbi.take"));
+		takeMenuItem = new MenuItem(i18n("Menu.robbi.take"));
 		takeMenuItem.setAccelerator(
 				new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
-		robbiMenu = new Menu(I18nUtils.i18n("Menu.robbi"), null, moveMenuItem, turnLeftMenuItem, putMenuItem,
+		robbiMenu = new Menu(i18n("Menu.robbi"), null, moveMenuItem, turnLeftMenuItem, putMenuItem,
 				takeMenuItem, pushPileOfScrapMenuItem, itemPresentMenuItem, isStockpileMenuItem, hollowAheadMenuItem,
 				pileOfScrapAheadMenuItem, isBagFullMenuItem);
 		robbiMenu.setMnemonicParsing(true);
@@ -517,17 +522,17 @@ public class MainStage extends Stage {
 	private void createSimulation() {
 		logger.debug("Create simulation entry for menubar");
 
-		resetMenuItem = new MenuItem(I18nUtils.i18n("Menu.simulation.reset"));
+		resetMenuItem = new MenuItem(i18n("Menu.simulation.reset"));
 		resetMenuItem.setGraphic(new ImageView(resetImage));
-		startMenuItem = new MenuItem(I18nUtils.i18n("Menu.simulation.start"));
+		startMenuItem = new MenuItem(i18n("Menu.simulation.start"));
 		startMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F11, KeyCombination.CONTROL_DOWN));
 		startMenuItem.setGraphic(new ImageView(menuStartImage));
-		pauseMenuItem = new MenuItem(I18nUtils.i18n("Menu.simulation.pause"));
+		pauseMenuItem = new MenuItem(i18n("Menu.simulation.pause"));
 		pauseMenuItem.setGraphic(new ImageView(menuPauseImage));
-		stopMenuItem = new MenuItem(I18nUtils.i18n("Menu.simulation.stop"));
+		stopMenuItem = new MenuItem(i18n("Menu.simulation.stop"));
 		stopMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F12, KeyCombination.CONTROL_DOWN));
 		stopMenuItem.setGraphic(new ImageView(menuStopImage));
-		simulationMenu = new Menu(I18nUtils.i18n("Menu.simulation"), null, resetMenuItem, startMenuItem, pauseMenuItem,
+		simulationMenu = new Menu(i18n("Menu.simulation"), null, resetMenuItem, startMenuItem, pauseMenuItem,
 				stopMenuItem);
 		simulationMenu.setMnemonicParsing(true);
 	}
@@ -536,9 +541,9 @@ public class MainStage extends Stage {
 	 * Creates the examples-related menu-bar elements
 	 */
 	private void createExamplesMenu() {
-		saveExampleMenuItem = new MenuItem(I18nUtils.i18n("Menu.examples.save"));
-		loadExampleMenuItem = new MenuItem(I18nUtils.i18n("Menu.examples.load"));
-		examplesMenu = new Menu(I18nUtils.i18n("Menu.examples"), null, saveExampleMenuItem, loadExampleMenuItem);
+		saveExampleMenuItem = new MenuItem(i18n("Menu.examples.save"));
+		loadExampleMenuItem = new MenuItem(i18n("Menu.examples.load"));
+		examplesMenu = new Menu(i18n("Menu.examples"), null, saveExampleMenuItem, loadExampleMenuItem);
 	}
 
 	/**
@@ -546,15 +551,15 @@ public class MainStage extends Stage {
 	 */
 	private void createTutorMenu() {
 		if (PropertiesLoader.isTutor()) {
-			loadRequestMenuItem = new MenuItem(I18nUtils.i18n("Menu.tutor.loadRequest"));
-			saveAnswerMenuItem = new MenuItem(I18nUtils.i18n("Menu.tutor.saveAnswer"));
+			loadRequestMenuItem = new MenuItem(i18n("Menu.tutor.loadRequest"));
+			saveAnswerMenuItem = new MenuItem(i18n("Menu.tutor.saveAnswer"));
 
-			tutorMenu = new Menu(I18nUtils.i18n("Menu.tutor"), null, loadRequestMenuItem, saveAnswerMenuItem);
+			tutorMenu = new Menu(i18n("Menu.tutor"), null, loadRequestMenuItem, saveAnswerMenuItem);
 		} else {
-			sendRequestMenuItem = new MenuItem(I18nUtils.i18n("Menu.tutor.sendRequest"));
-			receiveAnswerMenuItem = new MenuItem(I18nUtils.i18n("Menu.tutor.receiveAnswer"));
+			sendRequestMenuItem = new MenuItem(i18n("Menu.tutor.sendRequest"));
+			receiveAnswerMenuItem = new MenuItem(i18n("Menu.tutor.receiveAnswer"));
 
-			tutorMenu = new Menu(I18nUtils.i18n("Menu.tutor"), null, sendRequestMenuItem, receiveAnswerMenuItem);
+			tutorMenu = new Menu(i18n("Menu.tutor"), null, sendRequestMenuItem, receiveAnswerMenuItem);
 		}
 	}
 
@@ -562,20 +567,20 @@ public class MainStage extends Stage {
 	 * Creates the window-related menu-bar elements.
 	 */
 	private void createWindowMenu() {
-		englishLanguageMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.language.english"));
-		germanLanguageMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.language.german"));
-		languageMenu = new Menu(I18nUtils.i18n("Menu.window.language"), null, englishLanguageMenuItem,
+		englishLanguageMenuItem = new MenuItem(i18n("Menu.window.language.english"));
+		germanLanguageMenuItem = new MenuItem(i18n("Menu.window.language.german"));
+		languageMenu = new Menu(i18n("Menu.window.language"), null, englishLanguageMenuItem,
 				germanLanguageMenuItem);
 
-		changeCursorMenuItem = new CheckMenuItem(I18nUtils.i18n("Menu.window.changeCursor"));
+		changeCursorMenuItem = new CheckMenuItem(i18n("Menu.window.changeCursor"));
 		// https://stackoverflow.com/a/49159612/13670629
-		darkModeMenuItem = new CheckMenuItem(I18nUtils.i18n("Menu.window.darkmode"));
-		enableSoundsMenuItem = new CheckMenuItem(I18nUtils.i18n("Menu.window.enableSounds"));
+		darkModeMenuItem = new CheckMenuItem(i18n("Menu.window.darkmode"));
+		enableSoundsMenuItem = new CheckMenuItem(i18n("Menu.window.enableSounds"));
 
-		infoMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.info"));
-		libraryMenuItem = new MenuItem(I18nUtils.i18n("Menu.window.libraries"));
+		infoMenuItem = new MenuItem(i18n("Menu.window.info"));
+		libraryMenuItem = new MenuItem(i18n("Menu.window.libraries"));
 
-		windowMenu = new Menu(I18nUtils.i18n("Menu.window"), null, languageMenu, changeCursorMenuItem, darkModeMenuItem,
+		windowMenu = new Menu(i18n("Menu.window"), null, languageMenu, changeCursorMenuItem, darkModeMenuItem,
 				enableSoundsMenuItem, new SeparatorMenuItem(), infoMenuItem, libraryMenuItem);
 	}
 

@@ -19,7 +19,7 @@ public class SnackbarController {
 	}
 
 	public void showMessage(String key, Object... args) {
-		logger.debug("Showing snackbar-message: {}", key);
+		logger.debug("Showing snackbar-message: {}; {}", key, i18n(key, args));
 		snackbar.fireEvent(new SnackbarEvent(new JFXSnackbarLayout(i18n(key, args))));
 	}
 
