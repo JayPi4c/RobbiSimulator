@@ -10,6 +10,7 @@ import java.io.IOException;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This class contains the contents, the name of program and whether it is
@@ -20,11 +21,20 @@ import lombok.Getter;
  */
 @Getter
 public class Program extends Observable {
+
+	/**
+	 * The name of the program
+	 */
+	@Setter
 	private String name;
 
 	private String editorContent;
 	private File file;
 
+	/**
+	 * Whether the program is edited or not
+	 */
+	@Setter
 	private boolean edited = false;
 
 	/**
@@ -93,24 +103,6 @@ public class Program extends Observable {
 			e.printStackTrace();
 		}
 		edited = false;
-	}
-
-	/**
-	 * Sets the edited flag
-	 * 
-	 * @param flag the value of the edited flag
-	 */
-	public void setEdited(boolean flag) {
-		edited = flag;
-	}
-
-	/**
-	 * Setter for the name attribute.
-	 * 
-	 * @param newName the new name for the program
-	 */
-	public void setName(String newName) {
-		this.name = newName;
 	}
 
 }

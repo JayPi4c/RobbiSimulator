@@ -75,7 +75,9 @@ public class Simulation extends Thread implements Observer {
 			} else if (e.getCause() instanceof RobbiException re) {
 				logger.debug("Simulation stopped with exception: {}", re.getMessage());
 				SoundManager.playWarnSound();
-				Platform.runLater(() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getMessage(), parent));
+				// TODO: change to Snackbar?
+				Platform.runLater(
+						() -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getLocalizedMessage(), parent));
 			} else
 				e.printStackTrace();
 		} finally {

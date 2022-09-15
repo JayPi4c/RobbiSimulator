@@ -1,7 +1,5 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
-
 /**
  * Exception to be thrown if robbi attempts to move a pile of Scrap while the
  * tile ahead is not suitable to push a pile to.
@@ -17,7 +15,7 @@ public class TileBlockedException extends RobbiException {
 	 * Constructor for a new TileBlockedException with localized message.
 	 */
 	public TileBlockedException() {
-		super(I18nUtils.i18n("Exception.TileBlocked"));
+		super("Exception.TileBlocked");
 	}
 
 }

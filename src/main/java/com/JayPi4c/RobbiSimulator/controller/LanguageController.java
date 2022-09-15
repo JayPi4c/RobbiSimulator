@@ -1,15 +1,14 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.createBinding;
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.createTooltip;
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
-
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
-import javafx.scene.control.Tooltip;
 
 /**
  * Controller to handle the change of language.
@@ -18,6 +17,7 @@ import javafx.scene.control.Tooltip;
  *
  */
 public class LanguageController {
+
 	private MainStage stage;
 
 	/**
@@ -30,18 +30,21 @@ public class LanguageController {
 		this.stage = mainStage;
 
 		mainStage.getGermanLanguageMenuItem().setOnAction(e -> {
-			I18nUtils.setBundle(getBundle(Locale.GERMANY));
+			I18nUtils.setLocale(Locale.GERMANY);
 			updateTitle();
+			mainStage.getSnackbarController().showMessage("language.changed");
 		});
 		mainStage.getEnglishLanguageMenuItem().setOnAction(e -> {
-			I18nUtils.setBundle(getBundle(Locale.UK));
+			I18nUtils.setLocale(Locale.UK);
 			updateTitle();
+			mainStage.getSnackbarController().showMessage("language.changed");
 		});
 
 		// text bindings
 		mainStage.getNewEditorMenuItem().textProperty().bind(createBinding("Menu.editor.new"));
 		mainStage.getSaveEditorMenuItem().textProperty().bind(createBinding("Menu.editor.save"));
 		mainStage.getOpenEditorMenuItem().textProperty().bind(createBinding("Menu.editor.open"));
+		mainStage.getFormatSourceCodeMenuItem().textProperty().bind(createBinding("Menu.editor.format"));
 		mainStage.getCompileEditorMenuItem().textProperty().bind(createBinding("Menu.editor.compile"));
 		mainStage.getPrintEditorMenuItem().textProperty().bind(createBinding("Menu.editor.print"));
 		mainStage.getQuitEditorMenuItem().textProperty().bind(createBinding("Menu.editor.quit"));
@@ -134,8 +137,6 @@ public class LanguageController {
 		mainStage.getStopToggleButtonToolbar().setTooltip(createTooltip("Toolbar.action.stop"));
 		mainStage.getSpeedSliderToolbar().setTooltip(createTooltip("Toolbar.action.speed"));
 
-		mainStage.getMessageLabel().textProperty().bind(createBinding("Messages.label.greeting"));
-
 		mainStage.getExamplesMenu().textProperty().bind(createBinding("Menu.examples"));
 		mainStage.getLoadExampleMenuItem().textProperty().bind(createBinding("Menu.examples.load"));
 		mainStage.getSaveExampleMenuItem().textProperty().bind(createBinding("Menu.examples.save"));
@@ -151,37 +152,11 @@ public class LanguageController {
 	}
 
 	/**
-	 * Helper to crate a new String Binding for the provided key.
-	 * 
-	 * @param key the key to be mapped on the resources
-	 * @return a binding for the provided key
-	 */
-	private StringBinding createBinding(String key) {
-		return Bindings.createStringBinding(() -> I18nUtils.i18n(key), I18nUtils.bundleProperty());
-	}
-
-	/**
-	 * Helper to create a new Tooltip with a text-binding to the provided key.
-	 * 
-	 * @param key the key to map the text to
-	 * @return a Tooltip with text-binding
-	 */
-	private Tooltip createTooltip(String key) {
-		Tooltip tt = new Tooltip();
-		tt.textProperty().bind(createBinding(key));
-		return tt;
-	}
-
-	private static ResourceBundle getBundle(Locale locale) {
-		return ResourceBundle.getBundle("lang.messages", locale);
-	}
-
-	/**
 	 * needed since the star (*) would mess with the binding property
 	 */
 	public void updateTitle() {
-		stage.setTitle(I18nUtils.i18n("Main.title") + ": " + stage.getProgram().getName()
-				+ (stage.getProgram().isEdited() ? "*" : ""));
+		stage.setTitle(
+				i18n("Main.title") + ": " + stage.getProgram().getName() + (stage.getProgram().isEdited() ? "*" : ""));
 	}
 
 }

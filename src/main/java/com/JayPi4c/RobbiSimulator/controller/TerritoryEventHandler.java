@@ -1,12 +1,12 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
 import com.JayPi4c.RobbiSimulator.model.Territory;
+import com.JayPi4c.RobbiSimulator.view.MainStage;
 import com.JayPi4c.RobbiSimulator.view.RobbiContextMenu;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Window;
 
 /**
  * This class combines all functions needed to control the user interaction with
@@ -35,7 +35,7 @@ public class TerritoryEventHandler implements EventHandler<MouseEvent> {
 	 * @param parent         the parent window to show alerts relative to it
 	 */
 	public TerritoryEventHandler(Territory territory, TerritoryPanel territoryPanel, ButtonState buttonState,
-			Window parent) {
+			MainStage parent) {
 		this.territory = territory;
 		this.buttonState = buttonState;
 		territoryPanel.setOnContextMenuRequested(event -> {

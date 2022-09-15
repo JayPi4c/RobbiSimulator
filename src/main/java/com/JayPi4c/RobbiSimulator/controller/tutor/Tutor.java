@@ -67,8 +67,6 @@ public class Tutor extends UnicastRemoteObject implements ITutor {
 	 * @return Optional of the oldest request or an empty Optional.
 	 */
 	public synchronized Optional<Request> getNewRequest() {
-		if (requests.isEmpty())
-			return Optional.empty();
 		return Optional.ofNullable(requests.poll());
 	}
 

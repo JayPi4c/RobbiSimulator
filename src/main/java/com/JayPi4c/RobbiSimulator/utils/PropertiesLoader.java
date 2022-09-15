@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PropertiesLoader {
 
 	private static Properties properties;
@@ -23,12 +26,6 @@ public class PropertiesLoader {
 	private static final String DIR = System.getProperty("user.dir");
 	private static final String FILE = "/simulator.properties";
 	private static final String COMMENTS = "role=student OR tutor";
-
-	/**
-	 * Private constructor to hide the implicit one.
-	 */
-	private PropertiesLoader() {
-	}
 
 	/**
 	 * Loads the properties and stores them in an Object.
@@ -133,7 +130,7 @@ public class PropertiesLoader {
 	 * @return true, if the saving was successful, false otherwise
 	 */
 	public static boolean finish() {
-		properties.put("lang", I18nUtils.getBundle().getLocale().toString());
+		properties.put("lang", I18nUtils.getLocale().toString());
 		properties.put("sounds", Boolean.toString(SoundManager.getSound()));
 		properties.put("darkmode", Boolean.toString(SceneManager.getDarkmode()));
 		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {

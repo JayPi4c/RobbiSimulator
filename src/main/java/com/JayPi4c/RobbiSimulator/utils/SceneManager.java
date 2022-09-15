@@ -2,6 +2,8 @@ package com.JayPi4c.RobbiSimulator.utils;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Class to manage the loaded scene.
@@ -9,7 +11,9 @@ import javafx.beans.property.SimpleObjectProperty;
  * @author Jonas Pohl
  *
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SceneManager {
+
 	/**
 	 * The boolean on which elements can bind in order to be updated on darkmode
 	 * change.
@@ -52,9 +56,4 @@ public class SceneManager {
 		return "css/dark-theme.css";
 	}
 
-	/**
-	 * Private constructor to hide the implicit one.
-	 */
-	private SceneManager() {
-	}
 }

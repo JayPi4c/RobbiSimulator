@@ -12,11 +12,11 @@ import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.annotations.Default;
+import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Window;
 
 /**
  * MethodHandler to handle a methods invocation
@@ -28,7 +28,7 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 
 	private Method method;
 	private Territory territory;
-	private Window parent;
+	private MainStage parent;
 
 	/**
 	 * Creates a new MethodHandler with the method and the territory the message is
@@ -39,7 +39,7 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 	 * @param parent    the parent window, in order to place alerts relative to the
 	 *                  window
 	 */
-	public MethodHandler(Method method, Territory territory, Window parent) {
+	public MethodHandler(Method method, Territory territory, MainStage parent) {
 		this.method = method;
 		this.territory = territory;
 		this.parent = parent;
@@ -61,7 +61,7 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 					}
 				}
 			}
-			Object[] arr = args.toArray(new Object[0]);
+			Object[] arr = args.toArray(Object[]::new);
 			Object result = this.method.invoke(this.territory.getRobbi(), arr);
 
 			if (result != null) {
@@ -73,7 +73,7 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 		} catch (InvocationTargetException e) {
 			if (e.getCause().getClass() != ThreadDeath.class) {
 				if (e.getCause() instanceof RobbiException) {
-					AlertHelper.showAlertAndWait(AlertType.WARNING, e.getCause().getMessage(), parent);
+					parent.getSnackbarController().showMessage(e.getCause().getLocalizedMessage());
 				} else {
 					AlertHelper.showAlertAndWait(AlertType.ERROR, e.getCause().getMessage(), parent);
 				}
@@ -117,6 +117,7 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 				args.add(val);
 			}
 		} catch (IllegalArgumentException e) {
+			// TODO fix i18n
 			AlertHelper.showAlertAndWait(AlertType.ERROR,
 					String.format(I18nUtils.i18n("Editor.contextMenu.executionError"), val, method.getName()), parent);
 			return false;

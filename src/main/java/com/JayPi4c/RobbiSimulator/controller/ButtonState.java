@@ -14,6 +14,7 @@ import lombok.Setter;
  *
  */
 public class ButtonState {
+
 	/**
 	 * Constant for the ButtonState NONE.
 	 */

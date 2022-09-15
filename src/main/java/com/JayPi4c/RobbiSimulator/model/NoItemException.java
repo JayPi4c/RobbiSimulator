@@ -1,7 +1,5 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
-
 /**
  * Exception to be thrown if robbi tries to pick up an item from a tile, which
  * has no item provied.
@@ -17,7 +15,7 @@ public class NoItemException extends RobbiException {
 	 * Constructor for a new NoItemException with a localized message.
 	 */
 	public NoItemException() {
-		super(I18nUtils.i18n("Exception.NoItem"));
+		super("Exception.NoItem");
 	}
 
 }

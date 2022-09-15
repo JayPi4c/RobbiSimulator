@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class TerritoryTest {
-	
+
 	@Mock
 	TerritoryState stateMock;
 
@@ -23,7 +23,6 @@ class TerritoryTest {
 
 	@Mock
 	Territory territoryMock;
-
 
 	@Test
 	void testConstructor() {
@@ -73,7 +72,7 @@ class TerritoryTest {
 	}
 
 	@Test
-	void testGetTile(){
+	void testGetTile() {
 		Territory territory = new Territory();
 		territory.placeAccu(0, 0);
 		territory.placeHollow(1, 0);
@@ -83,7 +82,7 @@ class TerritoryTest {
 	}
 
 	@Test
-	void testGetNumRows(){
+	void testGetNumRows() {
 		Territory territory = new Territory();
 		assertEquals(6, territory.getNumRows());
 		territory.changeSize(4, 2);
@@ -91,7 +90,7 @@ class TerritoryTest {
 	}
 
 	@Test
-	void testGetNumCols(){
+	void testGetNumCols() {
 		Territory territory = new Territory();
 		assertEquals(6, territory.getNumCols());
 		territory.changeSize(4, 2);
@@ -99,9 +98,9 @@ class TerritoryTest {
 	}
 
 	@Test
-	void testSetRobbi(){
+	void testSetRobbi() {
 		Robbi robbi = new Robbi();
-		
+
 		Territory territory = new Territory();
 		territory.setRobbi(robbi);
 
@@ -110,7 +109,7 @@ class TerritoryTest {
 	}
 
 	@Test
-	void testRobbiOnTile(){
+	void testRobbiOnTile() {
 		Territory territory = new Territory();
 		territory.placeRobbi(2, 3);
 		assertEquals(2, territory.getRobbi().getX());
@@ -119,14 +118,14 @@ class TerritoryTest {
 	}
 
 	@Test
-	void testPlaceItem(){
+	void testPlaceItem() {
 		Territory territory = new Territory();
 		territory.placeItem(new Nut(), 2, 3);
 		assertTrue(territory.getItem(2, 3) instanceof Nut);
 	}
 
 	@Test
-	void testRemoveItem(){
+	void testRemoveItem() {
 		Territory territory = new Territory();
 		Nut n = new Nut();
 		territory.placeItem(n, 2, 3);
@@ -136,9 +135,9 @@ class TerritoryTest {
 	}
 
 	@Test
-	void testUpate()throws InvalidTerritoryException{
+	void testUpate() throws InvalidTerritoryException {
 
-		Territory otherTerritory= new Territory();
+		Territory otherTerritory = new Territory();
 		otherTerritory.changeSize(4, 5);
 
 		assertEquals(4, otherTerritory.getNumCols());
@@ -151,15 +150,16 @@ class TerritoryTest {
 		Territory territory = new Territory();
 		Nut n = new Nut();
 		territory.update(otherTerritory, n, 2, 3, DIRECTION.SOUTH);
-		
+
 		assertEquals(otherTerritory.getNumCols(), territory.getNumCols());
 		assertEquals(otherTerritory.getNumRows(), territory.getNumRows());
 		assertEquals(2, territory.getRobbiX());
 		assertEquals(3, territory.getRobbiY());
 		assertEquals(n, territory.getRobbiItem());
 		assertEquals(DIRECTION.SOUTH, territory.getRobbiDirection());
-		
-		assertThrows(InvalidTerritoryException.class, () -> territory.update(new Territory(), null, 10, 10, DIRECTION.SOUTH));
+
+		assertThrows(InvalidTerritoryException.class,
+				() -> territory.update(new Territory(), null, 10, 10, DIRECTION.SOUTH));
 	}
 
 	@Test
@@ -226,4 +226,5 @@ class TerritoryTest {
 		territory.placePileOfScrap(0, 1);
 		assertTrue(territory.getTile(0, 1) instanceof PileOfScrap);
 	}
+
 }

@@ -34,4 +34,5 @@ public class PileOfScrap extends Tile {
 	public Item getItem() {
 		return null;
 	}
+
 }

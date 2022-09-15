@@ -20,7 +20,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.transform.Rotate;
-import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -82,7 +81,7 @@ public class TerritoryPanel extends Canvas implements Observer {
 	 * @param parent      the parent Window to show alerts relative to the calling
 	 *                    window
 	 */
-	public TerritoryPanel(Territory territory, ButtonState buttonState, Window parent) {
+	public TerritoryPanel(Territory territory, ButtonState buttonState, MainStage parent) {
 		this.territory = territory;
 		this.territory.addObserver(this);
 

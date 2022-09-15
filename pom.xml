@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.JayPi4c</groupId>
 	<artifactId>RobbiSimulator</artifactId>
@@ -14,18 +13,6 @@
 	</properties>
 
 	<build>
-		<!--<sourceDirectory>src</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-				<includes>
-					<include>**/*.xml</include>
-				</includes>
-			</resource>
-		</resources>-->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -122,8 +109,8 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>make-assembly</id>						<!-- this is used for inheritance merges -->
-						<phase>package</phase>						<!-- bind to the packaging phase -->
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
 						<goals>
 							<goal>single</goal>
 						</goals>
@@ -154,6 +141,12 @@
 			<artifactId>jfoenix</artifactId>
 			<version>9.0.10</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.mihosoft.monacofx</groupId>
+			<artifactId>monacofx</artifactId>
+			<version>0.0.8</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>

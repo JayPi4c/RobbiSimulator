@@ -106,48 +106,48 @@ public class Robbi {
 		synchronized (territory) {
 			Tile t;
 			switch (facing) {
-			case NORTH:
-				t = territory.getTile(x, y - 1);
-				if (t instanceof Hollow)
-					throw new HollowAheadException();
-				else {
-					y = y - 1;
-					y += territory.getNumRows();
-					y %= territory.getNumRows();
-				}
-				break;
-			case SOUTH:
-				t = territory.getTile(x, y + 1);
-				if (t instanceof Hollow)
-					throw new HollowAheadException();
-				else {
-					y = y + 1;
-					y += territory.getNumRows();
-					y %= territory.getNumRows();
-				}
-				break;
-			case EAST:
-				t = territory.getTile(x + 1, y);
-				if (t instanceof Hollow)
-					throw new HollowAheadException();
-				else {
-					x = x + 1;
-					x += territory.getNumCols();
-					x %= territory.getNumCols();
-				}
-				break;
-			case WEST:
-				t = territory.getTile(x - 1, y);
-				if (t instanceof Hollow)
-					throw new HollowAheadException();
-				else {
-					x = x - 1;
-					x += territory.getNumCols();
-					x %= territory.getNumCols();
-				}
-				break;
-			default:
-				break;
+				case NORTH:
+					t = territory.getTile(x, y - 1);
+					if (t instanceof Hollow)
+						throw new HollowAheadException();
+					else {
+						y = y - 1;
+						y += territory.getNumRows();
+						y %= territory.getNumRows();
+					}
+					break;
+				case SOUTH:
+					t = territory.getTile(x, y + 1);
+					if (t instanceof Hollow)
+						throw new HollowAheadException();
+					else {
+						y = y + 1;
+						y += territory.getNumRows();
+						y %= territory.getNumRows();
+					}
+					break;
+				case EAST:
+					t = territory.getTile(x + 1, y);
+					if (t instanceof Hollow)
+						throw new HollowAheadException();
+					else {
+						x = x + 1;
+						x += territory.getNumCols();
+						x %= territory.getNumCols();
+					}
+					break;
+				case WEST:
+					t = territory.getTile(x - 1, y);
+					if (t instanceof Hollow)
+						throw new HollowAheadException();
+					else {
+						x = x - 1;
+						x += territory.getNumCols();
+						x %= territory.getNumCols();
+					}
+					break;
+				default:
+					break;
 			}
 		}
 		territory.setChanged();
@@ -210,14 +210,14 @@ public class Robbi {
 				throw new NoPileOfScrapAheadException();
 			}
 			int dx = switch (facing) {
-			case EAST -> x + 2;
-			case WEST -> x - 2;
-			default -> x;
+				case EAST -> x + 2;
+				case WEST -> x - 2;
+				default -> x;
 			};
 			int dy = switch (facing) {
-			case NORTH -> y - 2;
-			case SOUTH -> y + 2;
-			default -> y;
+				case NORTH -> y - 2;
+				case SOUTH -> y + 2;
+				default -> y;
 			};
 
 			Tile t = territory.getTile(dx, dy);
@@ -230,14 +230,14 @@ public class Robbi {
 				else
 					territory.placePileOfScrap(dx, dy);
 				int px = switch (facing) {
-				case EAST -> x + 1;
-				case WEST -> x - 1;
-				default -> x;
+					case EAST -> x + 1;
+					case WEST -> x - 1;
+					default -> x;
 				};
 				int py = switch (facing) {
-				case NORTH -> y - 1;
-				case SOUTH -> y + 1;
-				default -> y;
+					case NORTH -> y - 1;
+					case SOUTH -> y + 1;
+					default -> y;
 				};
 				territory.clearTile(px, py);
 			}
@@ -276,14 +276,14 @@ public class Robbi {
 	public final boolean vornKuhle() {
 		synchronized (territory) {
 			int dx = switch (facing) {
-			case EAST -> x + 1;
-			case WEST -> x - 1;
-			default -> x;
+				case EAST -> x + 1;
+				case WEST -> x - 1;
+				default -> x;
 			};
 			int dy = switch (facing) {
-			case NORTH -> y - 1;
-			case SOUTH -> y + 1;
-			default -> y;
+				case NORTH -> y - 1;
+				case SOUTH -> y + 1;
+				default -> y;
 			};
 			return territory.getTile(dx, dy) instanceof Hollow;
 		}
@@ -297,14 +297,14 @@ public class Robbi {
 	public final boolean vornSchrotthaufen() {
 		synchronized (territory) {
 			int dx = switch (facing) {
-			case EAST -> x + 1;
-			case WEST -> x - 1;
-			default -> x;
+				case EAST -> x + 1;
+				case WEST -> x - 1;
+				default -> x;
 			};
 			int dy = switch (facing) {
-			case NORTH -> y - 1;
-			case SOUTH -> y + 1;
-			default -> y;
+				case NORTH -> y - 1;
+				case SOUTH -> y + 1;
+				default -> y;
 			};
 			return territory.getTile(dx, dy) instanceof PileOfScrap;
 		}
@@ -328,20 +328,20 @@ public class Robbi {
 	 */
 	void print() {
 		switch (facing) {
-		case NORTH:
-			System.out.print("^");
-			break;
-		case SOUTH:
-			System.out.print("v");
-			break;
-		case EAST:
-			System.out.print(">");
-			break;
-		case WEST:
-			System.out.print("<");
-			break;
-		default:
-			System.out.print(" ");
+			case NORTH:
+				System.out.print("^");
+				break;
+			case SOUTH:
+				System.out.print("v");
+				break;
+			case EAST:
+				System.out.print(">");
+				break;
+			case WEST:
+				System.out.print("<");
+				break;
+			default:
+				System.out.print(" ");
 		}
 	}
 
