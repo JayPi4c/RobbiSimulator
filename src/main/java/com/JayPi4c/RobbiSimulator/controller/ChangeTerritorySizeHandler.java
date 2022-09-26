@@ -32,6 +32,12 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 	private Dialog<Dimension> dialog;
 	private Window parent;
 
+	// language keys
+	private static final String CHANGESIZE_DIALOG_TITLE = "ChangeSize.dialog.title";
+	private static final String CHANGESIZE_DIALOG_HEADER = "ChangeSize.dialog.header";
+	private static final String CHANGESIZE_DIALOG_COLS = "ChangeSize.dialog.cols";
+	private static final String CHANGESIZE_DIALOG_ROWS = "ChangeSize.dialog.rows";
+
 	/**
 	 * Creates a new ChangeTerritorySizeHandler and sets up a new Dialog, which can
 	 * be invoked in the handle method
@@ -51,8 +57,8 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 	 */
 	private void createDialog() {
 		dialog = new Dialog<>();
-		dialog.setTitle(i18n("ChangeSize.dialog.title"));
-		dialog.setHeaderText(i18n("ChangeSize.dialog.header"));
+		dialog.setTitle(i18n(CHANGESIZE_DIALOG_TITLE));
+		dialog.setHeaderText(i18n(CHANGESIZE_DIALOG_HEADER));
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 		TextField rowField = new TextField();
@@ -63,8 +69,8 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 				.lookupButton(ButtonType.OK).setDisable(newVal.isEmpty() || !isValid(newVal)));
 
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(i18n("ChangeSize.dialog.cols")), colField);
-		grid.addRow(1, new Label(i18n("ChangeSize.dialog.rows")), rowField);
+		grid.addRow(0, new Label(i18n(CHANGESIZE_DIALOG_COLS)), colField);
+		grid.addRow(1, new Label(i18n(CHANGESIZE_DIALOG_ROWS)), rowField);
 		grid.setHgap(20);
 		dialogPane.setContent(grid);
 		rowField.setText(Integer.toString(territory.getNumRows()));

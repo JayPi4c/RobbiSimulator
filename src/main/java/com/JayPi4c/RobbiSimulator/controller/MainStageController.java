@@ -27,7 +27,9 @@ import com.JayPi4c.RobbiSimulator.utils.Observer;
 import com.JayPi4c.RobbiSimulator.utils.SceneManager;
 import com.JayPi4c.RobbiSimulator.utils.SoundManager;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
+import com.JayPi4c.RobbiSimulator.view.MenuBar;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
+import com.JayPi4c.RobbiSimulator.view.Toolbar;
 import com.jfoenix.utils.JFXUtilities;
 
 import eu.mihosoft.monacofx.MonacoFX;
@@ -92,21 +94,23 @@ public class MainStageController implements Observer {
 			ProgramController.close(mainStage.getProgram().getName());
 		});
 
+		MenuBar menuBar = mainStage.getMenubar();
+
 		// editor (menuBar)
-		mainStage.getNewEditorMenuItem().setOnAction(e -> ProgramController.createAndShow(mainStage));
-		mainStage.getOpenEditorMenuItem().setOnAction(e -> ProgramController.openProgram(mainStage));
-		mainStage.getSaveEditorMenuItem().setOnAction(e -> {
+		menuBar.getNewEditorMenuItem().setOnAction(e -> ProgramController.createAndShow(mainStage));
+		menuBar.getOpenEditorMenuItem().setOnAction(e -> ProgramController.openProgram(mainStage));
+		menuBar.getSaveEditorMenuItem().setOnAction(e -> {
 			mainStage.getProgram().save(mainStage.getTextArea().getEditor().getDocument().getText());
 			mainStage.setTitle(getTitle(mainStage.getProgram()));
 		});
 
-		mainStage.getFormatSourceCodeMenuItem().setOnAction(e -> {
+		menuBar.getFormatSourceCodeMenuItem().setOnAction(e -> {
 			mainStage.getSnackbarController().showMessage("not.implemented");
 			// For this the following PR should first be merged:
 			// https://github.com/miho/MonacoFX/pull/25
 		});
 
-		mainStage.getCompileEditorMenuItem().setOnAction(e -> {
+		menuBar.getCompileEditorMenuItem().setOnAction(e -> {
 			mainStage.getSimulationController().stopSimulation();
 			Program program = mainStage.getProgram();
 			program.save(mainStage.getTextArea().getEditor().getDocument().getText());
@@ -114,9 +118,9 @@ public class MainStageController implements Observer {
 			ProgramController.compile(program, mainStage);
 		});
 		// TODO print editor content
-		mainStage.getPrintEditorMenuItem()
+		menuBar.getPrintEditorMenuItem()
 				.setOnAction(e -> mainStage.getSnackbarController().showMessage("not.implemented"));
-		mainStage.getQuitEditorMenuItem().setOnAction(e -> {
+		menuBar.getQuitEditorMenuItem().setOnAction(e -> {
 			Program program = mainStage.getProgram();
 			logger.info("exiting {}", program.getName());
 			program.save(mainStage.getTextArea().getEditor().getDocument().getText());
@@ -125,7 +129,7 @@ public class MainStageController implements Observer {
 		});
 		// Territory (menuBar)
 		// save -> TerritorySaveController
-		mainStage.getSaveAsPNGMenuItem().setOnAction(e -> {
+		menuBar.getSaveAsPNGMenuItem().setOnAction(e -> {
 			String extension = ".png";
 			File file = getFile(i18n("Menu.territory.saveAsPic.png.description"), extension);
 			if (file == null)
@@ -135,7 +139,7 @@ public class MainStageController implements Observer {
 				mainStage.getSnackbarController().showMessage("Menu.territory.saveAsPic.error");
 			}
 		});
-		mainStage.getSaveAsGifMenuItem().setOnAction(e -> {
+		menuBar.getSaveAsGifMenuItem().setOnAction(e -> {
 			String extension = ".gif";
 			File file = getFile(i18n("Menu.territory.saveAsPic.gif.description"), extension);
 			if (file == null)
@@ -145,50 +149,50 @@ public class MainStageController implements Observer {
 				mainStage.getSnackbarController().showMessage("Menu.territory.saveAsPic.error");
 			}
 		});
-		mainStage.getPrintTerritoryMenuItem().setOnAction(e -> printTerritory());
-		mainStage.getChangeSizeTerritoryMenuItem()
+		menuBar.getPrintTerritoryMenuItem().setOnAction(e -> printTerritory());
+		menuBar.getChangeSizeTerritoryMenuItem()
 				.setOnAction(new ChangeTerritorySizeHandler(mainStage, mainStage.getTerritory()));
 
-		mainStage.getPlaceRobbiTerritoryRadioMenuItem()
+		menuBar.getPlaceRobbiTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuRobbiImage, ButtonState.ROBBI));
-		mainStage.getPlaceHollowTerritoryRadioMenuItem()
+		menuBar.getPlaceHollowTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuHollowImage, ButtonState.HOLLOW));
-		mainStage.getPlacePileOfScrapTerritoryRadioMenuItem()
+		menuBar.getPlacePileOfScrapTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuPileOfScrapImage, ButtonState.PILE_OF_SCRAP));
-		mainStage.getPlaceStockpileTerritoryRadioMenuItem()
+		menuBar.getPlaceStockpileTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuStockpileImage, ButtonState.STOCKPILE));
-		mainStage.getPlaceAccuTerritoryRadioMenuItem()
+		menuBar.getPlaceAccuTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuAccuImage, ButtonState.ACCU));
-		mainStage.getPlaceScrewTerritoryRadioMenuItem()
+		menuBar.getPlaceScrewTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuScrewImage, ButtonState.SCREW));
-		mainStage.getPlaceNutTerritoryRadioMenuItem()
+		menuBar.getPlaceNutTerritoryRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuNutImage, ButtonState.NUT));
-		mainStage.getDeleteFieldRadioMenuItem()
+		menuBar.getDeleteFieldRadioMenuItem()
 				.setOnAction(getRadioHandler(MainStage.menuDeleteImage, ButtonState.CLEAR));
 		// Robbi (menuBar)
-		mainStage.getMoveMenuItem().setOnAction(e -> {
+		menuBar.getMoveMenuItem().setOnAction(e -> {
 			try {
 				mainStage.getTerritory().getRobbi().vor();
 			} catch (HollowAheadException ex) {
 				mainStage.getSnackbarController().showMessage(ex.getMessage());
 			}
 		});
-		mainStage.getTurnLeftMenuItem().setOnAction(e -> mainStage.getTerritory().getRobbi().linksUm());
-		mainStage.getPutMenuItem().setOnAction(e -> {
+		menuBar.getTurnLeftMenuItem().setOnAction(e -> mainStage.getTerritory().getRobbi().linksUm());
+		menuBar.getPutMenuItem().setOnAction(e -> {
 			try {
 				mainStage.getTerritory().getRobbi().legeAb();
 			} catch (BagIsEmptyException | TileIsFullException ex) {
 				mainStage.getSnackbarController().showMessage(ex.getMessage());
 			}
 		});
-		mainStage.getTakeMenuItem().setOnAction(e -> {
+		menuBar.getTakeMenuItem().setOnAction(e -> {
 			try {
 				mainStage.getTerritory().getRobbi().nehmeAuf();
 			} catch (NoItemException | BagIsFullException ex) {
 				mainStage.getSnackbarController().showMessage(ex.getMessage());
 			}
 		});
-		mainStage.getPushPileOfScrapMenuItem().setOnAction(e -> {
+		menuBar.getPushPileOfScrapMenuItem().setOnAction(e -> {
 			try {
 				mainStage.getTerritory().getRobbi().schiebeSchrotthaufen();
 			} catch (NoPileOfScrapAheadException | TileBlockedException ex) {
@@ -196,39 +200,39 @@ public class MainStageController implements Observer {
 			}
 		});
 
-		mainStage.getItemPresentMenuItem().setOnAction(e -> {
+		menuBar.getItemPresentMenuItem().setOnAction(e -> {
 			boolean itemPresent = mainStage.getTerritory().getRobbi().gegenstandDa();
 			mainStage.getSnackbarController().showMessage("Execution.information.itemPresent", itemPresent);
 		});
-		mainStage.getIsStockpileMenuItem().setOnAction(e -> {
+		menuBar.getIsStockpileMenuItem().setOnAction(e -> {
 			boolean stockpilePresent = mainStage.getTerritory().getRobbi().istLagerplatz();
 			mainStage.getSnackbarController().showMessage("Execution.information.stockpile", stockpilePresent);
 		});
-		mainStage.getHollowAheadMenuItem().setOnAction(e -> {
+		menuBar.getHollowAheadMenuItem().setOnAction(e -> {
 			boolean hollowAhead = mainStage.getTerritory().getRobbi().vornKuhle();
 			mainStage.getSnackbarController().showMessage("Execution.information.hollow", hollowAhead);
 		});
-		mainStage.getPileOfScrapAheadMenuItem().setOnAction(e -> {
+		menuBar.getPileOfScrapAheadMenuItem().setOnAction(e -> {
 			boolean pileOfScrapAhead = mainStage.getTerritory().getRobbi().vornSchrotthaufen();
 			mainStage.getSnackbarController().showMessage("Execution.information.pileOfScrap", pileOfScrapAhead);
 		});
-		mainStage.getIsBagFullMenuItem().setOnAction(e -> {
+		menuBar.getIsBagFullMenuItem().setOnAction(e -> {
 			boolean isBagFull = mainStage.getTerritory().getRobbi().istTascheVoll();
 			mainStage.getSnackbarController().showMessage("Execution.information.bag", isBagFull);
 		});
 
-		// simualtion (menuBar) -> SimualtionController
+		// simulation (menuBar) -> SimualtionController
 		// examples (menuBar) -> ExamplesController
 		// tutor (menuBar) -> TutorController / StudentController
 		// window (menuBar)
 		// language -> LangaugeController
 
-		mainStage.getChangeCursorMenuItem().setOnAction(e -> {
-			setChangeCursor(mainStage.getChangeCursorMenuItem().isSelected());
-			if (!mainStage.getChangeCursorMenuItem().isSelected())
+		menuBar.getChangeCursorMenuItem().setOnAction(e -> {
+			setChangeCursor(menuBar.getChangeCursorMenuItem().isSelected());
+			if (!menuBar.getChangeCursorMenuItem().isSelected())
 				mainStage.getScene().setCursor(Cursor.DEFAULT);
 		});
-		mainStage.getDarkModeMenuItem().selectedProperty().bindBidirectional(SceneManager.darkmodeProperty());
+		menuBar.getDarkModeMenuItem().selectedProperty().bindBidirectional(SceneManager.darkmodeProperty());
 		SceneManager.darkmodeProperty().addListener((obs, oldVal, newVal) -> {
 			if (Boolean.TRUE.equals(newVal)) {
 				mainStage.getScene().getStylesheets().add(SceneManager.getDarkmodeCss());
@@ -242,12 +246,12 @@ public class MainStageController implements Observer {
 			mainStage.getScene().getStylesheets().add(SceneManager.getDarkmodeCss());
 			mainStage.getTextArea().getEditor().setCurrentTheme("vs-dark");
 		}
-		mainStage.getEnableSoundsMenuItem().selectedProperty().bindBidirectional(SoundManager.soundProperty());
-		mainStage.getInfoMenuItem()
+		menuBar.getEnableSoundsMenuItem().selectedProperty().bindBidirectional(SoundManager.soundProperty());
+		menuBar.getInfoMenuItem()
 				.setOnAction(e -> AlertHelper.showAlertAndWait(AlertType.INFORMATION, i18n("Menu.window.info.content"),
 						mainStage, Modality.WINDOW_MODAL, i18n("Menu.window.info.title"),
 						i18n("Menu.window.info.header")));
-		mainStage.getLibraryMenuItem().setOnAction(e -> {
+		menuBar.getLibraryMenuItem().setOnAction(e -> {
 			String javaFxVersion = System.getProperty("javafx.version");
 			String javaVersion = System.getProperty("java.version");
 			String derbyVersion = sysinfo.getVersionString();
@@ -264,37 +268,38 @@ public class MainStageController implements Observer {
 					i18n("Menu.window.libraries.header"));
 		});
 
+		Toolbar toolbar = mainStage.getToolbar();
+
 		// Editor (toolbar)
-		mainStage.getNewButtonToolbar().onActionProperty().bind(mainStage.getNewEditorMenuItem().onActionProperty());
-		mainStage.getLoadButtonToolbar().onActionProperty().bind(mainStage.getOpenEditorMenuItem().onActionProperty());
-		mainStage.getSaveButtonToolbar().onActionProperty().bind(mainStage.getSaveEditorMenuItem().onActionProperty());
-		mainStage.getCompileButtonToolbar().onActionProperty()
-				.bind(mainStage.getCompileEditorMenuItem().onActionProperty());
+		toolbar.getNewButtonToolbar().onActionProperty().bind(menuBar.getNewEditorMenuItem().onActionProperty());
+		toolbar.getLoadButtonToolbar().onActionProperty().bind(menuBar.getOpenEditorMenuItem().onActionProperty());
+		toolbar.getSaveButtonToolbar().onActionProperty().bind(menuBar.getSaveEditorMenuItem().onActionProperty());
+		toolbar.getCompileButtonToolbar().onActionProperty()
+				.bind(menuBar.getCompileEditorMenuItem().onActionProperty());
 		// Territory (toolbar)
-		mainStage.getChangeSizeButtonToolbar().onActionProperty()
-				.bind(mainStage.getChangeSizeTerritoryMenuItem().onActionProperty());
-		mainStage.getPlaceRobbiToggleButtonToolbar()
+		toolbar.getChangeSizeButtonToolbar().onActionProperty()
+				.bind(menuBar.getChangeSizeTerritoryMenuItem().onActionProperty());
+		toolbar.getPlaceRobbiToggleButtonToolbar()
 				.setOnAction(getButtonHandler(MainStage.menuRobbiImage, ButtonState.ROBBI));
-		mainStage.getPlaceHollowToggleButtonToolbar()
+		toolbar.getPlaceHollowToggleButtonToolbar()
 				.setOnAction(getButtonHandler(MainStage.menuHollowImage, ButtonState.HOLLOW));
-		mainStage.getPlacePileOfScrapToggleButtonToolbar()
+		toolbar.getPlacePileOfScrapToggleButtonToolbar()
 				.setOnAction(getButtonHandler(MainStage.menuPileOfScrapImage, ButtonState.PILE_OF_SCRAP));
-		mainStage.getPlaceStockpileToggleButtonToolbar()
+		toolbar.getPlaceStockpileToggleButtonToolbar()
 				.setOnAction(getButtonHandler(MainStage.menuStockpileImage, ButtonState.STOCKPILE));
-		mainStage.getPlaceAccuToggleButtonToolbar()
+		toolbar.getPlaceAccuToggleButtonToolbar()
 				.setOnAction(getButtonHandler(MainStage.menuAccuImage, ButtonState.ACCU));
-		mainStage.getPlaceScrewToggleButtonToolbar()
+		toolbar.getPlaceScrewToggleButtonToolbar()
 				.setOnAction(getButtonHandler(MainStage.menuScrewImage, ButtonState.SCREW));
-		mainStage.getPlaceNutToggleButtonToolbar()
-				.setOnAction(getButtonHandler(MainStage.menuNutImage, ButtonState.NUT));
-		mainStage.getDeleteFieldToggleButtonToolbar()
+		toolbar.getPlaceNutToggleButtonToolbar().setOnAction(getButtonHandler(MainStage.menuNutImage, ButtonState.NUT));
+		toolbar.getDeleteFieldToggleButtonToolbar()
 				.setOnAction(getButtonHandler(MainStage.menuDeleteImage, ButtonState.CLEAR));
 		// Robbi (Toolbar)
-		mainStage.getRobbiMoveButtonToolbar().onActionProperty().bind(mainStage.getMoveMenuItem().onActionProperty());
-		mainStage.getRobbiTurnLeftButtonToolbar().onActionProperty()
-				.bind(mainStage.getTurnLeftMenuItem().onActionProperty());
-		mainStage.getRobbiPutButtonToolbar().onActionProperty().bind(mainStage.getPutMenuItem().onActionProperty());
-		mainStage.getRobbiTakeButtonToolbar().onActionProperty().bind(mainStage.getTakeMenuItem().onActionProperty());
+		toolbar.getRobbiMoveButtonToolbar().onActionProperty().bind(menuBar.getMoveMenuItem().onActionProperty());
+		toolbar.getRobbiTurnLeftButtonToolbar().onActionProperty()
+				.bind(menuBar.getTurnLeftMenuItem().onActionProperty());
+		toolbar.getRobbiPutButtonToolbar().onActionProperty().bind(menuBar.getPutMenuItem().onActionProperty());
+		toolbar.getRobbiTakeButtonToolbar().onActionProperty().bind(menuBar.getTakeMenuItem().onActionProperty());
 		// Simulation (Toolbar) -> SimulationController
 
 		// editor Panel

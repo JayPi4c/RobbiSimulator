@@ -16,6 +16,14 @@ import lombok.NoArgsConstructor;
 /**
  * Utility-Class to support internationalization.
  * 
+ * <br>
+ * Some research pointed out the eclipse solution for i18n. For further
+ * information have a look in the <a href=
+ * "https://www.eclipse.org/eclipse/platform-core/documents/3.1/message_bundles.html">documentation</a>.
+ * <br>
+ * Nevertheless, it is not used, as it is a completely different approach then
+ * previously used and does not bring that much of an advantage.
+ * 
  * @author Jonas Pohl
  *
  */

@@ -62,14 +62,14 @@ public class TerritorySaveController {
 	 */
 	public TerritorySaveController(MainStage mainStage) {
 		this.mainStage = mainStage;
-		this.mainStage.getSaveSerialTerritoryMenuItem().setOnAction(e -> serialize());
-		this.mainStage.getLoadSerialTerritoryMenuItem().setOnAction(e -> deserialize());
+		this.mainStage.getMenubar().getSaveSerialTerritoryMenuItem().setOnAction(e -> serialize());
+		this.mainStage.getMenubar().getLoadSerialTerritoryMenuItem().setOnAction(e -> deserialize());
 
-		this.mainStage.getSaveXMLTerritoryMenuItem().setOnAction(e -> saveXMLtoFile());
-		this.mainStage.getLoadXMLTerritoryMenuItem().setOnAction(e -> loadXMLfromFile());
+		this.mainStage.getMenubar().getSaveXMLTerritoryMenuItem().setOnAction(e -> saveXMLtoFile());
+		this.mainStage.getMenubar().getLoadXMLTerritoryMenuItem().setOnAction(e -> loadXMLfromFile());
 
-		this.mainStage.getSaveJAXBTerritoryMenuItem().setOnAction(e -> saveJAXB());
-		this.mainStage.getLoadJAXBTerritoryMenuItem().setOnAction(e -> loadJAXB());
+		this.mainStage.getMenubar().getSaveJAXBTerritoryMenuItem().setOnAction(e -> saveJAXB());
+		this.mainStage.getMenubar().getLoadJAXBTerritoryMenuItem().setOnAction(e -> loadJAXB());
 	}
 
 	/**
