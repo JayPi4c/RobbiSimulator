@@ -1,15 +1,12 @@
 package com.JayPi4c.RobbiSimulator.controller.examples;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.application.Platform;
@@ -21,7 +18,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
@@ -34,6 +30,7 @@ import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This controller contains all settings for the examples menus.
@@ -41,10 +38,23 @@ import javafx.util.Pair;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class ExamplesController {
-	private static final Logger logger = LoggerFactory.getLogger(ExamplesController.class);
 
 	private MainStage stage;
+
+	// language keys
+	private static final String EXAMPLES_LOAD_DIALOG_TAGS_FAIL = "Examples.load.dialog.tags.fail";
+	private static final String EXAMPLES_LOAD_DIALOG_PROGRAM_TITLE = "Examples.load.dialog.program.title";
+	private static final String EXAMPLES_LOAD_DIALOG_PROGRAM_HEADER = "Examples.load.dialog.program.header";
+	private static final String EXAMPLES_LOAD_DIALOG_PROGRAM_NAME = "Examples.load.dialog.program.name";
+	private static final String EXAMPLES_LOAD_DIALOG_TAGS_TITLE = "Examples.load.dialog.tags.title";
+	private static final String EXAMPLES_LOAD_DIALOG_TAGS_HEADER = "Examples.load.dialog.tags.header";
+	private static final String EXAMPLES_LOAD_DIALOG_TAGS_NAME = "Examples.load.dialog.tags.name";
+	private static final String EXAMPLES_SAVE_TAGS_TITLE = "Examples.save.tags.title";
+	private static final String EXAMPLES_SAVE_TAGS_HEADER = "Examples.save.tags.header";
+	private static final String EXAMPLES_SAVE_TAGS_PROMPT = "Examples.save.tags.prompt";
+	private static final String EXAMPLES_SAVE_TAGS_NAME = "Examples.save.tags.name";
 
 	/**
 	 * Constructor to create a new ExamplesController for the mainStage.
@@ -54,27 +64,26 @@ public class ExamplesController {
 	public ExamplesController(MainStage stage) {
 		this.stage = stage;
 
-		stage.getSaveExampleMenuItem().setOnAction(e -> {
+		stage.getMenubar().getSaveExampleMenuItem().setOnAction(e -> {
 			Optional<List<String>> tags = enterTags();
 			tags.ifPresentOrElse(ts -> {
 				String territoryXML = stage.getTerritory().toXML().toString();
-				if (!DatabaseManager.getDatabaseManager().store(stage.getProgram().getName(),
-						stage.getProgram().getEditorContent(), territoryXML, ts))
+				if (!ExampleService.store(stage.getProgram().getName(), stage.getProgram().getEditorContent(),
+						territoryXML, ts))
 					logger.debug("Could not save example in database");
 			}, () -> logger.debug("No tags were entered"));
 		});
 
-		stage.getLoadExampleMenuItem().setOnAction(e -> {
-			Optional<List<String>> tagsOpt = DatabaseManager.getDatabaseManager().getAllTags();
+		stage.getMenubar().getLoadExampleMenuItem().setOnAction(e -> {
+			Optional<List<String>> tagsOpt = ExampleService.getAllTags();
 			tagsOpt.ifPresentOrElse(tags -> {
 				Optional<String> s = showTagSelection(tags);
 				s.ifPresentOrElse(selectedTag -> {
-					Optional<List<Pair<Integer, String>>> programsOpt = DatabaseManager.getDatabaseManager()
-							.query(selectedTag);
+					Optional<List<Pair<Integer, String>>> programsOpt = ExampleService.query(selectedTag);
 					if (programsOpt.isPresent()) {
 						Optional<Integer> idOpt = showProgramSelection(programsOpt.get());
 						idOpt.ifPresentOrElse(id -> {
-							Optional<Example> exOpt = DatabaseManager.getDatabaseManager().loadExample(id);
+							Optional<Example> exOpt = ExampleService.loadExample(id);
 							exOpt.ifPresentOrElse(Example::load,
 									() -> logger.debug("Could not load example from database"));
 						}, () -> logger.debug("No example selected"));
@@ -82,8 +91,7 @@ public class ExamplesController {
 				}, () -> logger.debug("No tag selected"));
 			}, () -> {
 				logger.info("No tags are stored in database");
-				AlertHelper.showAlertAndWait(AlertType.WARNING, I18nUtils.i18n("Examples.load.dialog.tags.fail"),
-						stage);
+				stage.getSnackbarController().showMessage(EXAMPLES_LOAD_DIALOG_TAGS_FAIL);
 			});
 
 		});
@@ -100,8 +108,8 @@ public class ExamplesController {
 	 */
 	public Optional<Integer> showProgramSelection(List<Pair<Integer, String>> programs) {
 		Dialog<Integer> dialog = new Dialog<>();
-		dialog.setTitle(I18nUtils.i18n("Examples.load.dialog.program.title"));
-		dialog.setHeaderText(I18nUtils.i18n("Examples.load.dialog.program.header"));
+		dialog.setTitle(i18n(EXAMPLES_LOAD_DIALOG_PROGRAM_TITLE));
+		dialog.setHeaderText(i18n(EXAMPLES_LOAD_DIALOG_PROGRAM_HEADER));
 		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -109,7 +117,7 @@ public class ExamplesController {
 		ComboBox<HideableItem<Pair<Integer, String>>> comboBox = createComboBoxWithAutoCompletionSupport(programs);
 		comboBox.getSelectionModel().select(0);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(I18nUtils.i18n("Examples.load.dialog.program.name")), comboBox);
+		grid.addRow(0, new Label(i18n(EXAMPLES_LOAD_DIALOG_PROGRAM_NAME)), comboBox);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(comboBox::requestFocus);
@@ -127,8 +135,8 @@ public class ExamplesController {
 	 */
 	public Optional<String> showTagSelection(List<String> tags) {
 		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(I18nUtils.i18n("Examples.load.dialog.tags.title"));
-		dialog.setHeaderText(I18nUtils.i18n("Examples.load.dialog.tags.header"));
+		dialog.setTitle(i18n(EXAMPLES_LOAD_DIALOG_TAGS_TITLE));
+		dialog.setHeaderText(i18n(EXAMPLES_LOAD_DIALOG_TAGS_HEADER));
 		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -136,7 +144,7 @@ public class ExamplesController {
 		ComboBox<HideableItem<String>> comboBox = createComboBoxWithAutoCompletionSupport(tags);
 		comboBox.getSelectionModel().select(0);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(I18nUtils.i18n("Examples.load.dialog.tags.name")), comboBox);
+		grid.addRow(0, new Label(i18n(EXAMPLES_LOAD_DIALOG_TAGS_NAME)), comboBox);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(comboBox::requestFocus);
@@ -153,20 +161,20 @@ public class ExamplesController {
 	 */
 	private Optional<List<String>> enterTags() {
 		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(I18nUtils.i18n("Examples.save.tags.title"));
-		dialog.setHeaderText(I18nUtils.i18n("Examples.save.tags.header"));
+		dialog.setTitle(i18n(EXAMPLES_SAVE_TAGS_TITLE));
+		dialog.setHeaderText(i18n(EXAMPLES_SAVE_TAGS_HEADER));
 		dialog.initOwner(stage);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 		TextField tagsField = new TextField();
-		tagsField.setPromptText(I18nUtils.i18n("Examples.save.tags.prompt"));
+		tagsField.setPromptText(i18n(EXAMPLES_SAVE_TAGS_PROMPT));
 
 		tagsField.textProperty().addListener((observable, oldVal, newVal) -> dialog.getDialogPane()
 				.lookupButton(ButtonType.OK).setDisable(newVal.isBlank()));
 
 		dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(I18nUtils.i18n("Examples.save.tags.name")), tagsField);
+		grid.addRow(0, new Label(i18n(EXAMPLES_SAVE_TAGS_NAME)), tagsField);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(tagsField::requestFocus);

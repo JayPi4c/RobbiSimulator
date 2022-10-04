@@ -1,10 +1,11 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.util.Optional;
 
 import com.JayPi4c.RobbiSimulator.model.Dimension;
 import com.JayPi4c.RobbiSimulator.model.Territory;
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -29,8 +30,13 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 	private Territory territory;
 
 	private Dialog<Dimension> dialog;
-	private TextField rowField;
-	private TextField colField;
+	private Window parent;
+
+	// language keys
+	private static final String CHANGESIZE_DIALOG_TITLE = "ChangeSize.dialog.title";
+	private static final String CHANGESIZE_DIALOG_HEADER = "ChangeSize.dialog.header";
+	private static final String CHANGESIZE_DIALOG_COLS = "ChangeSize.dialog.cols";
+	private static final String CHANGESIZE_DIALOG_ROWS = "ChangeSize.dialog.rows";
 
 	/**
 	 * Creates a new ChangeTerritorySizeHandler and sets up a new Dialog, which can
@@ -42,25 +48,34 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 	 */
 	public ChangeTerritorySizeHandler(Window parent, Territory territory) {
 		this.territory = territory;
+		this.parent = parent;
+	}
 
+	/**
+	 * Creates a new Dialog to handle the size change. The Dialog will be newly
+	 * created every time in order to have the correct language at every moment.
+	 */
+	private void createDialog() {
 		dialog = new Dialog<>();
-		dialog.setTitle(I18nUtils.i18n("ChangeSize.dialog.title"));
-		dialog.setHeaderText(I18nUtils.i18n("ChangeSize.dialog.header"));
+		dialog.setTitle(i18n(CHANGESIZE_DIALOG_TITLE));
+		dialog.setHeaderText(i18n(CHANGESIZE_DIALOG_HEADER));
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-		rowField = new TextField();
+		TextField rowField = new TextField();
 		rowField.textProperty().addListener((observeable, oldVal, newVal) -> dialog.getDialogPane()
 				.lookupButton(ButtonType.OK).setDisable(newVal.isEmpty() || !isValid(newVal)));
-		colField = new TextField();
+		TextField colField = new TextField();
 		colField.textProperty().addListener((observable, oldVal, newVal) -> dialog.getDialogPane()
 				.lookupButton(ButtonType.OK).setDisable(newVal.isEmpty() || !isValid(newVal)));
 
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(I18nUtils.i18n("ChangeSize.dialog.cols")), colField);
-		grid.addRow(1, new Label(I18nUtils.i18n("ChangeSize.dialog.rows")), rowField);
+		grid.addRow(0, new Label(i18n(CHANGESIZE_DIALOG_COLS)), colField);
+		grid.addRow(1, new Label(i18n(CHANGESIZE_DIALOG_ROWS)), rowField);
 		grid.setHgap(20);
 		dialogPane.setContent(grid);
-		Platform.runLater(rowField::requestFocus);
+		rowField.setText(Integer.toString(territory.getNumRows()));
+		colField.setText(Integer.toString(territory.getNumCols()));
+		Platform.runLater(colField::requestFocus);
 		dialog.setResultConverter(button -> button == ButtonType.OK
 				? new Dimension(Integer.parseInt(colField.getText()), Integer.parseInt(rowField.getText()))
 				: null);
@@ -85,8 +100,7 @@ public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 
 	@Override
 	public void handle(ActionEvent event) {
-		rowField.setText(Integer.toString(territory.getNumRows()));
-		colField.setText(Integer.toString(territory.getNumCols()));
+		createDialog();
 		Optional<Dimension> optionalDimension = dialog.showAndWait();
 		optionalDimension.ifPresent(result -> territory.changeSize(result.cols(), result.rows()));
 	}

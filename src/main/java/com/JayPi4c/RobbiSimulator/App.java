@@ -1,14 +1,13 @@
 package com.JayPi4c.RobbiSimulator;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.JayPi4c.RobbiSimulator.controller.examples.DatabaseManager;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.controller.tutor.TutorController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
+import com.JayPi4c.RobbiSimulator.utils.HibernateUtils;
 import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 
@@ -16,19 +15,22 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
  * Hauptklasse des Robbi Simulators.<br>
  * Javaversion: 17 <br>
- * JavaFX: 17<br>
  * 
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class App extends Application {
 
-	private static final Logger logger = LoggerFactory.getLogger(App.class);
+	private static final String INIT_ERROR_MESSAGE = "Init.error.message";
+	private static final String INIT_ERROR_TITLE = "Init.error.title";
+	private static final String INIT_ERROR_HEADER = "Init.error.header";
 
 	/**
 	 * Application entry point
@@ -54,17 +56,11 @@ public class App extends Application {
 		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {
 			logger.error("Failed to load Program Controller");
-			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Init.error.message"), null, null,
-					I18nUtils.i18n("Init.error.title"), I18nUtils.i18n("Init.error.header"));
+			AlertHelper.showAlertAndWait(AlertType.ERROR, i18n(INIT_ERROR_MESSAGE), null, null, i18n(INIT_ERROR_TITLE),
+					i18n(INIT_ERROR_HEADER));
 			Platform.exit();
 		}
 		logger.debug("loading Program Controller successfully");
-
-		logger.debug("Connecting to Database");
-		if (DatabaseManager.initialize())
-			logger.debug("Connecting to Database successfully");
-		else
-			logger.debug("Connecting to Database failed");
 
 		if (PropertiesLoader.isTutor()) {
 			logger.debug("Starting Tutor RMI server");
@@ -85,9 +81,9 @@ public class App extends Application {
 
 	@Override
 	public void stop() {
-		logger.debug("Closing Database Connection");
-		DatabaseManager.getDatabaseManager().shutDown();
-		logger.debug("Closing Database Connection successfully");
+
+		logger.debug("Shutting down database connection");
+		HibernateUtils.shutdown();
 
 		if (PropertiesLoader.isTutor()) {
 			logger.debug("Stopping Tutor-Server.");

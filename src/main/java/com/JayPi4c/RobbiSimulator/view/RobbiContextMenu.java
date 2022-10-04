@@ -21,7 +21,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
-import javafx.stage.Window;
 
 /**
  * Class to for the ContextMenu which opens, when clicked on robbi in the
@@ -32,6 +31,8 @@ import javafx.stage.Window;
  */
 public class RobbiContextMenu extends ContextMenu {
 
+	private static final String EDITOR_CONTEXTMENU_TOOLTIP = "Editor.contextMenu.tooltip";
+
 	/**
 	 * Constructor to create a new RobbiContextMenu. It fills itself with all
 	 * methods that are provided by robbi and allows to run a particular method on
@@ -41,7 +42,7 @@ public class RobbiContextMenu extends ContextMenu {
 	 * @param parent    the parent window in order to display the alerts relative to
 	 *                  the calling window
 	 */
-	public RobbiContextMenu(Territory territory, Window parent) {
+	public RobbiContextMenu(Territory territory, MainStage parent) {
 
 		for (Method method : getDefaultMethods()) {
 			MenuItem item = getMenuItem(method);
@@ -66,7 +67,7 @@ public class RobbiContextMenu extends ContextMenu {
 				if (method.getParameterCount() != 0 && !hasCorrectDefaultAnnotations(method)) {
 					item.setDisable(true);
 					// https://stackoverflow.com/a/43053529/13670629
-					Tooltip tooltip = new Tooltip(I18nUtils.i18n("Editor.contextMenu.tooltip"));
+					Tooltip tooltip = I18nUtils.createTooltip(EDITOR_CONTEXTMENU_TOOLTIP);
 					Tooltip.install(item.getContent(), tooltip);
 
 				} else
@@ -147,7 +148,7 @@ public class RobbiContextMenu extends ContextMenu {
 			if (Modifier.isPublic(m.getModifiers()) && !isMainMethod(m))
 				methods.add(m);
 		}
-		return methods.toArray(new Method[0]);
+		return methods.toArray(Method[]::new);
 	}
 
 	/**
@@ -171,7 +172,7 @@ public class RobbiContextMenu extends ContextMenu {
 			}
 		}
 
-		return methods.toArray(new Method[0]);
+		return methods.toArray(Method[]::new);
 	}
 
 	/**

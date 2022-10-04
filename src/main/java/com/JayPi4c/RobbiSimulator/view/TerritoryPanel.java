@@ -1,8 +1,5 @@
 package com.JayPi4c.RobbiSimulator.view;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.ButtonState;
 import com.JayPi4c.RobbiSimulator.controller.TerritoryEventHandler;
 import com.JayPi4c.RobbiSimulator.model.Accu;
@@ -23,7 +20,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.transform.Rotate;
-import javafx.stage.Window;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -33,9 +30,8 @@ import javafx.stage.Window;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class TerritoryPanel extends Canvas implements Observer {
-
-	private static final Logger logger = LoggerFactory.getLogger(TerritoryPanel.class);
 
 	private Territory territory;
 
@@ -85,7 +81,7 @@ public class TerritoryPanel extends Canvas implements Observer {
 	 * @param parent      the parent Window to show alerts relative to the calling
 	 *                    window
 	 */
-	public TerritoryPanel(Territory territory, ButtonState buttonState, Window parent) {
+	public TerritoryPanel(Territory territory, ButtonState buttonState, MainStage parent) {
 		this.territory = territory;
 		this.territory.addObserver(this);
 

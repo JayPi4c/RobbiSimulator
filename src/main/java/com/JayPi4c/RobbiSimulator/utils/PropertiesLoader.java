@@ -7,8 +7,9 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utility-class for Properties.
@@ -16,19 +17,25 @@ import org.slf4j.LoggerFactory;
  * @author Jonas Pohl
  *
  */
+@Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PropertiesLoader {
-	private static final Logger logger = LoggerFactory.getLogger(PropertiesLoader.class);
+
 	private static Properties properties;
 
 	private static final String DIR = System.getProperty("user.dir");
 	private static final String FILE = "/simulator.properties";
 	private static final String COMMENTS = "role=student OR tutor";
-
-	/**
-	 * Private constructor to hide the implicit one.
-	 */
-	private PropertiesLoader() {
-	}
+	
+	private static final String DARKMODE_PROPERTY = "darkmode";
+	private static final String SOUNDS_PROPERTY = "sounds";
+	private static final String TUTORPORT_PROPERTY = "tutorport";
+	private static final String ROLE_PROPERTY = "role";
+	private static final String LANGUAGE_PROPERTY = "lang";
+	private static final String TUTORHOST_PROPERTY = "tutorhost";
+	
+	private static final String TUTORHOST_DEFAULT_VALUE = "localhost";
+	private static final String TUTORPORT_DEFAULT_VALUE = "3579";
 
 	/**
 	 * Loads the properties and stores them in an Object.
@@ -56,9 +63,9 @@ public class PropertiesLoader {
 	 */
 	public static boolean isTutor() {
 		try {
-			return properties.getProperty("role").equalsIgnoreCase("tutor");
+			return properties.getProperty(ROLE_PROPERTY).equalsIgnoreCase("tutor");
 		} catch (NullPointerException e) {
-			properties.put("role", "student");
+			properties.put(ROLE_PROPERTY, "student");
 			return false;
 		}
 	}
@@ -69,7 +76,7 @@ public class PropertiesLoader {
 	 * @return true if the sounds property is set to true
 	 */
 	public static boolean getSounds() {
-		return Boolean.parseBoolean(properties.getProperty("sounds"));
+		return Boolean.parseBoolean(properties.getProperty(SOUNDS_PROPERTY));
 	}
 
 	/**
@@ -78,7 +85,7 @@ public class PropertiesLoader {
 	 * @return true if the sounds property is set to true
 	 */
 	public static boolean getDarkmode() {
-		return Boolean.parseBoolean(properties.getProperty("darkmode"));
+		return Boolean.parseBoolean(properties.getProperty(DARKMODE_PROPERTY));
 	}
 
 	/**
@@ -88,11 +95,10 @@ public class PropertiesLoader {
 	 *         propterty is found
 	 */
 	public static String getTutorhost() {
-		String key = "tutorhost";
-		String host = properties.getProperty(key);
+		String host = properties.getProperty(TUTORHOST_PROPERTY);
 		if (host == null) {
-			host = "localhost";
-			properties.put(key, host);
+			host = TUTORHOST_DEFAULT_VALUE;
+			properties.put(TUTORHOST_PROPERTY, host);
 		}
 		return host;
 	}
@@ -104,10 +110,10 @@ public class PropertiesLoader {
 	 */
 	public static int getTutorport() {
 		try {
-			return Integer.parseInt(properties.getProperty("tutorport"));
+			return Integer.parseInt(properties.getProperty(TUTORPORT_PROPERTY));
 		} catch (NumberFormatException | NullPointerException e) {
-			properties.put("tutorport", "3579");
-			return 3579;
+			properties.put(TUTORPORT_PROPERTY, TUTORPORT_DEFAULT_VALUE);
+			return Integer.parseInt(TUTORPORT_DEFAULT_VALUE);
 		}
 	}
 
@@ -118,11 +124,11 @@ public class PropertiesLoader {
 	 */
 	public static Locale getLocale() {
 		try {
-			String[] parts = properties.getProperty("lang").split("_");
+			String[] parts = properties.getProperty(LANGUAGE_PROPERTY).split("_");
 			return new Locale(parts[0], parts[1]);
 		} catch (IndexOutOfBoundsException | NullPointerException e) {
 			logger.debug("Failed to load locale from properties");
-			properties.put("lang", Locale.GERMANY.toString());
+			properties.put(LANGUAGE_PROPERTY, Locale.GERMANY.toString());
 			return Locale.GERMANY;
 		}
 	}
@@ -133,9 +139,9 @@ public class PropertiesLoader {
 	 * @return true, if the saving was successful, false otherwise
 	 */
 	public static boolean finish() {
-		properties.put("lang", I18nUtils.getBundle().getLocale().toString());
-		properties.put("sounds", Boolean.toString(SoundManager.getSound()));
-		properties.put("darkmode", Boolean.toString(SceneManager.getDarkmode()));
+		properties.put(LANGUAGE_PROPERTY, I18nUtils.getLocale().toString());
+		properties.put(SOUNDS_PROPERTY, Boolean.toString(SoundManager.getSound()));
+		properties.put(DARKMODE_PROPERTY, Boolean.toString(SceneManager.getDarkmode()));
 		try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {
 			properties.store(fos, COMMENTS);
 			return true;
@@ -149,12 +155,12 @@ public class PropertiesLoader {
 	 * application failed to load properties from the file.
 	 */
 	private static void loadDefaultProperties() {
-		properties.put("lang", Locale.GERMANY.toString());
-		properties.put("role", "student");
-		properties.put("tutorport", "3579");
-		properties.put("tutorhost", "localhost");
-		properties.put("sounds", Boolean.toString(false));
-		properties.put("darkmode", Boolean.toString(false));
+		properties.put(LANGUAGE_PROPERTY, Locale.GERMANY.toString());
+		properties.put(ROLE_PROPERTY, "student");
+		properties.put(TUTORPORT_PROPERTY, TUTORPORT_DEFAULT_VALUE);
+		properties.put(TUTORHOST_PROPERTY, TUTORHOST_DEFAULT_VALUE);
+		properties.put(SOUNDS_PROPERTY, Boolean.toString(false));
+		properties.put(DARKMODE_PROPERTY, Boolean.toString(false));
 	}
 
 }

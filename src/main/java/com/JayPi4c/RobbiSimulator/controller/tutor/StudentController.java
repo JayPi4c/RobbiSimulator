@@ -6,9 +6,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.program.Program;
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
@@ -17,6 +14,7 @@ import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import javafx.scene.control.Alert.AlertType;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller to handle actions of a student.
@@ -24,12 +22,18 @@ import javafx.scene.control.Alert.AlertType;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class StudentController {
-	private static Logger logger = LoggerFactory.getLogger(StudentController.class);
 
 	private int requestID;
 
 	private MainStage stage;
+
+	// language keys
+	private static final String MENU_TUTOR_RECEIVEANSWER_INFORMATION = "Menu.tutor.receiveAnswer.information";
+	private static final String MENU_TUTOR_RECEIVEANSWER_ERROR = "Menu.tutor.receiveAnswer.error";
+	private static final String MENU_TUTOR_SEND_REQUEST_INFORMATION = "Menu.tutor.sendRequest.information";
+	private static final String MENU_TUTOR_SENDREQUEST_ERROR = "Menu.tutor.sendRequest.error";
 
 	/**
 	 * Constructor to create a new StudentController
@@ -38,10 +42,10 @@ public class StudentController {
 	 */
 	public StudentController(MainStage stage) {
 		this.stage = stage;
-		stage.getSendRequestMenuItem().setOnAction(e -> sendRequest());
-		stage.getReceiveAnswerMenuItem().setOnAction(e -> receiveAnswer());
-		stage.getSendRequestMenuItem().setDisable(false);
-		stage.getReceiveAnswerMenuItem().setDisable(true);
+		stage.getMenubar().getSendRequestMenuItem().setOnAction(e -> sendRequest());
+		stage.getMenubar().getReceiveAnswerMenuItem().setOnAction(e -> receiveAnswer());
+		stage.getMenubar().getSendRequestMenuItem().setDisable(false);
+		stage.getMenubar().getReceiveAnswerMenuItem().setDisable(true);
 	}
 
 	/**
@@ -55,20 +59,18 @@ public class StudentController {
 			Answer answer = tutor.getAnswer(requestID);
 			if (answer == null) {
 				logger.debug("Answer is not ready yet!");
-				AlertHelper.createAlert(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.receiveAnswer.information"),
-						stage);
+				stage.getSnackbarController().showMessage(MENU_TUTOR_RECEIVEANSWER_INFORMATION);
 				return;
 			}
 			stage.getProgram().setEditorContent(answer.code());
 			stage.getProgram().save();
 			ProgramController.compile(stage.getProgram(), false, stage);
 			stage.getTerritory().fromXML(new ByteArrayInputStream(answer.territory().getBytes()));
-			stage.getSendRequestMenuItem().setDisable(false);
-			stage.getReceiveAnswerMenuItem().setDisable(true);
+			stage.getMenubar().getSendRequestMenuItem().setDisable(false);
+			stage.getMenubar().getReceiveAnswerMenuItem().setDisable(true);
 		} catch (RemoteException | NotBoundException e) {
 			logger.debug("Failed to fetch answer from tutor.");
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.receiveAnswer.error"),
-					stage);
+			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n(MENU_TUTOR_RECEIVEANSWER_ERROR), stage);
 		}
 	}
 
@@ -82,17 +84,18 @@ public class StudentController {
 			ITutor tutor = (ITutor) registry.lookup(TutorController.TUTOR_CODE);
 			Program program = stage.getProgram();
 			program.setEdited(true);
-			program.save(stage.getTextArea().getText());
+			program.save(stage.getTextArea().getEditor().getDocument().getText());
 			stage.getLanguageController().updateTitle();
 			requestID = tutor.sendRequest(program.getEditorContent(), stage.getTerritory().toXML().toString());
 			logger.debug("The request has ID {}.", requestID);
-			stage.getSendRequestMenuItem().setDisable(true);
-			stage.getReceiveAnswerMenuItem().setDisable(false);
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.sendRequest.information"),
-					stage);
+			stage.getMenubar().getSendRequestMenuItem().setDisable(true);
+			stage.getMenubar().getReceiveAnswerMenuItem().setDisable(false);
+
+			stage.getSnackbarController().showMessage(MENU_TUTOR_SEND_REQUEST_INFORMATION);
+
 		} catch (RemoteException | NotBoundException e) {
 			logger.debug("Failed to send request to tutor.");
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.sendRequest.error"), stage);
+			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n(MENU_TUTOR_SENDREQUEST_ERROR), stage);
 		}
 	}
 

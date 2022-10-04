@@ -1,16 +1,20 @@
 package com.JayPi4c.RobbiSimulator.controller.simulation;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Optional;
 
+import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
+import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.model.TerritoryState;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
+import com.JayPi4c.RobbiSimulator.view.Toolbar;
 
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToggleButton;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller to handle all actions belonging to the simulation.
@@ -18,9 +22,8 @@ import javafx.scene.control.ToggleButton;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class SimulationController {
-
-	private static final Logger logger = LoggerFactory.getLogger(SimulationController.class);
 
 	private static final int MIN_SPEED = 100;
 	private static final int MAX_SPEED = 2500;
@@ -30,6 +33,7 @@ public class SimulationController {
 	private MainStage stage;
 	private Territory territory;
 
+	@Getter
 	private volatile int speed;
 
 	private MenuItem resetMenuItem;
@@ -54,39 +58,39 @@ public class SimulationController {
 	public SimulationController(MainStage stage, Territory territory) {
 		this.stage = stage;
 		this.territory = territory;
-		speed = (int) stage.getSpeedSliderToolbar().getValue();
+		Toolbar toolbar = stage.getToolbar();
+		speed = (int) toolbar.getSpeedSliderToolbar().getValue();
 
-		resetToolbar = this.stage.getResetButtonToolbar();
+		resetToolbar = toolbar.getResetButtonToolbar();
 		resetToolbar.setOnAction(e -> reset());
-		resetMenuItem = this.stage.getResetMenuItem();
+		resetMenuItem = this.stage.getMenubar().getResetMenuItem();
 		resetMenuItem.onActionProperty().bind(resetToolbar.onActionProperty());
 
-		startToolbar = this.stage.getStartToggleButtonToolbar();
+		startToolbar = toolbar.getStartToggleButtonToolbar();
 		startToolbar.setOnAction(e -> {
 			if (!isSimulationRunning())
 				start();
 			else
 				resume();
 		});
-		startMenuItem = stage.getStartMenuItem();
+		startMenuItem = stage.getMenubar().getStartMenuItem();
 		startMenuItem.onActionProperty().bind(startToolbar.onActionProperty());
 		startMenuItem.disableProperty().bind(startToolbar.disableProperty());
 
-		pauseToolbar = this.stage.getPauseToggleButtonToolbar();
+		pauseToolbar = toolbar.getPauseToggleButtonToolbar();
 		pauseToolbar.setOnAction(e -> pause());
-		pauseMenuItem = this.stage.getPauseMenuItem();
+		pauseMenuItem = this.stage.getMenubar().getPauseMenuItem();
 		pauseMenuItem.onActionProperty().bind(pauseToolbar.onActionProperty());
 		pauseMenuItem.disableProperty().bind(pauseToolbar.disableProperty());
 
-		stopToolbar = this.stage.getStopToggleButtonToolbar();
+		stopToolbar = toolbar.getStopToggleButtonToolbar();
 		stopToolbar.setOnAction(e -> stop());
-		stopMenuItem = this.stage.getStopMenuItem();
+		stopMenuItem = this.stage.getMenubar().getStopMenuItem();
 		stopMenuItem.onActionProperty().bind(stopToolbar.onActionProperty());
 		stopMenuItem.disableProperty().bind(stopToolbar.disableProperty());
 
-		this.stage.getSpeedSliderToolbar().valueProperty()
-				.addListener((ov, oldVal, newVal) -> setSpeed((Double) newVal));
-		setSpeed(this.stage.getSpeedSliderToolbar().getValue());
+		toolbar.getSpeedSliderToolbar().valueProperty().addListener((ov, oldVal, newVal) -> setSpeed((Double) newVal));
+		setSpeed(toolbar.getSpeedSliderToolbar().getValue());
 		disableButtonStates(false, true, true);
 
 	}
@@ -96,6 +100,11 @@ public class SimulationController {
 	 */
 	private void start() {
 		logger.debug("Starting new simulation");
+		Optional<Robbi> r = ProgramController.getNewRobbi(stage.getProgram().getName());
+		if (r.isPresent())
+			territory.setRobbi(r.get());
+		else
+			logger.debug("Could not initialize Robbi");
 		territoryState = territory.save();
 		simulation = new Simulation(territory, this, stage);
 		simulation.setDaemon(true); // program should exit even if simulation is running
@@ -108,7 +117,7 @@ public class SimulationController {
 	 */
 	private void pause() {
 		logger.debug("Pausing simulation");
-		simulation.setPause(true);
+		simulation.setPaused(true);
 		disableButtonStates(false, true, false);
 	}
 
@@ -117,7 +126,7 @@ public class SimulationController {
 	 */
 	private void resume() {
 		logger.debug("Resuming simulation");
-		simulation.setPause(false);
+		simulation.setPaused(false);
 		synchronized (simulation.getLock()) {
 			simulation.getLock().notifyAll();
 		}
@@ -129,8 +138,8 @@ public class SimulationController {
 	 */
 	private void stop() {
 		logger.debug("Stopping simulation");
-		simulation.setStop(true);
-		simulation.setPause(false);
+		simulation.setStopped(true);
+		simulation.setPaused(false);
 		simulation.interrupt();
 		synchronized (simulation.getLock()) {
 			simulation.getLock().notifyAll();
@@ -156,7 +165,7 @@ public class SimulationController {
 	 * @return true if the simulation is not null or not stopped
 	 */
 	private boolean isSimulationRunning() {
-		return !(simulation == null || simulation.getStop());
+		return !(simulation == null || simulation.isStopped());
 	}
 
 	/**
@@ -206,16 +215,7 @@ public class SimulationController {
 	 * @param speed the new speed value
 	 */
 	public void setSpeed(double speed) {
-		this.speed = (int) map(speed, MainStage.MIN_SPEED_VALUE, MainStage.MAX_SPEED_VALUE, MAX_SPEED, MIN_SPEED);
-	}
-
-	/**
-	 * Getter for the speed attribute.
-	 * 
-	 * @return the speed attribute
-	 */
-	public int getSpeed() {
-		return speed;
+		this.speed = (int) map(speed, Toolbar.MIN_SPEED_VALUE, Toolbar.MAX_SPEED_VALUE, MAX_SPEED, MIN_SPEED);
 	}
 
 	/**

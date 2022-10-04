@@ -1,5 +1,7 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,9 +16,6 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
 import com.JayPi4c.RobbiSimulator.model.Accu;
 import com.JayPi4c.RobbiSimulator.model.DIRECTION;
@@ -30,7 +29,6 @@ import com.JayPi4c.RobbiSimulator.model.Stockpile;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.model.TerritoryState;
 import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
 import jakarta.xml.bind.JAXBContext;
@@ -39,6 +37,7 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller to handle all territory save action. It handles load and save
@@ -47,9 +46,8 @@ import javafx.stage.FileChooser;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class TerritorySaveController {
-
-	private static final Logger logger = LoggerFactory.getLogger(TerritorySaveController.class);
 
 	private static final String DEFAULT_SERIALISATION_FILE_EXTENSION = ".ter";
 	private static final String DEFAULT_XML_FILE_EXTENSION = ".rsxml";
@@ -64,22 +62,22 @@ public class TerritorySaveController {
 	 */
 	public TerritorySaveController(MainStage mainStage) {
 		this.mainStage = mainStage;
-		this.mainStage.getSaveSerialTerritoryMenuItem().setOnAction(e -> serialize());
-		this.mainStage.getLoadSerialTerritoryMenuItem().setOnAction(e -> deserialize());
+		this.mainStage.getMenubar().getSaveSerialTerritoryMenuItem().setOnAction(e -> serialize());
+		this.mainStage.getMenubar().getLoadSerialTerritoryMenuItem().setOnAction(e -> deserialize());
 
-		this.mainStage.getSaveXMLTerritoryMenuItem().setOnAction(e -> saveXMLtoFile());
-		this.mainStage.getLoadXMLTerritoryMenuItem().setOnAction(e -> loadXMLfromFile());
+		this.mainStage.getMenubar().getSaveXMLTerritoryMenuItem().setOnAction(e -> saveXMLtoFile());
+		this.mainStage.getMenubar().getLoadXMLTerritoryMenuItem().setOnAction(e -> loadXMLfromFile());
 
-		this.mainStage.getSaveJAXBTerritoryMenuItem().setOnAction(e -> saveJAXB());
-		this.mainStage.getLoadJAXBTerritoryMenuItem().setOnAction(e -> loadJAXB());
+		this.mainStage.getMenubar().getSaveJAXBTerritoryMenuItem().setOnAction(e -> saveJAXB());
+		this.mainStage.getMenubar().getLoadJAXBTerritoryMenuItem().setOnAction(e -> loadJAXB());
 	}
 
 	/**
 	 * Helper to serialize the territory of the mainStage into a file.
 	 */
 	private void serialize() {
-		Optional<File> fileOpt = getSaveFile(I18nUtils.i18n("Territory.save.dialog.title"),
-				I18nUtils.i18n("Territory.save.dialog.filter.serial"), DEFAULT_SERIALISATION_FILE_EXTENSION);
+		Optional<File> fileOpt = getSaveFile(i18n("Territory.save.dialog.title"),
+				i18n("Territory.save.dialog.filter.serial"), DEFAULT_SERIALISATION_FILE_EXTENSION);
 
 		if (fileOpt.isEmpty()) {
 			logger.debug("No file was selected to serialze in.");
@@ -113,8 +111,8 @@ public class TerritorySaveController {
 	 * the new values.
 	 */
 	private void deserialize() {
-		Optional<File> fileOpt = getLoadFile(I18nUtils.i18n("Territory.load.dialog.title"),
-				I18nUtils.i18n("Territory.load.dialog.filter.deserial"), DEFAULT_SERIALISATION_FILE_EXTENSION);
+		Optional<File> fileOpt = getLoadFile(i18n("Territory.load.dialog.title"),
+				i18n("Territory.load.dialog.filter.deserial"), DEFAULT_SERIALISATION_FILE_EXTENSION);
 
 		if (fileOpt.isEmpty()) {
 			logger.debug("No file was selected to deserialize from.");
@@ -131,7 +129,7 @@ public class TerritorySaveController {
 			DIRECTION facing = (DIRECTION) ois.readObject();
 			mainStage.getTerritory().update(t, item, x, y, facing);
 		} catch (InvalidTerritoryException e) {
-			AlertHelper.showAlertAndWait(AlertType.WARNING, I18nUtils.i18n("Territory.load.failure"), mainStage);
+			AlertHelper.showAlertAndWait(AlertType.WARNING, i18n("Territory.load.failure"), mainStage);
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {
@@ -144,8 +142,8 @@ public class TerritorySaveController {
 	 * file.
 	 */
 	private void saveXMLtoFile() {
-		Optional<File> fileOpt = getSaveFile(I18nUtils.i18n("Territory.save.dialog.title"),
-				I18nUtils.i18n("Territory.save.dialog.filter.xml"), DEFAULT_XML_FILE_EXTENSION);
+		Optional<File> fileOpt = getSaveFile(i18n("Territory.save.dialog.title"),
+				i18n("Territory.save.dialog.filter.xml"), DEFAULT_XML_FILE_EXTENSION);
 
 		if (fileOpt.isEmpty()) {
 			logger.debug("No file selected to save territory in.");
@@ -171,8 +169,8 @@ public class TerritorySaveController {
 	 * Asks for an XML-File and loads the contents into the territory.
 	 */
 	private void loadXMLfromFile() {
-		Optional<File> fileOpt = getLoadFile(I18nUtils.i18n("Territory.load.dialog.title"),
-				I18nUtils.i18n("Territory.load.dialog.filter.xml"), DEFAULT_XML_FILE_EXTENSION);
+		Optional<File> fileOpt = getLoadFile(i18n("Territory.load.dialog.title"),
+				i18n("Territory.load.dialog.filter.xml"), DEFAULT_XML_FILE_EXTENSION);
 
 		if (fileOpt.isEmpty()) {
 			logger.debug("No file selected to load XML from.");
@@ -198,8 +196,8 @@ public class TerritorySaveController {
 	 * @return true if the territory was loaded successfully, false otherwise
 	 */
 	private void loadJAXB() {
-		Optional<File> fileOpt = getLoadFile(I18nUtils.i18n("Territory.load.dialog.title"),
-				I18nUtils.i18n("Territory.load.dialog.filter.jaxb"), DEFAULT_JAXB_FILE_EXTENSION);
+		Optional<File> fileOpt = getLoadFile(i18n("Territory.load.dialog.title"),
+				i18n("Territory.load.dialog.filter.jaxb"), DEFAULT_JAXB_FILE_EXTENSION);
 
 		if (fileOpt.isEmpty()) {
 			logger.debug("No file selected");
@@ -223,8 +221,8 @@ public class TerritorySaveController {
 	 * Saves the territory using JAXB.
 	 */
 	private void saveJAXB() {
-		Optional<File> fileOpt = getSaveFile(I18nUtils.i18n("Territory.save.dialog.title"),
-				I18nUtils.i18n("Territory.save.dialog.filter.jaxb"), DEFAULT_JAXB_FILE_EXTENSION);
+		Optional<File> fileOpt = getSaveFile(i18n("Territory.save.dialog.title"),
+				i18n("Territory.save.dialog.filter.jaxb"), DEFAULT_JAXB_FILE_EXTENSION);
 
 		if (fileOpt.isEmpty()) {
 			logger.debug("No file selected to save territory in.");

@@ -6,6 +6,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Manager to load and play sounds.
@@ -13,7 +15,9 @@ import javafx.scene.media.MediaPlayer;
  * @author Jonas Pohl
  *
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SoundManager {
+
 	/**
 	 * The boolean on which elements can bind in order to be updated if sound is
 	 * deactivated /activated
@@ -66,13 +70,6 @@ public class SoundManager {
 	 */
 	public static void setSound(boolean flag) {
 		soundProperty().set(flag);
-	}
-
-	/**
-	 * Private constructor to hide the implicit one.
-	 */
-	private SoundManager() {
-
 	}
 
 }

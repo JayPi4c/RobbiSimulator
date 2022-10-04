@@ -17,10 +17,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.utils.Observable;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -28,13 +27,12 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * territory.
  * 
  * @author Jonas Pohl
- *
+ * 
  */
+@Slf4j
 public class Territory extends Observable implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final Logger logger = LoggerFactory.getLogger(Territory.class);
 
 	private transient Robbi robbi;
 
@@ -514,65 +512,65 @@ public class Territory extends Observable implements Serializable {
 			XMLStreamReader parser = factory.createXMLStreamReader(stream);
 			while (parser.hasNext()) {
 				switch (parser.getEventType()) {
-				case XMLStreamConstants.START_DOCUMENT:
-					break;
-				case XMLStreamConstants.END_DOCUMENT:
-					parser.close();
-					break;
-				case XMLStreamConstants.START_ELEMENT:
-					switch (parser.getLocalName()) {
-					case "territory":
-						int cols = Integer.parseInt(parser.getAttributeValue(null, "col"));
-						int rows = Integer.parseInt(parser.getAttributeValue(null, "row"));
-						territory.changeSize(cols, rows);
+					case XMLStreamConstants.START_DOCUMENT:
 						break;
-					case "pileofscrap":
-						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
-						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
-						territory.tiles[x][y] = new PileOfScrap();
+					case XMLStreamConstants.END_DOCUMENT:
+						parser.close();
 						break;
-					case "hollow":
-						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
-						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
-						territory.tiles[x][y] = new Hollow();
-						break;
-					case "stockpile":
-						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
-						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
-						territory.tiles[x][y] = new Stockpile();
-						break;
-					case "tile":
-						x = Integer.parseInt(parser.getAttributeValue(null, "col"));
-						y = Integer.parseInt(parser.getAttributeValue(null, "row"));
-						break;
-					case "item":
-						Item item = getItemFromParser(parser);
-						if (x < 0 || y < 0) {
-							robbiItem = item;
-						} else {
-							territory.placeItem(item, x, y);
+					case XMLStreamConstants.START_ELEMENT:
+						switch (parser.getLocalName()) {
+							case "territory":
+								int cols = Integer.parseInt(parser.getAttributeValue(null, "col"));
+								int rows = Integer.parseInt(parser.getAttributeValue(null, "row"));
+								territory.changeSize(cols, rows);
+								break;
+							case "pileofscrap":
+								x = Integer.parseInt(parser.getAttributeValue(null, "col"));
+								y = Integer.parseInt(parser.getAttributeValue(null, "row"));
+								territory.tiles[x][y] = new PileOfScrap();
+								break;
+							case "hollow":
+								x = Integer.parseInt(parser.getAttributeValue(null, "col"));
+								y = Integer.parseInt(parser.getAttributeValue(null, "row"));
+								territory.tiles[x][y] = new Hollow();
+								break;
+							case "stockpile":
+								x = Integer.parseInt(parser.getAttributeValue(null, "col"));
+								y = Integer.parseInt(parser.getAttributeValue(null, "row"));
+								territory.tiles[x][y] = new Stockpile();
+								break;
+							case "tile":
+								x = Integer.parseInt(parser.getAttributeValue(null, "col"));
+								y = Integer.parseInt(parser.getAttributeValue(null, "row"));
+								break;
+							case "item":
+								Item item = getItemFromParser(parser);
+								if (x < 0 || y < 0) {
+									robbiItem = item;
+								} else {
+									territory.placeItem(item, x, y);
+								}
+								break;
+							case "facing":
+								DIRECTION facing = DIRECTION.valueOf(parser.getAttributeValue(null, "facing"));
+								robbiDirection = facing;
+								break;
+							case "robbi":
+								robbiX = Integer.parseInt(parser.getAttributeValue(null, "col"));
+								robbiY = Integer.parseInt(parser.getAttributeValue(null, "row"));
+								x = -1;
+								y = -1;
+								break;
+							default:
+								break;
 						}
 						break;
-					case "facing":
-						DIRECTION facing = DIRECTION.valueOf(parser.getAttributeValue(null, "facing"));
-						robbiDirection = facing;
+					case XMLStreamConstants.CHARACTERS:
 						break;
-					case "robbi":
-						robbiX = Integer.parseInt(parser.getAttributeValue(null, "col"));
-						robbiY = Integer.parseInt(parser.getAttributeValue(null, "row"));
-						x = -1;
-						y = -1;
+					case XMLStreamConstants.END_ELEMENT:
 						break;
 					default:
 						break;
-					}
-					break;
-				case XMLStreamConstants.CHARACTERS:
-					break;
-				case XMLStreamConstants.END_ELEMENT:
-					break;
-				default:
-					break;
 				}
 				parser.next();
 			}
@@ -753,38 +751,6 @@ public class Territory extends Observable implements Serializable {
 	 */
 	public synchronized int getRobbiY() {
 		return robbi.getY();
-	}
-
-	// ================== DEBUG =======
-	/**
-	 * Debug method to print the territory in the console.
-	 */
-	public void print() {
-
-		for (int i = 0; i < numberOfColumns; i++) {
-			for (int j = 0; j < numberOfRows; j++) {
-				if (j == robbi.getX() && i == robbi.getY()) {
-					robbi.print();
-					continue;
-				}
-				Tile t = tiles[j][i];
-				if (t instanceof Hollow)
-					System.out.print("H");
-				else if (t instanceof Stockpile)
-					System.out.print("k");
-				else if (t instanceof PileOfScrap)
-					System.out.print("P");
-				else if (t.getItem() == null)
-					System.out.print("+");
-				else if (t.getItem() instanceof Screw)
-					System.out.print("s");
-				else if (t.getItem() instanceof Accu)
-					System.out.print("A");
-				else if (t.getItem() instanceof Nut)
-					System.out.print("N");
-			}
-			System.out.println();
-		}
 	}
 
 }

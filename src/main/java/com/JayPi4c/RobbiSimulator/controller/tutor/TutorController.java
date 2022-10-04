@@ -8,16 +8,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
-import com.JayPi4c.RobbiSimulator.utils.AlertHelper;
-import com.JayPi4c.RobbiSimulator.utils.I18nUtils;
 import com.JayPi4c.RobbiSimulator.utils.PropertiesLoader;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
 
-import javafx.scene.control.Alert.AlertType;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controller to handle actions of a tutor.
@@ -25,8 +20,8 @@ import javafx.scene.control.Alert.AlertType;
  * @author Jonas Pohl
  *
  */
+@Slf4j
 public class TutorController {
-	private static final Logger logger = LoggerFactory.getLogger(TutorController.class);
 
 	private static Tutor tutor;
 	private static Registry registry;
@@ -41,6 +36,11 @@ public class TutorController {
 	 */
 	public static final String TUTOR_CODE = "Tutor";
 
+	// language keys
+	private static final String MENU_TUTOR_LOADREQUEST_SUCCESS = "Menu.tutor.loadRequest.success";
+	private static final String MENU_TUTOR_LOADREQUEST_WARNING = "Menu.tutor.loadRequest.warning";
+	private static final String MENU_TUTOR_SAVEANSWER_INFORMATION = "Menu.tutor.saveAnswer.information";
+
 	/**
 	 * Constructor to create a new TutorController.
 	 * 
@@ -48,10 +48,10 @@ public class TutorController {
 	 */
 	public TutorController(MainStage mainStage) {
 		this.stage = mainStage;
-		mainStage.getLoadRequestMenuItem().setOnAction(e -> loadRequest());
-		mainStage.getSaveAnswerMenuItem().setOnAction(e -> saveAnswer());
-		mainStage.getLoadRequestMenuItem().setDisable(false);
-		mainStage.getSaveAnswerMenuItem().setDisable(true);
+		mainStage.getMenubar().getLoadRequestMenuItem().setOnAction(e -> loadRequest());
+		mainStage.getMenubar().getSaveAnswerMenuItem().setOnAction(e -> saveAnswer());
+		mainStage.getMenubar().getLoadRequestMenuItem().setDisable(false);
+		mainStage.getMenubar().getSaveAnswerMenuItem().setDisable(true);
 	}
 
 	/**
@@ -66,12 +66,12 @@ public class TutorController {
 			ProgramController.compile(stage.getProgram(), false, stage);
 			stage.getTerritory().fromXML(new ByteArrayInputStream(request.territory().getBytes()));
 			currentID = request.id();
-			stage.getLoadRequestMenuItem().setDisable(true);
-			stage.getSaveAnswerMenuItem().setDisable(false);
+			stage.getMenubar().getLoadRequestMenuItem().setDisable(true);
+			stage.getMenubar().getSaveAnswerMenuItem().setDisable(false);
+			stage.getSnackbarController().showMessage(MENU_TUTOR_LOADREQUEST_SUCCESS, request.id());
 		}, () -> {
 			logger.debug("no request available");
-			AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.loadRequest.warning"),
-					stage);
+			stage.getSnackbarController().showMessage(MENU_TUTOR_LOADREQUEST_WARNING);
 		});
 	}
 
@@ -80,13 +80,13 @@ public class TutorController {
 	 */
 	private void saveAnswer() {
 		logger.debug("Saving answer for id {}.", currentID);
-		stage.getProgram().save(stage.getTextArea().getText());
+		stage.getProgram().save(stage.getTextArea().getEditor().getDocument().getText());
 		tutor.setAnswer(currentID,
 				new Answer(stage.getProgram().getEditorContent(), stage.getTerritory().toXML().toString()));
 		currentID = NO_ID;
-		stage.getLoadRequestMenuItem().setDisable(false);
-		stage.getSaveAnswerMenuItem().setDisable(true);
-		AlertHelper.showAlertAndWait(AlertType.INFORMATION, I18nUtils.i18n("Menu.tutor.saveAnswer.information"), stage);
+		stage.getMenubar().getLoadRequestMenuItem().setDisable(false);
+		stage.getMenubar().getSaveAnswerMenuItem().setDisable(true);
+		stage.getSnackbarController().showMessage(MENU_TUTOR_SAVEANSWER_INFORMATION);
 	}
 
 	/**
@@ -122,4 +122,5 @@ public class TutorController {
 		}
 		return true;
 	}
+
 }

@@ -7,6 +7,7 @@ package com.JayPi4c.RobbiSimulator.model;
  *
  */
 public enum DIRECTION {
+
 	/**
 	 * Direction if robbi is looking up.
 	 */
@@ -43,4 +44,5 @@ public enum DIRECTION {
 	public DIRECTION previous() {
 		return vals[(this.ordinal() + vals.length - 1) % vals.length];
 	}
+
 }

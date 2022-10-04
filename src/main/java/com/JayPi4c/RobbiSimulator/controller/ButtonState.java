@@ -1,5 +1,8 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * This class stores the state of the currently selected territory button state.
  * The state should be modified by the editor tool buttons.
@@ -11,6 +14,7 @@ package com.JayPi4c.RobbiSimulator.controller;
  *
  */
 public class ButtonState {
+
 	/**
 	 * Constant for the ButtonState NONE.
 	 */
@@ -49,6 +53,8 @@ public class ButtonState {
 	 */
 	public static final int CLEAR = 7;
 
+	@Getter
+	@Setter
 	private int selected;
 
 	/**
@@ -65,21 +71,4 @@ public class ButtonState {
 		selected = NONE;
 	}
 
-	/**
-	 * Sets the current state to the given state
-	 * 
-	 * @param state the state, the saved state should be changed to
-	 */
-	public void setSelected(int state) {
-		this.selected = state;
-	}
-
-	/**
-	 * Returns the currently selected state
-	 * 
-	 * @return the currently selected state
-	 */
-	public int getSelected() {
-		return this.selected;
-	}
 }

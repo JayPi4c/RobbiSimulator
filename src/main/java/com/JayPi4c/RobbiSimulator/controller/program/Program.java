@@ -9,6 +9,9 @@ import java.io.IOException;
 
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * This class contains the contents, the name of program and whether it is
  * edited or not
@@ -16,12 +19,22 @@ import com.JayPi4c.RobbiSimulator.utils.Observable;
  * @author Jonas Pohl
  *
  */
+@Getter
 public class Program extends Observable {
+
+	/**
+	 * The name of the program
+	 */
+	@Setter
 	private String name;
 
 	private String editorContent;
 	private File file;
 
+	/**
+	 * Whether the program is edited or not
+	 */
+	@Setter
 	private boolean edited = false;
 
 	/**
@@ -50,30 +63,6 @@ public class Program extends Observable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * 
-	 * @return the file corresponding to this program
-	 */
-	public File getFile() {
-		return file;
-	}
-
-	/**
-	 * 
-	 * @return the name of the program
-	 */
-	public String getName() {
-		return this.name;
-	}
-
-	/**
-	 * 
-	 * @return the real content of the editor
-	 */
-	public String getEditorContent() {
-		return this.editorContent;
 	}
 
 	/**
@@ -114,33 +103,6 @@ public class Program extends Observable {
 			e.printStackTrace();
 		}
 		edited = false;
-	}
-
-	/**
-	 * Sets the edited flag
-	 * 
-	 * @param flag the value of the edited flag
-	 */
-	public void setEdited(boolean flag) {
-		edited = flag;
-	}
-
-	/**
-	 * returns whether the editor-content has changed
-	 * 
-	 * @return true if content is edited, false otherwise
-	 */
-	public boolean isEdited() {
-		return edited;
-	}
-
-	/**
-	 * Setter for the name attribute.
-	 * 
-	 * @param newName the new name for the program
-	 */
-	public void setName(String newName) {
-		this.name = newName;
 	}
 
 }

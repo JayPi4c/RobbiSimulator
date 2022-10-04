@@ -4,6 +4,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import javafx.stage.Window;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Static class to create Alerts with the necessary information.
@@ -11,6 +13,7 @@ import javafx.stage.Window;
  * @author Jonas Pohl
  *
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AlertHelper {
 
 	/**
@@ -106,10 +109,4 @@ public class AlertHelper {
 		return alert;
 	}
 
-	/**
-	 * Private constructor to hide the implicit public one.
-	 */
-	private AlertHelper() {
-
-	}
 }
