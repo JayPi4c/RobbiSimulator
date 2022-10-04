@@ -36,6 +36,11 @@ public class TutorController {
 	 */
 	public static final String TUTOR_CODE = "Tutor";
 
+	// language keys
+	private static final String MENU_TUTOR_LOADREQUEST_SUCCESS = "Menu.tutor.loadRequest.success";
+	private static final String MENU_TUTOR_LOADREQUEST_WARNING = "Menu.tutor.loadRequest.warning";
+	private static final String MENU_TUTOR_SAVEANSWER_INFORMATION = "Menu.tutor.saveAnswer.information";
+
 	/**
 	 * Constructor to create a new TutorController.
 	 * 
@@ -43,10 +48,10 @@ public class TutorController {
 	 */
 	public TutorController(MainStage mainStage) {
 		this.stage = mainStage;
-		mainStage.getLoadRequestMenuItem().setOnAction(e -> loadRequest());
-		mainStage.getSaveAnswerMenuItem().setOnAction(e -> saveAnswer());
-		mainStage.getLoadRequestMenuItem().setDisable(false);
-		mainStage.getSaveAnswerMenuItem().setDisable(true);
+		mainStage.getMenubar().getLoadRequestMenuItem().setOnAction(e -> loadRequest());
+		mainStage.getMenubar().getSaveAnswerMenuItem().setOnAction(e -> saveAnswer());
+		mainStage.getMenubar().getLoadRequestMenuItem().setDisable(false);
+		mainStage.getMenubar().getSaveAnswerMenuItem().setDisable(true);
 	}
 
 	/**
@@ -61,12 +66,12 @@ public class TutorController {
 			ProgramController.compile(stage.getProgram(), false, stage);
 			stage.getTerritory().fromXML(new ByteArrayInputStream(request.territory().getBytes()));
 			currentID = request.id();
-			stage.getLoadRequestMenuItem().setDisable(true);
-			stage.getSaveAnswerMenuItem().setDisable(false);
-			stage.getSnackbarController().showMessage("Menu.tutor.loadRequest.success", request.id());
+			stage.getMenubar().getLoadRequestMenuItem().setDisable(true);
+			stage.getMenubar().getSaveAnswerMenuItem().setDisable(false);
+			stage.getSnackbarController().showMessage(MENU_TUTOR_LOADREQUEST_SUCCESS, request.id());
 		}, () -> {
 			logger.debug("no request available");
-			stage.getSnackbarController().showMessage("Menu.tutor.loadRequest.warning");
+			stage.getSnackbarController().showMessage(MENU_TUTOR_LOADREQUEST_WARNING);
 		});
 	}
 
@@ -79,9 +84,9 @@ public class TutorController {
 		tutor.setAnswer(currentID,
 				new Answer(stage.getProgram().getEditorContent(), stage.getTerritory().toXML().toString()));
 		currentID = NO_ID;
-		stage.getLoadRequestMenuItem().setDisable(false);
-		stage.getSaveAnswerMenuItem().setDisable(true);
-		stage.getSnackbarController().showMessage("Menu.tutor.saveAnswer.information");
+		stage.getMenubar().getLoadRequestMenuItem().setDisable(false);
+		stage.getMenubar().getSaveAnswerMenuItem().setDisable(true);
+		stage.getSnackbarController().showMessage(MENU_TUTOR_SAVEANSWER_INFORMATION);
 	}
 
 	/**

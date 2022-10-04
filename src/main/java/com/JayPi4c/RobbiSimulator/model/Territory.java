@@ -753,36 +753,4 @@ public class Territory extends Observable implements Serializable {
 		return robbi.getY();
 	}
 
-	// ================== DEBUG =======
-	/**
-	 * Debug method to print the territory in the console.
-	 */
-	public void print() {
-
-		for (int i = 0; i < numberOfColumns; i++) {
-			for (int j = 0; j < numberOfRows; j++) {
-				if (j == robbi.getX() && i == robbi.getY()) {
-					robbi.print();
-					continue;
-				}
-				Tile t = tiles[j][i];
-				if (t instanceof Hollow)
-					System.out.print("H");
-				else if (t instanceof Stockpile)
-					System.out.print("k");
-				else if (t instanceof PileOfScrap)
-					System.out.print("P");
-				else if (t.getItem() == null)
-					System.out.print("+");
-				else if (t.getItem() instanceof Screw)
-					System.out.print("s");
-				else if (t.getItem() instanceof Accu)
-					System.out.print("A");
-				else if (t.getItem() instanceof Nut)
-					System.out.print("N");
-			}
-			System.out.println();
-		}
-	}
-
 }

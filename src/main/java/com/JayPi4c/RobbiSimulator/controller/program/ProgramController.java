@@ -82,7 +82,8 @@ public class ProgramController {
 	public static final String DEFAULT_FILE_EXTENSION = ".java";
 	/**
 	 * Constant String for the default content of the editor when the file is newly
-	 * created.
+	 * created. <br>
+	 * The comment "// place your code here" could also be internationalized. TODO
 	 */
 	public static final String DEFAULT_CONTENT = "void main(){" + System.lineSeparator() + "\t// place your code here"
 			+ System.lineSeparator() + "}";
@@ -99,6 +100,24 @@ public class ProgramController {
 	public static final String POSTFIX_TEMPLATE = System.lineSeparator() + "}";
 
 	private static HashMap<String, Stage> programs;
+
+	// language keys
+	private static final String NEW_DIALOG_TITLE = "New.dialog.title";
+	private static final String NEW_DIALOG_HEADER = "New.dialog.header";
+	private static final String NEW_DIALOG_PROMPT = "New.dialog.prompt";
+	private static final String NEW_DIALOG_NAME = "New.dialog.name";
+	private static final String COMPILATION_DIAGNOSTIC_KIND = "Compilation.diagnostic.kind";
+	private static final String COMPILATION_DIAGNOSTIC_CODEANDMESSAGE = "Compilation.diagnostic.CodeAndMessage";
+	private static final String COMPILATION_DIAGNOSTIC_ROW = "Compilation.diagnostic.row";
+	private static final String COMPILATION_DIAGNOSTIC_TITLE = "Compilation.diagnostic.title";
+	private static final String COMPILATION_ANNOTATIONS_MSG_DEFAULT = "Compilation.annotations.msg.default";
+	private static final String COMPILATION_ANNOTATIONS_MSG_INFO = "Compilation.annotations.msg.info";
+	private static final String COMPILATION_ANNOTATIONS_TITLE = "Compilation.annotations.title";
+	private static final String COMPILATION_ANNOTATIONS_HEADER = "Compilation.annotations.header";
+	private static final String COMPILATION_SUCCESS_MESSAGE = "Compilation.success.message";
+	private static final String COMPILATION_SUCCESS_TITLE = "Compilation.success.title";
+	private static final String COMPILATION_SUCCESS_HEADER = "Compilation.success.header";
+	private static final String COMPILATION_DIAGNOSTIC_OVERRIDE = "Compilation.diagnostic.override";
 
 	/**
 	 * Initializes the Application on startup and makes sure the programs folder and
@@ -174,13 +193,13 @@ public class ProgramController {
 	 */
 	private static Optional<String> getNameForProgram(Window parent) {
 		Dialog<String> dialog = new Dialog<>();
-		dialog.setTitle(i18n("New.dialog.title"));
-		dialog.setHeaderText(i18n("New.dialog.header"));
+		dialog.setTitle(i18n(NEW_DIALOG_TITLE));
+		dialog.setHeaderText(i18n(NEW_DIALOG_HEADER));
 		dialog.initOwner(parent);
 		DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 		TextField nameField = new TextField();
-		nameField.setPromptText(i18n("New.dialog.prompt"));
+		nameField.setPromptText(i18n(NEW_DIALOG_PROMPT));
 
 		Collection<String> filenamesInDirectory = getFilenamesInDirectory();
 
@@ -193,7 +212,7 @@ public class ProgramController {
 
 		dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 		GridPane grid = new GridPane();
-		grid.addRow(0, new Label(i18n("New.dialog.name")), nameField);
+		grid.addRow(0, new Label(i18n(NEW_DIALOG_NAME)), nameField);
 
 		dialogPane.setContent(grid);
 		Platform.runLater(nameField::requestFocus);
@@ -232,6 +251,10 @@ public class ProgramController {
 		ProgramController.compile(program, false, stage);
 	}
 
+	private static final String EXAMPLES_DUPLICATION_MESSAGE = "Examples.duplication.message";
+	private static final String EXAMPLES_DUPLICATION_HEADER = "Examples.duplication.header";
+	private static final String EXAMPLES_DUPLICATION_TITLE = "Examples.duplication.title";
+
 	/**
 	 * Creates a stage with the given programName, the programCode provided and the
 	 * territory encoded as XML. If the user has already a stage with the same name,
@@ -257,10 +280,9 @@ public class ProgramController {
 				p.save(p.getEditorContent());
 				stage.close();
 			}
-
-			Alert alert = AlertHelper.createAlert(AlertType.INFORMATION, i18n("Examples.duplication.message"), null);
-			alert.setHeaderText(i18n("Examples.duplication.header"));
-			alert.setTitle(i18n("Examples.duplication.title"));
+			Alert alert = AlertHelper.createAlert(AlertType.INFORMATION, i18n(EXAMPLES_DUPLICATION_MESSAGE), null);
+			alert.setHeaderText(i18n(EXAMPLES_DUPLICATION_HEADER));
+			alert.setTitle(i18n(EXAMPLES_DUPLICATION_TITLE));
 			alert.getButtonTypes().remove(ButtonType.OK);
 			alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
 			Optional<ButtonType> result = alert.showAndWait();
@@ -365,6 +387,9 @@ public class ProgramController {
 
 	}
 
+	private static final String OPEN_DIALOG_TITLE = "Open.dialog.title";
+	private static final String OPEN_DIALOG_FILTER = "Open.dialog.filter";
+
 	/**
 	 * Opens a FileChooser and loads the selected file. If the file is already
 	 * loaded, the ProgramController requests the focus for the loaded program.
@@ -374,10 +399,10 @@ public class ProgramController {
 	 */
 	public static void openProgram(Window parent) {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(i18n("Open.dialog.title"));
+		fileChooser.setTitle(i18n(OPEN_DIALOG_TITLE));
 		fileChooser.setInitialDirectory(new File(PATH_TO_PROGRAMS));
 		fileChooser.getExtensionFilters()
-				.add(new FileChooser.ExtensionFilter(i18n("Open.dialog.filter"), "*" + DEFAULT_FILE_EXTENSION));
+				.add(new FileChooser.ExtensionFilter(i18n(OPEN_DIALOG_FILTER), "*" + DEFAULT_FILE_EXTENSION));
 
 		File file = fileChooser.showOpenDialog(parent);
 		if (file != null) {
@@ -445,15 +470,16 @@ public class ProgramController {
 					logger.error("Position/Spalte: {}/{}", diagnostic.getPosition(), diagnostic.getColumnNumber());
 					logger.error("Startpostion/Endposition: {}/{}", diagnostic.getStartPosition(),
 							diagnostic.getEndPosition());
+					// TODO change String.format to use i18n directly
 					if (showAlerts && !showedAlert) {
 						StringBuilder bobTheBuilder = new StringBuilder();
-						bobTheBuilder.append(String.format(i18n("Compilation.diagnostic.kind"), diagnostic.getKind()));
-						bobTheBuilder.append(String.format(i18n("Compilation.diagnostic.CodeAndMessage"),
+						bobTheBuilder.append(String.format(i18n(COMPILATION_DIAGNOSTIC_KIND), diagnostic.getKind()));
+						bobTheBuilder.append(String.format(i18n(COMPILATION_DIAGNOSTIC_CODEANDMESSAGE),
 								diagnostic.getCode(), diagnostic.getMessage(null)));
 						bobTheBuilder.append(
-								String.format(i18n("Compilation.diagnostic.row"), diagnostic.getLineNumber() - 1));
+								String.format(i18n(COMPILATION_DIAGNOSTIC_ROW), diagnostic.getLineNumber() - 1));
 						AlertHelper.showAlertAndWait(AlertType.ERROR, bobTheBuilder.toString(), parent,
-								Modality.WINDOW_MODAL, i18n("Compilation.diagnostic.title"),
+								Modality.WINDOW_MODAL, i18n(COMPILATION_DIAGNOSTIC_TITLE),
 								diagnostic.getKind().toString());
 						showedAlert = true;
 					}
@@ -475,13 +501,14 @@ public class ProgramController {
 							logger.error("[Annotation Error]: {} is not applicable for {}", val, type);
 						} else
 							logger.error("[Annotation Error]: Error has been found but could not be diagnosed.");
+
 						if (showAlerts) {
-							String msg = i18n("Compilation.annotations.msg.default");
+							String msg = i18n(COMPILATION_ANNOTATIONS_MSG_DEFAULT);
 							if (val != null && type != null) {
-								msg = String.format(i18n("Compilation.annotations.msg.info"), val, type);
+								msg = String.format(i18n(COMPILATION_ANNOTATIONS_MSG_INFO), val, type);
 							}
 							AlertHelper.showAlertAndWait(AlertType.WARNING, msg, parent, Modality.WINDOW_MODAL,
-									i18n("Compilation.annotations.title"), i18n("Compilation.annotations.header"));
+									i18n(COMPILATION_ANNOTATIONS_TITLE), i18n(COMPILATION_ANNOTATIONS_HEADER));
 						}
 					} else {
 						if (overwritesMainMethod(r)) {
@@ -491,12 +518,12 @@ public class ProgramController {
 							if (showAlerts) {
 								// TODO change to snackbar
 								AlertHelper.showAlertAndWait(AlertType.INFORMATION,
-										String.format(i18n("Compilation.success.message"), program.getName()), parent,
-										Modality.WINDOW_MODAL, i18n("Compilation.success.title"),
-										i18n("Compilation.success.header"));
+										String.format(i18n(COMPILATION_SUCCESS_MESSAGE), program.getName()), parent,
+										Modality.WINDOW_MODAL, i18n(COMPILATION_SUCCESS_TITLE),
+										i18n(COMPILATION_SUCCESS_HEADER));
 							}
 						} else {
-							AlertHelper.showAlertAndWait(AlertType.ERROR, i18n("Compilation.diagnostic.override"),
+							AlertHelper.showAlertAndWait(AlertType.ERROR, i18n(COMPILATION_DIAGNOSTIC_OVERRIDE),
 									parent);
 							logger.error("The custom Robbi class does not overwrite the main-Method");
 						}

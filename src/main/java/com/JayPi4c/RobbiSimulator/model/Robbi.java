@@ -186,8 +186,8 @@ public class Robbi {
 	 */
 	public final void nehmeAuf() {
 		synchronized (territory) {
-			Item item = territory.getItem(x, y);
-			if (item == null)
+			Item i = territory.getItem(x, y);
+			if (i == null)
 				throw new NoItemException();
 			if (this.item != null) {
 				throw new BagIsFullException();
@@ -318,30 +318,6 @@ public class Robbi {
 	public final boolean istTascheVoll() {
 		synchronized (territory) {
 			return item != null;
-		}
-	}
-
-	// =================== DEBUG ===================
-
-	/**
-	 * Prints robbis current facing into the console.
-	 */
-	void print() {
-		switch (facing) {
-			case NORTH:
-				System.out.print("^");
-				break;
-			case SOUTH:
-				System.out.print("v");
-				break;
-			case EAST:
-				System.out.print(">");
-				break;
-			case WEST:
-				System.out.print("<");
-				break;
-			default:
-				System.out.print(" ");
 		}
 	}
 

@@ -7,6 +7,7 @@ import com.JayPi4c.RobbiSimulator.model.Robbi;
 import com.JayPi4c.RobbiSimulator.model.Territory;
 import com.JayPi4c.RobbiSimulator.model.TerritoryState;
 import com.JayPi4c.RobbiSimulator.view.MainStage;
+import com.JayPi4c.RobbiSimulator.view.Toolbar;
 
 import javafx.application.Platform;
 import javafx.scene.control.Button;
@@ -57,39 +58,39 @@ public class SimulationController {
 	public SimulationController(MainStage stage, Territory territory) {
 		this.stage = stage;
 		this.territory = territory;
-		speed = (int) stage.getSpeedSliderToolbar().getValue();
+		Toolbar toolbar = stage.getToolbar();
+		speed = (int) toolbar.getSpeedSliderToolbar().getValue();
 
-		resetToolbar = this.stage.getResetButtonToolbar();
+		resetToolbar = toolbar.getResetButtonToolbar();
 		resetToolbar.setOnAction(e -> reset());
-		resetMenuItem = this.stage.getResetMenuItem();
+		resetMenuItem = this.stage.getMenubar().getResetMenuItem();
 		resetMenuItem.onActionProperty().bind(resetToolbar.onActionProperty());
 
-		startToolbar = this.stage.getStartToggleButtonToolbar();
+		startToolbar = toolbar.getStartToggleButtonToolbar();
 		startToolbar.setOnAction(e -> {
 			if (!isSimulationRunning())
 				start();
 			else
 				resume();
 		});
-		startMenuItem = stage.getStartMenuItem();
+		startMenuItem = stage.getMenubar().getStartMenuItem();
 		startMenuItem.onActionProperty().bind(startToolbar.onActionProperty());
 		startMenuItem.disableProperty().bind(startToolbar.disableProperty());
 
-		pauseToolbar = this.stage.getPauseToggleButtonToolbar();
+		pauseToolbar = toolbar.getPauseToggleButtonToolbar();
 		pauseToolbar.setOnAction(e -> pause());
-		pauseMenuItem = this.stage.getPauseMenuItem();
+		pauseMenuItem = this.stage.getMenubar().getPauseMenuItem();
 		pauseMenuItem.onActionProperty().bind(pauseToolbar.onActionProperty());
 		pauseMenuItem.disableProperty().bind(pauseToolbar.disableProperty());
 
-		stopToolbar = this.stage.getStopToggleButtonToolbar();
+		stopToolbar = toolbar.getStopToggleButtonToolbar();
 		stopToolbar.setOnAction(e -> stop());
-		stopMenuItem = this.stage.getStopMenuItem();
+		stopMenuItem = this.stage.getMenubar().getStopMenuItem();
 		stopMenuItem.onActionProperty().bind(stopToolbar.onActionProperty());
 		stopMenuItem.disableProperty().bind(stopToolbar.disableProperty());
 
-		this.stage.getSpeedSliderToolbar().valueProperty()
-				.addListener((ov, oldVal, newVal) -> setSpeed((Double) newVal));
-		setSpeed(this.stage.getSpeedSliderToolbar().getValue());
+		toolbar.getSpeedSliderToolbar().valueProperty().addListener((ov, oldVal, newVal) -> setSpeed((Double) newVal));
+		setSpeed(toolbar.getSpeedSliderToolbar().getValue());
 		disableButtonStates(false, true, true);
 
 	}
@@ -214,7 +215,7 @@ public class SimulationController {
 	 * @param speed the new speed value
 	 */
 	public void setSpeed(double speed) {
-		this.speed = (int) map(speed, MainStage.MIN_SPEED_VALUE, MainStage.MAX_SPEED_VALUE, MAX_SPEED, MIN_SPEED);
+		this.speed = (int) map(speed, Toolbar.MIN_SPEED_VALUE, Toolbar.MAX_SPEED_VALUE, MAX_SPEED, MIN_SPEED);
 	}
 
 	/**

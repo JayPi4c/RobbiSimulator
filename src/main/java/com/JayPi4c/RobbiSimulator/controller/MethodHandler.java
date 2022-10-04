@@ -48,7 +48,7 @@ public class MethodHandler implements EventHandler<ActionEvent> {
 	@Override
 	public void handle(ActionEvent event) {
 		this.territory.deactivateNotification();
-		this.method.setAccessible(true); // allow calling private/pacakge-private and protected
+		this.method.setAccessible(true); // allow calling private/package-private and protected
 		try {
 			List<Object> args = new ArrayList<>();
 			for (Parameter p : method.getParameters()) {

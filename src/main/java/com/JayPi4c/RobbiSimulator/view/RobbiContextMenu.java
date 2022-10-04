@@ -31,6 +31,8 @@ import javafx.scene.control.Tooltip;
  */
 public class RobbiContextMenu extends ContextMenu {
 
+	private static final String EDITOR_CONTEXTMENU_TOOLTIP = "Editor.contextMenu.tooltip";
+
 	/**
 	 * Constructor to create a new RobbiContextMenu. It fills itself with all
 	 * methods that are provided by robbi and allows to run a particular method on
@@ -65,7 +67,7 @@ public class RobbiContextMenu extends ContextMenu {
 				if (method.getParameterCount() != 0 && !hasCorrectDefaultAnnotations(method)) {
 					item.setDisable(true);
 					// https://stackoverflow.com/a/43053529/13670629
-					Tooltip tooltip = I18nUtils.createTooltip("Editor.contextMenu.tooltip");
+					Tooltip tooltip = I18nUtils.createTooltip(EDITOR_CONTEXTMENU_TOOLTIP);
 					Tooltip.install(item.getContent(), tooltip);
 
 				} else
