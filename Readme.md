@@ -21,6 +21,12 @@ Um das Programm besser debuggen zu können, werden viele Informationen mit dem L
 - (In Stockpile.java) Es ist zu überprüfen, auf welche Weise die Items vom Lager entfernt und hinzugefügt werden sollen. Abhängig davon, wie die Daten gespeichert werden unterscheidet sich die Arbeit mit dem Lager. Im speziellen ist hier die Frage zu stellen, ob FIFO oder LIFO verwendet werden soll. Zusätzlich stellt sich die Frage, ob Robbi die Items in der Tasche unterscheiden können soll.
 - (In MainStageController.java) Der Slider soll eine Beschriftung bekommen, sodass zu erkennen ist, welche Richtung schneller und welcher langsamer bedeutet und wofür der Slider überhaupt ist.
 
+## Coverage
+![coverage](../badges/jacoco.svg)
+![branches coverage](../badges/branches.svg)
+
+Die Coverage wurde nach diesem [Template](https://github.com/cicirello/examples-jacoco-badge-generator) umgesetzt.
+
 ### Acknowledgement
 
 Der Warnsound wurde von [hier](https://freesound.org/s/507906/) heruntergeladen.
