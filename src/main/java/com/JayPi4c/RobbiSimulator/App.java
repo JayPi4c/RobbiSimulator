@@ -1,5 +1,7 @@
 package com.JayPi4c.RobbiSimulator;
 
+import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
+
 import java.util.ResourceBundle;
 
 import com.JayPi4c.RobbiSimulator.controller.program.ProgramController;
@@ -19,13 +21,16 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * Hauptklasse des Robbi Simulators.<br>
  * Javaversion: 17 <br>
- * JavaFX: 17<br>
  * 
  * @author Jonas Pohl
  *
  */
 @Slf4j
 public class App extends Application {
+
+	private static final String INIT_ERROR_MESSAGE = "Init.error.message";
+	private static final String INIT_ERROR_TITLE = "Init.error.title";
+	private static final String INIT_ERROR_HEADER = "Init.error.header";
 
 	/**
 	 * Application entry point
@@ -51,8 +56,8 @@ public class App extends Application {
 		logger.debug("Loading Program Controller");
 		if (!ProgramController.initialize()) {
 			logger.error("Failed to load Program Controller");
-			AlertHelper.showAlertAndWait(AlertType.ERROR, I18nUtils.i18n("Init.error.message"), null, null,
-					I18nUtils.i18n("Init.error.title"), I18nUtils.i18n("Init.error.header"));
+			AlertHelper.showAlertAndWait(AlertType.ERROR, i18n(INIT_ERROR_MESSAGE), null, null, i18n(INIT_ERROR_TITLE),
+					i18n(INIT_ERROR_HEADER));
 			Platform.exit();
 		}
 		logger.debug("loading Program Controller successfully");

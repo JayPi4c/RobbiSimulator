@@ -22,7 +22,10 @@ import lombok.NoArgsConstructor;
  * "https://www.eclipse.org/eclipse/platform-core/documents/3.1/message_bundles.html">documentation</a>.
  * <br>
  * Nevertheless, it is not used, as it is a completely different approach then
- * previously used and does not bring that much of an advantage.
+ * previously used and does not bring that much of an advantage. <br>
+ * Further best practices have been discussed in <a href=
+ * "https://stackoverflow.com/questions/6992977/where-to-place-i18n-key-strings-in-java">this</a>
+ * Stack Overflow article.
  * 
  * @author Jonas Pohl
  *
