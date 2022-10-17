@@ -7,7 +7,7 @@
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<javafx.version>19-ea+2</javafx.version>
+		<javafx.version>16</javafx.version> <!-- Version 16 is used to resolve conflicts with monacoFX -->
 		<junit.version>5.8.2</junit.version>
 		<derby.version>10.16.1.1</derby.version>
 	</properties>
