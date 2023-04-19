@@ -657,21 +657,26 @@ public class ProgramController {
 
 	/**
 	 * Loads a new Robbi by the name of the class
-	 * 
+	 *
 	 * @param name the name of the class
 	 * @return an Optional of the given robbi class
 	 */
 	private static Optional<Robbi> loadNewRobbi(String name) {
 		Optional<Robbi> robbi;
-		try (URLClassLoader classLoader = new URLClassLoader(
-				new URL[] { new File(PATH_TO_PROGRAMS).toURI().toURL() })) {
+		ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
+		try {
+            // cant be closed here because then the simulation thread can't access lazily loaded classes loaded with this classloader
+			// maybe think about a factory solution: https://stackoverflow.com/a/13946807
+			// see this whole discussion about when to close a classloader: https://stackoverflow.com/q/13944868
+            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { new File(PATH_TO_PROGRAMS).toURI().toURL() }, previousClassLoader);
+			Thread.currentThread().setContextClassLoader(classLoader);
 			Constructor<?> c = classLoader.loadClass(name).getConstructor();
 			Robbi r = (Robbi) c.newInstance();
-			robbi = Optional.ofNullable(r);
+			robbi = Optional.of(r);
 		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | ClassNotFoundException
 				| NoSuchMethodException | SecurityException | IOException e) {
 			logger.error("Could not load class of '{}'. Message: {}", name, e.getMessage());
-			robbi = Optional.ofNullable(null);
+			robbi = Optional.empty();
 		}
 		return robbi;
 	}
