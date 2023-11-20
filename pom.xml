@@ -9,7 +9,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<javafx.version>19-ea+2</javafx.version>
 		<junit.version>5.8.2</junit.version>
-		<derby.version>10.16.1.1</derby.version>
+		<derby.version>10.17.1.0</derby.version>
 	</properties>
 
 	<build>
