@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SceneManager {
 	
-	private static final String DARK_MODE_CSS = "css/dark-theme.css";
+	private static final String DARK_MODE_CSS = "/css/dark-theme.css";
 	
 	/**
 	 * The boolean on which elements can bind in order to be updated on dark-mode

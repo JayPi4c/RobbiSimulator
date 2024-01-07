@@ -60,16 +60,16 @@ public class TerritoryPanel extends Canvas implements Observer {
 
 		logger.debug("Loading territory images");
 
-		robbiImage = new Image("img/0Robbi32.png");
+		robbiImage = new Image(String.valueOf(MainStage.class.getResource("/img/0Robbi32.png")));
 
-		tileImages[TILE] = new Image("img/Tile32.png");
-		tileImages[STOCKPILE] = new Image("img/Stockpile32.png");
-		tileImages[HOLLOW] = new Image("img/Hollow32.png");
-		tileImages[PILEOFSCRAP] = new Image("img/PileOfScrap32.png");
+		tileImages[TILE] = new Image(String.valueOf(MainStage.class.getResource("/img/Tile32.png")));
+		tileImages[STOCKPILE] = new Image(String.valueOf(MainStage.class.getResource("/img/Stockpile32.png")));
+		tileImages[HOLLOW] = new Image(String.valueOf(MainStage.class.getResource("/img/Hollow32.png")));
+		tileImages[PILEOFSCRAP] = new Image(String.valueOf(MainStage.class.getResource("/img/PileOfScrap32.png")));
 
-		itemImages[NUT] = new Image("img/Nut32.png");
-		itemImages[SCREW] = new Image("img/Screw32.png");
-		itemImages[ACCU] = new Image("img/Accu32.png");
+		itemImages[NUT] = new Image(String.valueOf(MainStage.class.getResource("/img/Nut32.png")));
+		itemImages[SCREW] = new Image(String.valueOf(MainStage.class.getResource("/img/Screw32.png")));
+		itemImages[ACCU] = new Image(String.valueOf(MainStage.class.getResource("/img/Accu32.png")));
 	}
 
 	/**
