@@ -92,7 +92,7 @@ public class ProgramController {
 	 * and load into the simulator. This String will not be shown in the editor
 	 * content.
 	 */
-	public static final String PREFIX_TEMPLATE = "import com.JayPi4c.RobbiSimulator.utils.annotations.*; public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{";
+	public static final String PREFIX_TEMPLATE = "import com.JayPi4c.RobbiSimulator.utils.annotations.*;import lombok.extern.slf4j.Slf4j; @Slf4j public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{";
 	/**
 	 * Constant String for the editor postfix, to close the class and make it
 	 * compilable. This postfix will not be shown in the editor content.
