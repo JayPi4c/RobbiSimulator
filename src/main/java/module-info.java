@@ -21,8 +21,6 @@ module RobbiSimulator {
     requires org.apache.logging.log4j;
     requires org.apache.derby.tools;
 
-    opens com.JayPi4c.RobbiSimulator to javafx.controls;
-
     exports com.JayPi4c.RobbiSimulator.utils.annotations;
     exports com.JayPi4c.RobbiSimulator.model;
     exports com.JayPi4c.RobbiSimulator;

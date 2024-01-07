@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.apache.derby.tools.sysinfo;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Version;
 
@@ -254,7 +253,7 @@ public class MainStageController implements Observer {
 		menuBar.getLibraryMenuItem().setOnAction(e -> {
 			String javaFxVersion = System.getProperty("javafx.version");
 			String javaVersion = System.getProperty("java.version");
-			String derbyVersion = sysinfo.getVersionString();
+			String derbyVersion = "10.x"; // TODO: read info from derby's info.properties
 			String jaxbVersion = JAXBContext.class.getPackage().getImplementationVersion();
 			String hibernateVersion = Version.getVersionString();
 			String lombokVersion = Generated.class.getPackage().getImplementationVersion();

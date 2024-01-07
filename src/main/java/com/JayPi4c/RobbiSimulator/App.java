@@ -17,6 +17,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.swing.*;
+
 /**
  * 
  * Hauptklasse des Robbi Simulators.<br>
@@ -38,7 +40,17 @@ public class App extends Application {
 	 * @param args the arguments from the command line
 	 */
 	public static void main(String[] args) {
-		launch(args);
+		try {
+			launch(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, """
+					Failed to load application.
+					Further information can be obtained running the
+					application in the command line.
+					Please consider submitting your error.
+					""");
+		}
 	}
 
 	@Override
