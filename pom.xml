@@ -13,6 +13,7 @@
         <junit.version>5.8.2</junit.version>
         <derby.version>10.17.1.0</derby.version>
         <lombok.version>1.18.30</lombok.version>
+        <hibernate.version>6.1.2.Final</hibernate.version>
     </properties>
 
     <build>
@@ -141,7 +142,12 @@
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>6.1.2.Final</version>
+            <version>${hibernate.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>

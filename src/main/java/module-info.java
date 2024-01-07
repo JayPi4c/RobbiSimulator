@@ -21,6 +21,8 @@ module RobbiSimulator {
     requires org.apache.logging.log4j;
     requires org.apache.derby.tools;
 
+    opens com.JayPi4c.RobbiSimulator.controller.examples to org.hibernate.orm.core;
+
     exports com.JayPi4c.RobbiSimulator.utils.annotations;
     exports com.JayPi4c.RobbiSimulator.model;
     exports com.JayPi4c.RobbiSimulator;

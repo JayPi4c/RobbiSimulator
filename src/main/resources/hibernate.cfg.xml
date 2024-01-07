@@ -16,7 +16,7 @@
 		<!-- Enable Hibernate's automatic session context management -->
 		<property name="current_session_context_class">thread</property>
 
-		<property name="hibernate.dialect">org.hibernate.dialect.DerbyTenSevenDialect</property>
-		<mapping class="com.JayPi4c.RobbiSimulator.controller.examples.Example"></mapping>
+		<property name="hibernate.dialect">org.hibernate.dialect.DerbyDialect</property>
+		<mapping class="com.JayPi4c.RobbiSimulator.controller.examples.Example"/>
 	</session-factory>
 </hibernate-configuration>
