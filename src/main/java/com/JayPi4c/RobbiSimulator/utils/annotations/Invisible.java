@@ -9,9 +9,8 @@ import java.lang.annotation.Target;
  * Annotation to hide methods from the ContextMenu. Methods annotated with this
  * annotation will not show up in the ContextMenu. Nonetheless, they still can
  * be used in the code without any restrictions.
- * 
- * @author Jonas Pohl
  *
+ * @author Jonas Pohl
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,25 +1,12 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.util.Optional;
+import com.JayPi4c.RobbiSimulator.utils.Observable;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
-import com.JayPi4c.RobbiSimulator.utils.Observable;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.xml.stream.*;
+import java.io.*;
+import java.util.Optional;
 
 /**
  * This class contains all datastructures and utility functions to control the
@@ -30,10 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Territory extends Observable implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
-
+    private static final int DEFAULT_NUMBER_OF_COLUMNS = 6;
+    private static final int DEFAULT_NUMBER_OF_ROWS = 6;
     private transient Robbi robbi;
-
     /**
      * Array-attribute to store the real territory
      */
@@ -42,10 +30,6 @@ public class Territory extends Observable implements Serializable {
      * Attribute to save if the territory has changed.
      */
     private boolean sizeChanged = false;
-
-    private static final int DEFAULT_NUMBER_OF_COLUMNS = 6;
-    private static final int DEFAULT_NUMBER_OF_ROWS = 6;
-
     /**
      * Attribute to store the current number of columns of the territory.
      */
@@ -151,6 +135,15 @@ public class Territory extends Observable implements Serializable {
     }
 
     /**
+     * Getter for the current robbi in the territory.
+     *
+     * @return the current robbi
+     */
+    public synchronized Robbi getRobbi() {
+        return robbi;
+    }
+
+    /**
      * Setter to update Robbi in the territory.
      *
      * @param robbi the new Robbi for the territory
@@ -163,15 +156,6 @@ public class Territory extends Observable implements Serializable {
             robbi.setItem(this.robbi.getItem());
         }
         this.robbi = robbi;
-    }
-
-    /**
-     * Getter for the current robbi in the territory.
-     *
-     * @return the current robbi
-     */
-    public synchronized Robbi getRobbi() {
-        return robbi;
     }
 
     /**
@@ -717,7 +701,7 @@ public class Territory extends Observable implements Serializable {
      */
     private Optional<String> getDTD() {
         Optional<Module> module = ModuleLayer.boot().findModule("RobbiSimulator");
-        if(module.isEmpty()) {
+        if (module.isEmpty()) {
             logger.warn("Could not load dtd");
             return Optional.empty();
         }

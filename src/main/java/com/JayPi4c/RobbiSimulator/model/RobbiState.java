@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 /**
  * Robbi State to store all state relevant attributes in order to apply the
  * Memento-Pattern.
- * 
- * @author Jonas Pohl
  *
+ * @author Jonas Pohl
  */
 @XmlRootElement
 @Getter
@@ -21,16 +20,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RobbiState {
 
-	@XmlElement
-	private int x;
+    @XmlElement
+    private int x;
 
-	@XmlElement
-	private int y;
+    @XmlElement
+    private int y;
 
-	@XmlElement
-	private DIRECTION facing;
+    @XmlElement
+    private DIRECTION facing;
 
-	@XmlAnyElement
-	private Item item;
+    @XmlAnyElement
+    private Item item;
 
 }

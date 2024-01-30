@@ -1,15 +1,17 @@
 package com.JayPi4c.RobbiSimulator.controller.simulation;
 
+import java.io.Serial;
+
 /**
  * This Exception indicates, that the simulation has been interrupted. It will
  * be thrown, if the user hits the stop button while the main Method of robbi is
  * still running.
- * 
- * @author Jonas Pohl
  *
+ * @author Jonas Pohl
  */
 public class StopException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
 }
