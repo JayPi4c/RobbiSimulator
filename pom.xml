@@ -9,11 +9,11 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>16</javafx.version> <!-- Version 16 is used to resolve conflicts with monacoFX -->
+        <javafx.version>21</javafx.version> <!-- Version 16 is used to resolve conflicts with monacoFX -->
         <junit.version>5.8.2</junit.version>
         <derby.version>10.17.1.0</derby.version>
         <lombok.version>1.18.30</lombok.version>
-        <hibernate.version>6.1.2.Final</hibernate.version>
+        <hibernate.version>6.4.2.Final</hibernate.version>
     </properties>
 
     <build>
@@ -34,81 +34,8 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.3</version>
-                <configuration>
-                    <includes>
-                        <include>**/*TestCases.java</include>
-                        <include>**/*Tests.java</include>
-                        <include>**/*TestCase.java</include>
-                        <include>**/*Test.java</include>
-                        <include>**/Test*.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <configuration>
-                    <mainClass>RobbiSimulator/com.JayPi4c.RobbiSimulator.App</mainClass>
-                        <stripDebug>true</stripDebug>
-                        <compress>2</compress>
-                        <noHeaderFiles>true</noHeaderFiles>
-                        <noManPages>true</noManPages>
-                        <jlinkImageName>RobbiSimulator</jlinkImageName>
-                        <jlinkZipName>RobbiSimulator</jlinkZipName>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-    <profiles>
-
-        <profile>
-            <id>linux-deb</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.panteleyev</groupId>
-                        <artifactId>jpackage-maven-plugin</artifactId>
-                        <configuration>
-                            <type>DEB</type>
-                            <linuxShortcut>true</linuxShortcut>
-                            <linuxPackageName>RobbiSimulator</linuxPackageName>
-                            <linuxAppCategory>Utilities</linuxAppCategory>
-                            <linuxMenuGroup>Utilities</linuxMenuGroup>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>jpackage</id>
-            <build>
-                <plugins>
-
-                    <plugin>
-                        <groupId>org.panteleyev</groupId>
-                        <artifactId>jpackage-maven-plugin</artifactId>
-                        <version>1.6.0</version>
-                        <configuration>
-                            <name>RobbiSimulator</name>
-                            <vendor>JayPi4c</vendor>
-                            <destination>target/dist</destination>
-                            <module>RobbiSimulator/com.JayPi4c.RobbiSimulator.App</module>
-                            <runtimeImage>target/robbisimulator</runtimeImage>
-                            <resourceDir>./jpackage</resourceDir>
-                            <javaOptions>
-                                <option>-Dfile.encoding=UTF-8</option>
-                            </javaOptions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 
     <dependencies>
@@ -136,8 +63,13 @@
             <groupId>eu.mihosoft.monacofx</groupId>
             <artifactId>monacofx</artifactId>
             <version>0.0.8</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
 
         <dependency>
             <groupId>org.hibernate.orm</groupId>
