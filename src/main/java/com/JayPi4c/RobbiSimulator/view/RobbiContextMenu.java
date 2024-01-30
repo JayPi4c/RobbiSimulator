@@ -13,7 +13,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -108,14 +107,13 @@ public class RobbiContextMenu extends ContextMenu {
      */
     private CustomMenuItem getMenuItem(Method m) {
         StringBuilder bobTheBuilder = new StringBuilder();
-        bobTheBuilder.append(m.getReturnType().toString());
+        bobTheBuilder.append(m.getReturnType());
         bobTheBuilder.append(" ");
         bobTheBuilder.append(m.getName());
         bobTheBuilder.append("(");
         for (Parameter parameter : m.getParameters()) {
             bobTheBuilder.append(parameter.getType());
-            List<Annotation> annos = Arrays.asList(parameter.getAnnotations());
-            for (Annotation anno : annos)
+            for (Annotation anno : parameter.getAnnotations())
                 if (anno instanceof Default a) {
                     bobTheBuilder.append(" = ");
                     bobTheBuilder.append(a.value());

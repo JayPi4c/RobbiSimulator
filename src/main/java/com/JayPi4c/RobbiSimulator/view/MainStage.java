@@ -136,7 +136,7 @@ public class MainStage extends Stage {
      */
     public static final Image robbiTake;
 
-    /**
+    /*
      * loading images
      */
     static {

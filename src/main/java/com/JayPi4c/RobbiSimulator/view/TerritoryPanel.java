@@ -35,7 +35,7 @@ public class TerritoryPanel extends Canvas implements Observer {
     private static final int CELLSIZE = 32;
     private static final int CELLSPACER = 1;
 
-    /**
+    /*
      * loading territory images
      */
     static {
@@ -190,7 +190,6 @@ public class TerritoryPanel extends Canvas implements Observer {
             case SOUTH:
                 yield 90;
             case EAST:
-            default:
                 yield 0;
         };
         drawRotatedImage(gc, robbiImage, angle, (double) territory.getRobbiX() * (CELLSIZE + CELLSPACER) + CELLSPACER,

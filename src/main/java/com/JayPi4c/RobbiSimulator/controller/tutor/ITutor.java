@@ -19,7 +19,7 @@ public interface ITutor extends Remote {
      * @return the requests id
      * @throws RemoteException thrown on connection errors
      */
-    public int sendRequest(String code, String territory) throws RemoteException;
+    int sendRequest(String code, String territory) throws RemoteException;
 
     /**
      * Fetches the answer for the given id. The answer will be null, if no answer is
@@ -29,6 +29,6 @@ public interface ITutor extends Remote {
      * @return the answer for the id or null, if no answer is set
      * @throws RemoteException thrown on connection errors
      */
-    public Answer getAnswer(int id) throws RemoteException;
+    Answer getAnswer(int id) throws RemoteException;
 
 }

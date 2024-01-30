@@ -3,6 +3,7 @@ package com.JayPi4c.RobbiSimulator.controller.tutor;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serial;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
@@ -16,6 +17,7 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = true)
 public class Tutor extends UnicastRemoteObject implements ITutor {
 
+    @Serial
     private static final long serialVersionUID = 4722167139215525516L;
 
     private transient Queue<Request> requests;

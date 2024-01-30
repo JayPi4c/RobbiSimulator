@@ -14,6 +14,6 @@ public interface Observer {
      *
      * @param observable the Observable to call the update function.
      */
-    public void update(Observable observable);
+    void update(Observable observable);
 
 }

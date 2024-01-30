@@ -24,7 +24,7 @@ public enum DIRECTION {
      */
     EAST;
 
-    private static DIRECTION[] vals = values();
+    private static final DIRECTION[] vals = values();
 
     /**
      * moves through the direction counter-clockwise

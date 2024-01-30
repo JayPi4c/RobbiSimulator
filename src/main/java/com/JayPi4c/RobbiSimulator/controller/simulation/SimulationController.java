@@ -229,7 +229,7 @@ public class SimulationController {
      * @see <a href=
      * "https://stackoverflow.com/a/17135426/13670629">Stackoverflow</a>
      */
-    private final double map(double value, double istart, double istop, double ostart, double ostop) {
+    private double map(double value, double istart, double istop, double ostart, double ostop) {
         return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
     }
 

@@ -12,6 +12,8 @@ import lombok.Setter;
  *
  * @author Jonas Pohl
  */
+@Getter
+@Setter
 public class ButtonState {
 
     /**
@@ -52,8 +54,6 @@ public class ButtonState {
      */
     public static final int CLEAR = 7;
 
-    @Getter
-    @Setter
     private int selected;
 
     /**

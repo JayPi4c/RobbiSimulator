@@ -118,14 +118,14 @@ public class ProgramController {
                 if (!defaultProgram.createNewFile())
                     return false;
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Could not create file", e);
                 return false;
             }
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(defaultProgram))) {
                 writer.write(createTemplate(DEFAULT_ROBBI_FILE_NAME, DEFAULT_CONTENT));
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Could not write to file", e);
                 return false;
             }
         }
@@ -427,7 +427,7 @@ public class ProgramController {
 
         try (StandardJavaFileManager manager = javac.getStandardFileManager(diagnostics, null, null)) {
             Iterable<? extends JavaFileObject> units = manager
-                    .getJavaFileObjectsFromFiles(Arrays.asList(program.getFile()));
+                    .getJavaFileObjectsFromFiles(Collections.singletonList(program.getFile()));
             // https://stackoverflow.com/questions/60016127/can-toolprovider-getsystemjavacompiler-access-runtime-generated-in-memory-sour
             CompilationTask task = javac.getTask(null, manager, diagnostics,
                     List.of("-p", System.getProperty("jdk.module.path")), null, units);
@@ -472,7 +472,7 @@ public class ProgramController {
                         String val = null;
                         String type = null;
                         if (!diags.isEmpty()) {
-                            Diagnostics.Diagnostic diagnostic = diags.get(0);
+                            Diagnostics.Diagnostic diagnostic = diags.getFirst();
                             val = diagnostic.value();
                             type = diagnostic.type();
                             logger.error("[Annotation Error]: {} is not applicable for {}", val, type);

@@ -45,7 +45,7 @@ public class Stockpile extends Tile {
      */
     @Override
     public Item getItem() {
-        return (items.isEmpty()) ? null : items.get(items.size() - 1);
+        return (items.isEmpty()) ? null : items.getLast();
     }
 
     /**
@@ -65,7 +65,7 @@ public class Stockpile extends Tile {
      */
     @Override
     public Item pickItem() {
-        return items.remove(items.size() - 1);
+        return items.removeLast();
     }
 
     /**
