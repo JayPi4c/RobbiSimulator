@@ -92,9 +92,10 @@ public class ExampleService {
 		List<String> tags;
 		try (Session session = HibernateUtils.getSessionFactory().openSession()) {
 			List<Example> allExamples = session.createQuery("from Example", Example.class).list();
+			logger.debug("Found {} examples", allExamples.size());
 			tags = allExamples.stream().flatMap(ex -> ex.getTags().stream()).distinct().toList();
 		}
-		return Optional.ofNullable(tags);
+		return Optional.of(tags);
 	}
 
 }

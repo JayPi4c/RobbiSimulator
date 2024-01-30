@@ -179,31 +179,30 @@ public class MainStage extends Stage {
 	 */
 	static {
 		logger.debug("Loading stage images");
+		newImage = new Image(String.valueOf(MainStage.class.getResource("/img/New24.gif")));
+		saveImage = new Image(String.valueOf(MainStage.class.getResource("/img/Save24.gif")));
+		openImage = new Image(String.valueOf(MainStage.class.getResource("/img/Open24.gif")));
+		compileImage = new Image(String.valueOf(MainStage.class.getResource("/img/Compile24.gif")));
+		printImage = new Image(String.valueOf(MainStage.class.getResource("/img/Print24.gif")));
+		terrainImage = new Image(String.valueOf(MainStage.class.getResource("/img/Terrain24.gif")));
+		menuRobbiImage = new Image(String.valueOf(MainStage.class.getResource("/img/Robbi24.png")));
+		menuHollowImage = new Image(String.valueOf(MainStage.class.getResource("/img/Hollow24.png")));
+		menuPileOfScrapImage = new Image(String.valueOf(MainStage.class.getResource("/img/PileOfScrap24.png")));
+		menuStockpileImage = new Image(String.valueOf(MainStage.class.getResource("/img/Stockpile24.png")));
+		menuAccuImage = new Image(String.valueOf(MainStage.class.getResource("/img/Accu24.png")));
+		menuScrewImage = new Image(String.valueOf(MainStage.class.getResource("/img/Screw24.png")));
+		menuNutImage = new Image(String.valueOf(MainStage.class.getResource("/img/Nut24.png")));
+		menuDeleteImage = new Image(String.valueOf(MainStage.class.getResource("/img/Delete24.gif")));
 
-		newImage = new Image("img/New24.gif");
-		saveImage = new Image("img/Save24.gif");
-		openImage = new Image("img/Open24.gif");
-		compileImage = new Image("img/Compile24.gif");
-		printImage = new Image("img/Print24.gif");
-		terrainImage = new Image("img/Terrain24.gif");
-		menuRobbiImage = new Image("img/Robbi24.png");
-		menuHollowImage = new Image("img/Hollow24.png");
-		menuPileOfScrapImage = new Image("img/PileOfScrap24.png");
-		menuStockpileImage = new Image("img/Stockpile24.png");
-		menuAccuImage = new Image("img/Accu24.png");
-		menuScrewImage = new Image("img/Screw24.png");
-		menuNutImage = new Image("img/Nut24.png");
-		menuDeleteImage = new Image("img/Delete24.gif");
+		resetImage = new Image(String.valueOf(MainStage.class.getResource("/img/reset24.png")));
+		menuStartImage = new Image(String.valueOf(MainStage.class.getResource("/img/Play24.gif")));
+		menuPauseImage = new Image(String.valueOf(MainStage.class.getResource("/img/Pause24.gif")));
+		menuStopImage = new Image(String.valueOf(MainStage.class.getResource("/img/Stop24.gif")));
 
-		resetImage = new Image("img/reset24.png");
-		menuStartImage = new Image("img/Play24.gif");
-		menuPauseImage = new Image("img/Pause24.gif");
-		menuStopImage = new Image("img/Stop24.gif");
-
-		robbiMove = new Image("img/RobbiMove24.png");
-		robbiTurnLeft = new Image("img/RobbiLeft24.png");
-		robbiPut = new Image("img/RobbiPut24.png");
-		robbiTake = new Image("img/RobbiTake24.png");
+		robbiMove = new Image(String.valueOf(MainStage.class.getResource("/img/RobbiMove24.png")));
+		robbiTurnLeft = new Image(String.valueOf(MainStage.class.getResource("/img/RobbiLeft24.png")));
+		robbiPut = new Image(String.valueOf(MainStage.class.getResource("/img/RobbiPut24.png")));
+		robbiTake = new Image(String.valueOf(MainStage.class.getResource("/img/RobbiTake24.png")));
 	}
 
 	/**

@@ -92,7 +92,7 @@ public class ProgramController {
 	 * and load into the simulator. This String will not be shown in the editor
 	 * content.
 	 */
-	public static final String PREFIX_TEMPLATE = "import com.JayPi4c.RobbiSimulator.utils.annotations.*;import lombok.extern.slf4j.Slf4j;@Slf4j public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{";
+	public static final String PREFIX_TEMPLATE = "import com.JayPi4c.RobbiSimulator.utils.annotations.*;import lombok.extern.slf4j.Slf4j; @Slf4j public class %s extends com.JayPi4c.RobbiSimulator.model.Robbi{";
 	/**
 	 * Constant String for the editor postfix, to close the class and make it
 	 * compilable. This postfix will not be shown in the editor content.
@@ -450,13 +450,16 @@ public class ProgramController {
 	 *                   relative to it
 	 */
 	public static void compile(Program program, boolean showAlerts, Window parent) {
+
 		JavaCompiler javac = ToolProvider.getSystemJavaCompiler();
 		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
 		try (StandardJavaFileManager manager = javac.getStandardFileManager(diagnostics, null, null)) {
 			Iterable<? extends JavaFileObject> units = manager
 					.getJavaFileObjectsFromFiles(Arrays.asList(program.getFile()));
-			CompilationTask task = javac.getTask(null, manager, diagnostics, null, null, units);
+			// https://stackoverflow.com/questions/60016127/can-toolprovider-getsystemjavacompiler-access-runtime-generated-in-memory-sour
+			CompilationTask task = javac.getTask(null, manager, diagnostics, List.of("-p", System.getProperty("jdk.module.path")), null, units);
+			task.addModules(List.of("RobbiSimulator")); //https://docs.oracle.com/javase%2F9%2Fdocs%2Fapi%2F%2F/javax/tools/JavaCompiler.CompilationTask.html
 
 			if (Boolean.FALSE.equals(task.call())) {
 				boolean showedAlert = false; // flag to indicate that only one alert is shown
