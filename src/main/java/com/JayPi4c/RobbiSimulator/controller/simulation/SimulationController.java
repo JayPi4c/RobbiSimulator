@@ -28,21 +28,21 @@ public class SimulationController {
 
     private Simulation simulation;
 
-    private MainStage stage;
-    private Territory territory;
+    private final MainStage stage;
+    private final Territory territory;
 
     @Getter
     private volatile int speed;
 
-    private MenuItem resetMenuItem;
-    private Button resetToolbar;
+    private final MenuItem resetMenuItem;
+    private final Button resetToolbar;
 
-    private MenuItem pauseMenuItem;
-    private ToggleButton pauseToolbar;
-    private MenuItem startMenuItem;
-    private ToggleButton startToolbar;
-    private MenuItem stopMenuItem;
-    private ToggleButton stopToolbar;
+    private final MenuItem pauseMenuItem;
+    private final ToggleButton pauseToolbar;
+    private final MenuItem startMenuItem;
+    private final ToggleButton startToolbar;
+    private final MenuItem stopMenuItem;
+    private final ToggleButton stopToolbar;
 
     private TerritoryState territoryState;
 
@@ -217,20 +217,20 @@ public class SimulationController {
     }
 
     /**
-     * Maps the given value, which ranges between istart and istop on a value which
-     * ranges between ostart and ostop.
+     * Maps the given value, which ranges between inStart and inStop, on a value which
+     * ranges between outStart and outStop.
      *
-     * @param value  value to map
-     * @param istart input start
-     * @param istop  input stop
-     * @param ostart output start
-     * @param ostop  output stop
+     * @param value    value to map
+     * @param inStart  input start
+     * @param inStop   input stop
+     * @param outStart output start
+     * @param outStop  output stop
      * @return the mapped value
      * @see <a href=
      * "https://stackoverflow.com/a/17135426/13670629">Stackoverflow</a>
      */
-    private final double map(double value, double istart, double istop, double ostart, double ostop) {
-        return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+    private double map(double value, double inStart, double inStop, double outStart, double outStop) {
+        return outStart + (outStop - outStart) * ((value - inStart) / (inStop - inStart));
     }
 
 }

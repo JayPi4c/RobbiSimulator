@@ -33,7 +33,7 @@ public class HibernateUtils {
             try {
                 sessionFactory = new Configuration().configure().buildSessionFactory();
             } catch (Exception ex) {
-                logger.error("Initial SessionFactory creation failed: {}", ex);
+                logger.error("Initial SessionFactory creation failed.", ex);
                 throw new ExceptionInInitializerError(ex);
             }
         }
@@ -41,7 +41,7 @@ public class HibernateUtils {
     }
 
     /**
-     * Utility function to shutdown the database connection.
+     * Utility function to shut down the database connection.
      */
     public static void shutdown() {
         if (sessionFactory != null)

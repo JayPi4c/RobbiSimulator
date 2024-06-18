@@ -15,11 +15,11 @@ import javafx.scene.input.MouseEvent;
  */
 public class TerritoryEventHandler implements EventHandler<MouseEvent> {
 
-    private Territory territory;
+    private final Territory territory;
 
     private boolean robbiDragged = false;
 
-    private ButtonState buttonState;
+    private final ButtonState buttonState;
 
     private RobbiContextMenu robbiContextMenu;
 

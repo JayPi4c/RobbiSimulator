@@ -70,7 +70,7 @@ public class PropertiesLoader {
     }
 
     /**
-     * Getter for the sounds property.
+     * Getter for the sounds-property.
      *
      * @return true if the sounds property is set to true
      */

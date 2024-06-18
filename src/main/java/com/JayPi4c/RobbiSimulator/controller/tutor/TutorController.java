@@ -32,7 +32,7 @@ public class TutorController {
     private static final String MENU_TUTOR_SAVEANSWER_INFORMATION = "Menu.tutor.saveAnswer.information";
     private static Tutor tutor;
     private static Registry registry;
-    private MainStage stage;
+    private final MainStage stage;
     private int currentID = NO_ID;
 
     /**
@@ -67,7 +67,7 @@ public class TutorController {
     }
 
     /**
-     * Unbinds all previously binded instances.
+     * Unbinds all previously bound instances.
      *
      * @return true if the unbinding was successful, false otherwise
      */

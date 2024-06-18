@@ -24,7 +24,7 @@ public class Stockpile extends Tile {
      */
     @XmlElementWrapper
     @XmlAnyElement(lax = true)
-    private ArrayList<Item> items;
+    private final List<Item> items;
     // TODO Queue more efficient?
     // check if queue would be better, allowing an easier iteration over the
     // elements.
@@ -55,7 +55,7 @@ public class Stockpile extends Tile {
      */
     @Override
     public Item getItem() {
-        return (items.isEmpty()) ? null : items.get(items.size() - 1);
+        return (items.isEmpty()) ? null : items.getLast();
     }
 
     /**
@@ -65,7 +65,7 @@ public class Stockpile extends Tile {
      */
     @Override
     public Item pickItem() {
-        return items.remove(items.size() - 1);
+        return items.removeLast();
     }
 
     /**

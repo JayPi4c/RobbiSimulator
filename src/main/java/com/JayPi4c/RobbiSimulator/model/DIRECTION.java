@@ -24,15 +24,13 @@ public enum DIRECTION {
      */
     EAST;
 
-    private static DIRECTION[] vals = values();
-
     /**
      * moves through the direction counter-clockwise
      *
      * @return the next direction after a counter-clockwise 90 degrees turn.
      */
     public DIRECTION next() {
-        return vals[(this.ordinal() + 1) % vals.length];
+        return values()[(this.ordinal() + 1) % values().length];
     }
 
     /**
@@ -41,7 +39,7 @@ public enum DIRECTION {
      * @return the next direction after a clockwise 90 degrees turn.
      */
     public DIRECTION previous() {
-        return vals[(this.ordinal() + vals.length - 1) % vals.length];
+        return values()[(this.ordinal() + values().length - 1) % values().length];
     }
 
 }

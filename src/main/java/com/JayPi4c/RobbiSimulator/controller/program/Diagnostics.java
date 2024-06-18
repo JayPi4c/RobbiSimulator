@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Diagnostics {
 
-    private List<Diagnostic> diags;
+    private final List<Diagnostic> diags;
 
     /**
      * Constructor for the Diagnostics-class. It creates the list to hold the

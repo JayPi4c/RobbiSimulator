@@ -20,7 +20,7 @@ public class Tutor extends UnicastRemoteObject implements ITutor {
     @Serial
     private static final long serialVersionUID = 4722167139215525516L;
 
-    private transient Queue<Request> requests;
+    private transient final Queue<Request> requests;
     /**
      * ID of the latest request. Will increment after a request arrived.
      */
@@ -28,7 +28,7 @@ public class Tutor extends UnicastRemoteObject implements ITutor {
     /**
      * Map to hold answers accessible by their id
      */
-    private Map<Integer, Answer> answers;
+    private final Map<Integer, Answer> answers;
 
     /**
      * Create a new tutor-instance

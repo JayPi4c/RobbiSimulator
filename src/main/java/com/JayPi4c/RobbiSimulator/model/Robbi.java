@@ -19,24 +19,24 @@ public class Robbi {
     @Setter(value = AccessLevel.PACKAGE)
     private Territory territory;
     /**
-     * Attribute to store robbis x position in the territory
+     * Attribute to store robbi's x position in the territory
      */
     @Getter(value = AccessLevel.PACKAGE)
     private volatile int x;
     /**
-     * Attribute to store robbis y position in the territory
+     * Attribute to store robbi's y position in the territory
      */
     @Getter(value = AccessLevel.PACKAGE)
     private volatile int y;
     /**
-     * Attribute to store robbis item
+     * Attribute to store robbi's item
      */
     @Getter(value = AccessLevel.PACKAGE, onMethod_ = {@Synchronized("territory")})
     @Setter(value = AccessLevel.PACKAGE, onMethod_ = {@Synchronized("territory")})
     private Item item = null;
 
     /**
-     * Attribute to store robbis facing
+     * Attribute to store robbi's facing
      */
     @Getter(value = AccessLevel.PACKAGE)
     private volatile DIRECTION facing;
@@ -84,7 +84,7 @@ public class Robbi {
     /**
      * Updates the facing of robbi to the given facing.
      *
-     * @param facing robbis new facing
+     * @param facing robbi's new facing
      */
     void setFacing(DIRECTION facing) {
         synchronized (territory) {
@@ -194,7 +194,7 @@ public class Robbi {
     }
 
     /**
-     * If a pile of scrap is ahead of Robbi and afterwards a nonblocking tile, Robbi
+     * If a pile of scrap is ahead of Robbi and afterward a nonblocking tile, Robbi
      * pushes the pile of scrap one tile the direction he is facing.
      */
     public final void schiebeSchrotthaufen() {
@@ -244,7 +244,7 @@ public class Robbi {
     /**
      * checks if an Item is on the tile Robbi is on.
      *
-     * @return true if an item is on robbis tile, false otherwise
+     * @return true if an item is on robbi's tile, false otherwise
      */
     public final boolean gegenstandDa() {
         synchronized (territory) {
@@ -266,7 +266,7 @@ public class Robbi {
     /**
      * checks if a hollow is ahead of Robbi.
      *
-     * @return true if an hollow is ahead, false otherwise
+     * @return true if a hollow is ahead, false otherwise
      */
     public final boolean vornKuhle() {
         synchronized (territory) {
@@ -306,7 +306,7 @@ public class Robbi {
     }
 
     /**
-     * checks if an item is in Robbis bag.
+     * checks if an item is in Robbi's bag.
      *
      * @return true if an item is in the bag, false otherwise
      */

@@ -6,6 +6,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URISyntaxException;
 
@@ -14,6 +15,7 @@ import java.net.URISyntaxException;
  *
  * @author Jonas Pohl
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SoundManager {
 
@@ -37,7 +39,7 @@ public class SoundManager {
                 warningSound = new Media(
                         SoundManager.class.getResource("/sounds/warning-sound.mp3").toURI().toString());
             } catch (URISyntaxException e) {
-                e.printStackTrace();
+                logger.error("Could not load sound file.", e);
             }
         }
         MediaPlayer mediaPlayer = new MediaPlayer(warningSound);

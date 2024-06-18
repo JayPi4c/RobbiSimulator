@@ -17,7 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * This Simulation class is a separate thread that runs the code of robbis
+ * This Simulation class is a separate thread that runs the code of robbi's
  * main-Method. It can be paused, resumed and stopped by the user at any time.
  *
  * @author Jonas Pohl
@@ -25,9 +25,9 @@ import java.lang.reflect.Method;
 @Slf4j
 public class Simulation extends Thread implements Observer {
 
-    private Territory territory;
-    private SimulationController simController;
-    private Window parent;
+    private final Territory territory;
+    private final SimulationController simController;
+    private final Window parent;
 
     @Getter
     @Setter
@@ -39,11 +39,11 @@ public class Simulation extends Thread implements Observer {
     private final Object lock = new Object();
 
     /**
-     * Constructor to create a new Simulation, which can execute robbis main-Method.
+     * Constructor to create a new Simulation, which can execute robbi's main-Method.
      *
      * @param territory     The territory in which the simulation is happening
      * @param simController The SimulationController, which started this simulation
-     * @param parent        The parent window to show alerts relative to the it
+     * @param parent        The parent window to show alerts relative to it
      */
     public Simulation(Territory territory, SimulationController simController, Window parent) {
         this.territory = territory;
@@ -54,7 +54,7 @@ public class Simulation extends Thread implements Observer {
     }
 
     /**
-     * Starts the simulation and triggers the robbis main-Method. It informs the
+     * Starts the simulation and triggers the robbi's main-Method. It informs the
      * user if the execution finished in an unexpected way. In the end it does some
      * finalization.
      */
@@ -77,7 +77,7 @@ public class Simulation extends Thread implements Observer {
                 Platform.runLater(
                         () -> AlertHelper.showAlertAndWait(AlertType.ERROR, re.getLocalizedMessage(), parent));
             } else
-                e.printStackTrace();
+                logger.error("Simulation stopped with unwanted exception", e);
         } finally {
             stopped = true;
             territory.removeObserver(this);

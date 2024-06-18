@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class Observable {
 
-    private CopyOnWriteArrayList<Observer> observers; // faster than vector for read access and thread save
+    private final CopyOnWriteArrayList<Observer> observers; // faster than vector for read access and thread save
 
     private boolean changed;
 

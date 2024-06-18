@@ -27,4 +27,6 @@ module RobbiSimulator {
     exports com.JayPi4c.RobbiSimulator.utils.annotations;
     exports com.JayPi4c.RobbiSimulator.model;
     exports com.JayPi4c.RobbiSimulator;
+
+    exports com.JayPi4c.RobbiSimulator.controller.tutor to java.rmi;
 }

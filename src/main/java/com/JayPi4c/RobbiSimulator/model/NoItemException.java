@@ -4,7 +4,7 @@ import java.io.Serial;
 
 /**
  * Exception to be thrown if robbi tries to pick up an item from a tile, which
- * has no item provied.
+ * has no item provided.
  *
  * @author Jonas Pohl
  */

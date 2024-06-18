@@ -30,7 +30,7 @@ public class TerritorySaveController {
     private static final String DEFAULT_XML_FILE_EXTENSION = ".rsxml";
     private static final String DEFAULT_JAXB_FILE_EXTENSION = ".rsjaxb";
 
-    private MainStage mainStage;
+    private final MainStage mainStage;
 
     /**
      * Constructor to create a new TerritorySaveController for the given mainStage.
@@ -76,7 +76,7 @@ public class TerritorySaveController {
                 oos.writeObject(mainStage.getTerritory().getRobbiDirection());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to serialize territory", e);
         } finally {
             logger.info("finished serialization");
         }
@@ -108,7 +108,7 @@ public class TerritorySaveController {
         } catch (InvalidTerritoryException e) {
             AlertHelper.showAlertAndWait(AlertType.WARNING, i18n("Territory.load.failure"), mainStage);
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Failed to deserialize territory", e);
         } finally {
             logger.info("finished deserialization");
         }
@@ -169,8 +169,6 @@ public class TerritorySaveController {
 
     /**
      * Loads a territory by a filename using JAXB
-     *
-     * @return true if the territory was loaded successfully, false otherwise
      */
     private void loadJAXB() {
         Optional<File> fileOpt = getLoadFile(i18n("Territory.load.dialog.title"),
@@ -189,8 +187,7 @@ public class TerritorySaveController {
             TerritoryState ter = (TerritoryState) um.unmarshal(new FileReader(file));
             mainStage.getTerritory().restore(ter);
         } catch (IOException | JAXBException e) {
-            e.printStackTrace();
-            logger.debug("failed to load JAXB");
+            logger.error("failed to load JAXB.", e);
         }
     }
 
@@ -217,8 +214,7 @@ public class TerritorySaveController {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(mainStage.getTerritory().save(), w);
         } catch (IOException | JAXBException e) {
-            e.printStackTrace();
-            logger.debug("failed to save jaxb");
+            logger.debug("failed to save jaxb.", e);
         }
     }
 

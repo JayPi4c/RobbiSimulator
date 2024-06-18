@@ -15,6 +15,8 @@ import java.io.Serializable;
  *
  * @author Jonas Pohl
  */
+@Getter
+@Setter
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Tile implements Serializable {
@@ -25,8 +27,6 @@ public class Tile implements Serializable {
     /**
      * Attribute to store the item which is placed on the tile.
      */
-    @Getter
-    @Setter
     @XmlAnyElement(lax = true)
     private Item item = null;
 

@@ -3,6 +3,7 @@ package com.JayPi4c.RobbiSimulator.controller.program;
 import com.JayPi4c.RobbiSimulator.utils.Observable;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 
@@ -12,6 +13,7 @@ import java.io.*;
  *
  * @author Jonas Pohl
  */
+@Slf4j
 @Getter
 public class Program extends Observable {
 
@@ -22,7 +24,7 @@ public class Program extends Observable {
     private String name;
 
     private String editorContent;
-    private File file;
+    private final File file;
 
     /**
      * Whether the program is edited or not
@@ -54,7 +56,7 @@ public class Program extends Observable {
             bobTheBuilder.setLength(0);
             editorContent = bobTheBuilder.append(editorContent).deleteCharAt(endIndex).toString().trim();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Could not load program", e);
         }
     }
 
@@ -93,7 +95,7 @@ public class Program extends Observable {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write(content);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Could not save program", e);
         }
         edited = false;
     }

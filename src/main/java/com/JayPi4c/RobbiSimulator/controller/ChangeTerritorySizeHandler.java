@@ -21,10 +21,10 @@ import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
  */
 public class ChangeTerritorySizeHandler implements EventHandler<ActionEvent> {
 
-    private Territory territory;
+    private final Territory territory;
 
     private Dialog<Dimension> dialog;
-    private Window parent;
+    private final Window parent;
 
     // language keys
     private static final String CHANGESIZE_DIALOG_TITLE = "ChangeSize.dialog.title";

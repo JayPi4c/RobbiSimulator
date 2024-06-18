@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TerritoryPanel extends Canvas implements Observer {
 
-    private Territory territory;
+    private final Territory territory;
 
     private static final Image[] tileImages = new Image[4];
     private static final Image[] itemImages = new Image[3];
@@ -42,9 +42,6 @@ public class TerritoryPanel extends Canvas implements Observer {
     // store current bounds to allow centering on updated territory size
     private Bounds bounds;
 
-    /**
-     * loading territory images
-     */
     static {
 
         logger.debug("Loading territory images");
@@ -102,7 +99,7 @@ public class TerritoryPanel extends Canvas implements Observer {
 
     /**
      * updates the size of the territory if the size has changed. Paints the
-     * territory afterwards.
+     * territory afterward.
      */
     private void drawPanel() {
         if (getWidth() != getTerritoryWidth())
@@ -116,8 +113,8 @@ public class TerritoryPanel extends Canvas implements Observer {
     /**
      * Getter for the territory width.
      *
-     * @return the width of the territory, calculated by number of cols, Cellsize
-     * and cellspacer
+     * @return the width of the territory, calculated by number of cols, Cell-size
+     * and cell-spacer
      */
     private int getTerritoryWidth() {
         return (territory.getNumCols()) * (CELLSIZE + CELLSPACER);
@@ -193,7 +190,6 @@ public class TerritoryPanel extends Canvas implements Observer {
             case SOUTH:
                 yield 90;
             case EAST:
-            default:
                 yield 0;
         };
         drawRotatedImage(gc, robbiImage, angle, (double) territory.getRobbiX() * (CELLSIZE + CELLSPACER) + CELLSPACER,
@@ -270,8 +266,8 @@ public class TerritoryPanel extends Canvas implements Observer {
     }
 
     /**
-     * Centers the territory if the size has changed. Afterwards, it draws the
-     * territorypanel.
+     * Centers the territory if the size has changed. Afterward, it draws the
+     * territory-panel.
      */
     public void update() {
         if (territory.hasSizeChanged()) {

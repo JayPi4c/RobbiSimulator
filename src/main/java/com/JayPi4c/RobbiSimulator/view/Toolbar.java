@@ -22,8 +22,8 @@ public class Toolbar extends ToolBar {
      * Constant for the maximum value for the speed slider.
      */
     public static final int MAX_SPEED_VALUE = 10;
-    private MenuBar menubar;
-    // Tool bar
+    private final MenuBar menubar;
+    // Toolbar
     private Button newButtonToolbar;
     private Button loadButtonToolbar;
     private Button saveButtonToolbar;

@@ -39,7 +39,7 @@ public class App extends Application {
         try {
             launch(args);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to load application", e);
             JOptionPane.showMessageDialog(null, """
                     Failed to load application.
                     Further information can be obtained running the

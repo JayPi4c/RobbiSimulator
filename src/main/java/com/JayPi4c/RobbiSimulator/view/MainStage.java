@@ -96,7 +96,7 @@ public class MainStage extends Stage {
      */
     public static final Image menuScrewImage;
     /**
-     * Constant Image for nut icon.
+     * Constant Image for the nut icon.
      */
     public static final Image menuNutImage;
     /**
@@ -136,9 +136,6 @@ public class MainStage extends Stage {
      */
     public static final Image robbiTake;
 
-    /**
-     * loading images
-     */
     static {
         logger.debug("Loading stage images");
         newImage = new Image(String.valueOf(MainStage.class.getResource("/img/New24.gif")));
@@ -167,26 +164,26 @@ public class MainStage extends Stage {
         robbiTake = new Image(String.valueOf(MainStage.class.getResource("/img/RobbiTake24.png")));
     }
 
-    private Territory territory;
-    private ButtonState buttonState;
+    private final Territory territory;
+    private final ButtonState buttonState;
     // controllers
-    private MainStageController mainStageController;
-    private SimulationController simulationController;
-    private TerritorySaveController territorySaveController;
-    private ExamplesController examplesController;
-    private StudentController studenController;
+    private final MainStageController mainStageController;
+    private final SimulationController simulationController;
+    private final TerritorySaveController territorySaveController;
+    private final ExamplesController examplesController;
+    private StudentController studentController;
     private TutorController tutorController;
-    private LanguageController languageController;
-    private NotificationController notificationController;
-    private Program program;
-    private MenuBar menubar;
-    private Toolbar toolbar;
+    private final LanguageController languageController;
+    private final NotificationController notificationController;
+    private final Program program;
+    private final MenuBar menubar;
+    private final Toolbar toolbar;
     // Content Pane
     private MonacoFX textArea;
     private ScrollPane territoryScrollPane;
     private TerritoryPanel territoryPanel;
     private SplitPane splitPane;
-    private Scene mainStageScene;
+    private final Scene mainStageScene;
 
     /**
      * Constructor for the MainStage. It creates a mainStage for the given Program
@@ -228,7 +225,7 @@ public class MainStage extends Stage {
         if (PropertiesLoader.isTutor())
             tutorController = new TutorController(this);
         else
-            studenController = new StudentController(this);
+            studentController = new StudentController(this);
 
         show();
         textArea.requestFocus();
