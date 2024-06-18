@@ -29,7 +29,7 @@ public class StudentController {
     private static final String MENU_TUTOR_SEND_REQUEST_INFORMATION = "Menu.tutor.sendRequest.information";
     private static final String MENU_TUTOR_SENDREQUEST_ERROR = "Menu.tutor.sendRequest.error";
     private int requestID;
-    private MainStage stage;
+    private final MainStage stage;
 
     /**
      * Constructor to create a new StudentController

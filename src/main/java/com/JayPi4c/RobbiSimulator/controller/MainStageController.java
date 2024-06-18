@@ -48,14 +48,14 @@ import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
 @Slf4j
 public class MainStageController implements Observer {
 
-    private ButtonState buttonState;
+    private final ButtonState buttonState;
 
-    private MainStage mainStage;
+    private final MainStage mainStage;
 
     @Setter
     private boolean changeCursor = false;
     @Getter
-    private boolean soundsEnabled = false;
+    private final boolean soundsEnabled = false;
 
     private RadioMenuItem selectedRadioMenuItem = null;
 
@@ -353,10 +353,7 @@ public class MainStageController implements Observer {
      * has unsaved changes
      */
     private String getTitle(Program program) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(i18n("Main.title")).append(": ").append(program.getName())
-                .append((program.isEdited() ? "*" : ""));
-        return builder.toString();
+        return i18n("Main.title") + ": " + program.getName() + (program.isEdited() ? "*" : "");
     }
 
     /**

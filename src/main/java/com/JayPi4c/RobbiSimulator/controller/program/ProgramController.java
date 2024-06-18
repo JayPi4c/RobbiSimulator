@@ -45,7 +45,7 @@ import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
 public class ProgramController {
 
     /**
-     * Constant String with the Path name for the programs directory.
+     * Constant String with the Path name for the programs' directory.
      */
     public static final String PATH_TO_PROGRAMS = "programs";
     /**
@@ -118,14 +118,14 @@ public class ProgramController {
                 if (!defaultProgram.createNewFile())
                     return false;
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Could not create file", e);
                 return false;
             }
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(defaultProgram))) {
                 writer.write(createTemplate(DEFAULT_ROBBI_FILE_NAME, DEFAULT_CONTENT));
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Could not write to file", e);
                 return false;
             }
         }
@@ -142,6 +142,8 @@ public class ProgramController {
         // get a list of all files in programs directory that end with .java
         File[] files = new File(PATH_TO_PROGRAMS)
                 .listFiles(file -> (file.isFile() && file.getName().endsWith(DEFAULT_FILE_EXTENSION)));
+        if (files == null)
+            return Collections.emptySet();
         // get a String collection with all filenames in the programs directory
         Collection<String> filenamesInDirectory = Arrays.stream(files)
                 .map(file -> file.getName().replace(DEFAULT_FILE_EXTENSION, ""))
@@ -154,7 +156,7 @@ public class ProgramController {
 
     /**
      * Creates a Dialog and asks the user to for the name of the new program.
-     * Afterwards, it initiates the creation of a new stage for the program.
+     * Afterward, it initiates the creation of a new stage for the program.
      *
      * @param parent the parent window to show alerts relative to the parent window
      * @see ProgramController#createAndShow(String)
@@ -216,12 +218,12 @@ public class ProgramController {
                 if (!f.createNewFile())
                     logger.debug("Could not create file '{}'", f.getAbsolutePath());
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Failed to create file", e);
             }
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))) {
                 writer.write(content);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Failed to write to file", e);
             }
         }
 
@@ -299,12 +301,12 @@ public class ProgramController {
                 if (!f.createNewFile())
                     logger.debug("Could not create file '{}'", f.getAbsolutePath());
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Failed to create file", e);
             }
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(f))) {
                 writer.write(content);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Failed to write to file", e);
             }
         }
 
@@ -427,17 +429,15 @@ public class ProgramController {
 
         try (StandardJavaFileManager manager = javac.getStandardFileManager(diagnostics, null, null)) {
             Iterable<? extends JavaFileObject> units = manager
-                    .getJavaFileObjectsFromFiles(Arrays.asList(program.getFile()));
+                    .getJavaFileObjectsFromFiles(Collections.singletonList(program.getFile()));
             // https://stackoverflow.com/questions/60016127/can-toolprovider-getsystemjavacompiler-access-runtime-generated-in-memory-sour
             CompilationTask task = javac.getTask(null, manager, diagnostics, List.of("-p", System.getProperty("jdk.module.path")), null, units);
             task.addModules(List.of("RobbiSimulator")); //https://docs.oracle.com/javase%2F9%2Fdocs%2Fapi%2F%2F/javax/tools/JavaCompiler.CompilationTask.html
 
             if (Boolean.FALSE.equals(task.call())) {
                 boolean showedAlert = false; // flag to indicate that only one alert is shown
-                diagnostics.toString();
                 logger.error("Compilation failed");
                 for (Diagnostic<?> diagnostic : diagnostics.getDiagnostics()) {
-                    diagnostic.toString();
 
                     logger.error("Kind: {}", diagnostic.getKind());
                     logger.error("Quelle: {}", diagnostic.getSource());
@@ -448,13 +448,11 @@ public class ProgramController {
                             diagnostic.getEndPosition());
                     // TODO change String.format to use i18n directly
                     if (showAlerts && !showedAlert) {
-                        StringBuilder bobTheBuilder = new StringBuilder();
-                        bobTheBuilder.append(String.format(i18n(COMPILATION_DIAGNOSTIC_KIND), diagnostic.getKind()));
-                        bobTheBuilder.append(String.format(i18n(COMPILATION_DIAGNOSTIC_CODEANDMESSAGE),
-                                diagnostic.getCode(), diagnostic.getMessage(null)));
-                        bobTheBuilder.append(
-                                String.format(i18n(COMPILATION_DIAGNOSTIC_ROW), diagnostic.getLineNumber() - 1));
-                        AlertHelper.showAlertAndWait(AlertType.ERROR, bobTheBuilder.toString(), parent,
+                        String bobTheBuilder = String.format(i18n(COMPILATION_DIAGNOSTIC_KIND), diagnostic.getKind()) +
+                                String.format(i18n(COMPILATION_DIAGNOSTIC_CODEANDMESSAGE),
+                                        diagnostic.getCode(), diagnostic.getMessage(null)) +
+                                String.format(i18n(COMPILATION_DIAGNOSTIC_ROW), diagnostic.getLineNumber() - 1);
+                        AlertHelper.showAlertAndWait(AlertType.ERROR, bobTheBuilder, parent,
                                 Modality.WINDOW_MODAL, i18n(COMPILATION_DIAGNOSTIC_TITLE),
                                 diagnostic.getKind().toString());
                         showedAlert = true;
@@ -505,7 +503,7 @@ public class ProgramController {
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to compile program", e);
         }
 
     }

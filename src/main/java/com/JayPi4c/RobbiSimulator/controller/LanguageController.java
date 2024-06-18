@@ -105,7 +105,7 @@ public class LanguageController {
     private static final String MENU_TUTOR_RECEIVEANSWER = "Menu.tutor.receiveAnswer";
     private static final String MENU_TUTOR = "Menu.tutor";
     private static final String MAIN_TITLE = "Main.title";
-    private MainStage stage;
+    private final MainStage stage;
 
     /**
      * Constructor to create a new LanguageController. Sets the actions to the

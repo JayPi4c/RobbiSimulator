@@ -22,8 +22,11 @@ module RobbiSimulator {
     requires org.apache.derby.tools;
 
     opens com.JayPi4c.RobbiSimulator.controller.examples to org.hibernate.orm.core;
+    opens com.JayPi4c.RobbiSimulator.model to jakarta.xml.bind;
 
     exports com.JayPi4c.RobbiSimulator.utils.annotations;
     exports com.JayPi4c.RobbiSimulator.model;
     exports com.JayPi4c.RobbiSimulator;
+
+    exports com.JayPi4c.RobbiSimulator.controller.tutor to java.rmi;
 }
