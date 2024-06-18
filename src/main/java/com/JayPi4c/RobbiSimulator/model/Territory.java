@@ -1,25 +1,12 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.util.Optional;
+import com.JayPi4c.RobbiSimulator.utils.Observable;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
-import com.JayPi4c.RobbiSimulator.utils.Observable;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.xml.stream.*;
+import java.io.*;
+import java.util.Optional;
 
 /**
  * This class contains all datastructures and utility functions to control the
@@ -30,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Territory extends Observable implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private transient Robbi robbi;
@@ -717,7 +705,7 @@ public class Territory extends Observable implements Serializable {
      */
     private Optional<String> getDTD() {
         Optional<Module> module = ModuleLayer.boot().findModule("RobbiSimulator");
-        if(module.isEmpty()) {
+        if (module.isEmpty()) {
             logger.warn("Could not load dtd");
             return Optional.empty();
         }

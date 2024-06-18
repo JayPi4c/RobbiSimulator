@@ -45,7 +45,7 @@ import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
 public class ProgramController {
 
     /**
-     * Constant String with the Path name for the programs directory.
+     * Constant String with the Path name for the programs' directory.
      */
     public static final String PATH_TO_PROGRAMS = "programs";
     /**
