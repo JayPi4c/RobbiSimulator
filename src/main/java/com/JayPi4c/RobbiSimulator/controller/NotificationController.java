@@ -1,14 +1,13 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.NotificationPane;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
 
@@ -16,7 +15,11 @@ import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
 public class NotificationController {
 
     private final NotificationPane notificationPane;
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread thread = Executors.defaultThreadFactory().newThread(r);
+        thread.setDaemon(true);
+        return thread;
+    });
     private Future<?> schedulerFuture;
 
     public NotificationController(Node node) {
