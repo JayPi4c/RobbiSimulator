@@ -5,8 +5,8 @@ module RobbiSimulator {
     requires javafx.media;
     requires javafx.web;
 
-    requires com.jfoenix;
     requires eu.mihosoft.monacofx;
+    requires org.controlsfx.controls;
 
     requires java.desktop;
     requires java.rmi;
@@ -22,8 +22,11 @@ module RobbiSimulator {
     requires org.apache.derby.tools;
 
     opens com.JayPi4c.RobbiSimulator.controller.examples to org.hibernate.orm.core;
+    opens com.JayPi4c.RobbiSimulator.model to jakarta.xml.bind;
 
     exports com.JayPi4c.RobbiSimulator.utils.annotations;
     exports com.JayPi4c.RobbiSimulator.model;
     exports com.JayPi4c.RobbiSimulator;
+
+    exports com.JayPi4c.RobbiSimulator.controller.tutor to java.rmi;
 }

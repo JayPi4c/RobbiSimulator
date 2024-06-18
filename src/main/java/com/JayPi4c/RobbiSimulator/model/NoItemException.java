@@ -1,21 +1,23 @@
 package com.JayPi4c.RobbiSimulator.model;
 
+import java.io.Serial;
+
 /**
  * Exception to be thrown if robbi tries to pick up an item from a tile, which
- * has no item provied.
- * 
- * @author Jonas Pohl
+ * has no item provided.
  *
+ * @author Jonas Pohl
  */
 public class NoItemException extends RobbiException {
 
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Constructor for a new NoItemException with a localized message.
-	 */
-	public NoItemException() {
-		super("Exception.NoItem");
-	}
+    /**
+     * Constructor for a new NoItemException with a localized message.
+     */
+    public NoItemException() {
+        super("Exception.NoItem");
+    }
 
 }

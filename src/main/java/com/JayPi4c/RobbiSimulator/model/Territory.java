@@ -1,25 +1,12 @@
 package com.JayPi4c.RobbiSimulator.model;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.util.Optional;
+import com.JayPi4c.RobbiSimulator.utils.Observable;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.XMLConstants;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
-import com.JayPi4c.RobbiSimulator.utils.Observable;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.xml.stream.*;
+import java.io.*;
+import java.util.Optional;
 
 /**
  * This class contains all datastructures and utility functions to control the
@@ -30,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Territory extends Observable implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private transient Robbi robbi;
@@ -175,16 +163,16 @@ public class Territory extends Observable implements Serializable {
     }
 
     /**
-     * Getter for robbis current direction.
+     * Getter for robbi's current direction.
      *
-     * @return robbis current direction
+     * @return robbi's current direction
      */
     public synchronized DIRECTION getRobbiDirection() {
         return robbi.getFacing();
     }
 
     /**
-     * Getter for robbis current item.
+     * Getter for robbi's current item.
      *
      * @return the item robbi is currently holding. null, if robbi does not have
      * one.
@@ -200,7 +188,7 @@ public class Territory extends Observable implements Serializable {
      * @param bound the bound to limit i to
      * @return the normalized value of i
      */
-    private int normalizeCoord(int i, int bound) {
+    private int normalizeCoordinate(int i, int bound) {
         i %= bound;
         i += bound;
         i %= bound;
@@ -229,7 +217,7 @@ public class Territory extends Observable implements Serializable {
      */
     public boolean placeItem(Item item, int x, int y) {
         synchronized (this) {
-            Tile t = tiles[normalizeCoord(x, numberOfColumns)][normalizeCoord(y, numberOfRows)];
+            Tile t = tiles[normalizeCoordinate(x, numberOfColumns)][normalizeCoordinate(y, numberOfRows)];
             if (t.getItem() != null && !(t instanceof Stockpile))
                 return false;
             t.setItem(item);
@@ -247,7 +235,7 @@ public class Territory extends Observable implements Serializable {
      * @return the item, which is placed at the given position
      */
     public synchronized Item getItem(int x, int y) {
-        Tile t = tiles[normalizeCoord(x, numberOfColumns)][normalizeCoord(y, numberOfRows)];
+        Tile t = tiles[normalizeCoordinate(x, numberOfColumns)][normalizeCoordinate(y, numberOfRows)];
         return t.getItem();
     }
 
@@ -259,9 +247,9 @@ public class Territory extends Observable implements Serializable {
      * @return the item that has been removed from the tile
      */
     public Item removeItem(int x, int y) {
-        Item i = null;
+        Item i;
         synchronized (this) {
-            Tile t = tiles[normalizeCoord(x, numberOfColumns)][normalizeCoord(y, numberOfRows)];
+            Tile t = tiles[normalizeCoordinate(x, numberOfColumns)][normalizeCoordinate(y, numberOfRows)];
             i = t.pickItem();
         }
         setChanged();
@@ -277,9 +265,9 @@ public class Territory extends Observable implements Serializable {
      *
      * @param territory the new territory
      * @param item      the item robbi has in his bag
-     * @param x         robbis x position
-     * @param y         robbis y positions
-     * @param facing    robbis facing
+     * @param x         robbi's x position
+     * @param y         robbi's y positions
+     * @param facing    robbi's facing
      * @throws InvalidTerritoryException if it is impossible to create the territory
      *                                   with the given information
      */
@@ -355,8 +343,8 @@ public class Territory extends Observable implements Serializable {
     /**
      * move robbi to the given position.
      *
-     * @param x robbis new x-position
-     * @param y robbis new y-position
+     * @param x robbi's new x-position
+     * @param y robbi's new y-position
      */
     public void placeRobbi(int x, int y) {
         synchronized (this) {
@@ -372,12 +360,12 @@ public class Territory extends Observable implements Serializable {
      * Place a new Hollow at the given position if it is in bounds and robbi is not
      * on the tile.
      *
-     * @param x Hollows x-Position
-     * @param y Hollows y-Position
+     * @param x Hollow's x-Position
+     * @param y Hollow's y-Position
      */
     public void placeHollow(int x, int y) {
-        x = normalizeCoord(x, numberOfColumns);
-        y = normalizeCoord(y, numberOfRows);
+        x = normalizeCoordinate(x, numberOfColumns);
+        y = normalizeCoordinate(y, numberOfRows);
         synchronized (this) {
             if ((x < numberOfColumns && y < numberOfRows) && !(x == robbi.getX() && y == robbi.getY()))
                 tiles[x][y] = new Hollow();
@@ -395,8 +383,8 @@ public class Territory extends Observable implements Serializable {
      * @param y PileOfScrap y-Position
      */
     public void placePileOfScrap(int x, int y) {
-        x = normalizeCoord(x, numberOfColumns);
-        y = normalizeCoord(y, numberOfRows);
+        x = normalizeCoordinate(x, numberOfColumns);
+        y = normalizeCoordinate(y, numberOfRows);
         synchronized (this) {
             tiles[x][y] = new PileOfScrap();
         }
@@ -412,8 +400,8 @@ public class Territory extends Observable implements Serializable {
      * @param y Stockpile y-Position
      */
     public void placeStockpile(int x, int y) {
-        x = normalizeCoord(x, numberOfColumns);
-        y = normalizeCoord(y, numberOfRows);
+        x = normalizeCoordinate(x, numberOfColumns);
+        y = normalizeCoordinate(y, numberOfRows);
         synchronized (this) {
             tiles[x][y] = new Stockpile();
         }
@@ -428,8 +416,8 @@ public class Territory extends Observable implements Serializable {
      * @param y Accu y-Position
      */
     public void placeAccu(int x, int y) {
-        x = normalizeCoord(x, numberOfColumns);
-        y = normalizeCoord(y, numberOfRows);
+        x = normalizeCoordinate(x, numberOfColumns);
+        y = normalizeCoordinate(y, numberOfRows);
         synchronized (this) {
             tiles[x][y].setItem(new Accu());
         }
@@ -445,8 +433,8 @@ public class Territory extends Observable implements Serializable {
      * @param y Screw y-Position
      */
     public void placeScrew(int x, int y) {
-        x = normalizeCoord(x, numberOfColumns);
-        y = normalizeCoord(y, numberOfRows);
+        x = normalizeCoordinate(x, numberOfColumns);
+        y = normalizeCoordinate(y, numberOfRows);
         synchronized (this) {
             tiles[x][y].setItem(new Screw());
         }
@@ -461,8 +449,8 @@ public class Territory extends Observable implements Serializable {
      * @param y Nut y-Position
      */
     public void placeNut(int x, int y) {
-        x = normalizeCoord(x, numberOfColumns);
-        y = normalizeCoord(y, numberOfRows);
+        x = normalizeCoordinate(x, numberOfColumns);
+        y = normalizeCoordinate(y, numberOfRows);
         synchronized (this) {
             tiles[x][y].setItem(new Nut());
         }
@@ -477,8 +465,8 @@ public class Territory extends Observable implements Serializable {
      * @param y Tile y-Position
      */
     public void clearTile(int x, int y) {
-        x = normalizeCoord(x, numberOfColumns);
-        y = normalizeCoord(y, numberOfRows);
+        x = normalizeCoordinate(x, numberOfColumns);
+        y = normalizeCoordinate(y, numberOfRows);
         synchronized (this) {
             tiles[x][y] = new Tile();
         }
@@ -549,8 +537,7 @@ public class Territory extends Observable implements Serializable {
                                 }
                                 break;
                             case "facing":
-                                DIRECTION facing = DIRECTION.valueOf(parser.getAttributeValue(null, "facing"));
-                                robbiDirection = facing;
+                                robbiDirection = DIRECTION.valueOf(parser.getAttributeValue(null, "facing"));
                                 break;
                             case "robbi":
                                 robbiX = Integer.parseInt(parser.getAttributeValue(null, "col"));
@@ -579,7 +566,7 @@ public class Territory extends Observable implements Serializable {
             try {
                 stream.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Could not close stream", e);
             }
         }
     }
@@ -594,14 +581,12 @@ public class Territory extends Observable implements Serializable {
      */
     private Item getItemFromParser(XMLStreamReader parser) {
         String type = parser.getAttributeValue(null, "type");
-        if (type.equals("Nut")) {
-            return new Nut();
-        } else if (type.equals("Accu")) {
-            return new Accu();
-        } else if (type.equals("Screw")) {
-            return new Screw();
-        }
-        return null;
+        return switch (type) {
+            case "Nut" -> new Nut();
+            case "Accu" -> new Accu();
+            case "Screw" -> new Screw();
+            default -> null;
+        };
     }
 
     /**
@@ -689,14 +674,13 @@ public class Territory extends Observable implements Serializable {
 
             return baos;
         } catch (FactoryConfigurationError | XMLStreamException e) {
-            e.printStackTrace();
-            logger.error("failed to save as XML.");
+            logger.error("failed to save as XML.", e);
             return null;
         }
     }
 
     /**
-     * Helper to store an item in an xml-file.
+     * Helper to store an item in a xml-file.
      *
      * @param writer the writer, the item needs to be written to
      * @param item   the item to write
@@ -717,7 +701,7 @@ public class Territory extends Observable implements Serializable {
      */
     private Optional<String> getDTD() {
         Optional<Module> module = ModuleLayer.boot().findModule("RobbiSimulator");
-        if(module.isEmpty()) {
+        if (module.isEmpty()) {
             logger.warn("Could not load dtd");
             return Optional.empty();
         }
@@ -736,18 +720,18 @@ public class Territory extends Observable implements Serializable {
     }
 
     /**
-     * Getter for Robbis x Position.
+     * Getter for Robbi's x Position.
      *
-     * @return robbis x Position
+     * @return robbi's x Position
      */
     public synchronized int getRobbiX() {
         return robbi.getX();
     }
 
     /**
-     * Getter for Robbis y Position.
+     * Getter for Robbi's y Position.
      *
-     * @return robbis y Position
+     * @return robbi's y Position
      */
     public synchronized int getRobbiY() {
         return robbi.getY();
