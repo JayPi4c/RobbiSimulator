@@ -125,12 +125,11 @@ public class I18nUtils {
     /**
      * Setter for the current locale by the String representation of the locale.
      *
-     * @param locale the locale as String
+     * @param languageTag the locale defined by a language tag
      */
-    public static void setLocale(String locale) {
+    public static void setLocale(String languageTag) {
         try {
-            String[] parts = locale.split("_");
-            setLocale(new Locale(parts[0], parts[1]));
+            setLocale(Locale.forLanguageTag(languageTag));
         } catch (IndexOutOfBoundsException | NullPointerException e) {
             setLocale(Locale.UK);
         }

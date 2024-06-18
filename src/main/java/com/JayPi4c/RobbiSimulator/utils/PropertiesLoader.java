@@ -79,9 +79,9 @@ public class PropertiesLoader {
     }
 
     /**
-     * Getter for the sounds property.
+     * Getter for the darkmode-property.
      *
-     * @return true if the sounds property is set to true
+     * @return true if the darkmode property is set to true
      */
     public static boolean getDarkmode() {
         return Boolean.parseBoolean(properties.getProperty(DARKMODE_PROPERTY));
@@ -103,9 +103,9 @@ public class PropertiesLoader {
     }
 
     /**
-     * Getter for the tutorport.
+     * Getter for the tutor-port.
      *
-     * @return the tutorport stored in the properties file
+     * @return the tutor-port stored in the properties file
      */
     public static int getTutorport() {
         try {
@@ -123,11 +123,10 @@ public class PropertiesLoader {
      */
     public static Locale getLocale() {
         try {
-            String[] parts = properties.getProperty(LANGUAGE_PROPERTY).split("_");
-            return new Locale(parts[0], parts[1]);
+            return Locale.forLanguageTag(properties.getProperty(LANGUAGE_PROPERTY));
         } catch (IndexOutOfBoundsException | NullPointerException e) {
             logger.debug("Failed to load locale from properties");
-            properties.put(LANGUAGE_PROPERTY, Locale.GERMANY.toString());
+            properties.put(LANGUAGE_PROPERTY, Locale.GERMANY.toLanguageTag());
             return Locale.GERMANY;
         }
     }
@@ -154,7 +153,7 @@ public class PropertiesLoader {
      * application failed to load properties from the file.
      */
     private static void loadDefaultProperties() {
-        properties.put(LANGUAGE_PROPERTY, Locale.GERMANY.toString());
+        properties.put(LANGUAGE_PROPERTY, Locale.GERMANY.toLanguageTag());
         properties.put(ROLE_PROPERTY, "student");
         properties.put(TUTORPORT_PROPERTY, TUTORPORT_DEFAULT_VALUE);
         properties.put(TUTORHOST_PROPERTY, TUTORHOST_DEFAULT_VALUE);
