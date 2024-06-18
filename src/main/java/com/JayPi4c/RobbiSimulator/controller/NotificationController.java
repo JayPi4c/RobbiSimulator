@@ -1,13 +1,12 @@
 package com.JayPi4c.RobbiSimulator.controller;
 
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.NotificationPane;
-
-import java.util.concurrent.*;
 
 import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
 
@@ -15,17 +14,13 @@ import static com.JayPi4c.RobbiSimulator.utils.I18nUtils.i18n;
 public class NotificationController {
 
     private final NotificationPane notificationPane;
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-        Thread thread = Executors.defaultThreadFactory().newThread(r);
-        thread.setDaemon(true);
-        return thread;
-    });
-    private Future<?> schedulerFuture;
+    private final Timeline hideTimeline = new Timeline();
 
     public NotificationController(Node node) {
         notificationPane = new NotificationPane(node);
         notificationPane.setShowFromTop(false);
         notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
+        hideTimeline.setCycleCount(1);
     }
 
     public Parent getScene() {
@@ -41,12 +36,14 @@ public class NotificationController {
      * @param args    the arguments for the message
      */
     public void showMessage(int timeout, String key, Object... args) {
-        if (schedulerFuture != null && !schedulerFuture.isDone()) {
-            schedulerFuture.cancel(true);
-        }
-        logger.info("Showing snackbar-message: {}; {}", key, i18n(key, args));
+        hideTimeline.stop();
         notificationPane.show(i18n(key, args));
-        schedulerFuture = scheduler.schedule(notificationPane::hide, timeout, TimeUnit.MILLISECONDS);
+        KeyFrame kf = new KeyFrame(Duration.millis(timeout), e -> {
+            if (notificationPane.isShowing())
+                notificationPane.hide();
+        });
+        hideTimeline.getKeyFrames().setAll(kf);
+        hideTimeline.play();
     }
 
 }

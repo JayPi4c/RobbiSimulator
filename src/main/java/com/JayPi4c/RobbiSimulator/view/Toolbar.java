@@ -21,7 +21,7 @@ public class Toolbar extends ToolBar {
     /**
      * Constant for the maximum value for the speed slider.
      */
-    public static final int MAX_SPEED_VALUE = 100;
+    public static final int MAX_SPEED_VALUE = 10;
     private MenuBar menubar;
     // Tool bar
     private Button newButtonToolbar;
@@ -148,6 +148,8 @@ public class Toolbar extends ToolBar {
         stopToggleButtonToolbar.setToggleGroup(simulationGroupToolbar);
 
         speedSliderToolbar = new Slider(MIN_SPEED_VALUE, MAX_SPEED_VALUE, (MIN_SPEED_VALUE + MAX_SPEED_VALUE) / 2d);
+        speedSliderToolbar.setShowTickLabels(true);
+        speedSliderToolbar.setShowTickMarks(true);
 
         getItems().addAll(newButtonToolbar, loadButtonToolbar, new Separator(), saveButtonToolbar, compileButtonToolbar,
                 new Separator(), changeSizeButtonToolbar, placeRobbiToggleButtonToolbar, placeHollowToggleButtonToolbar,
