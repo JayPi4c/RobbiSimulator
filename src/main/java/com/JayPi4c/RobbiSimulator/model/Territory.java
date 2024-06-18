@@ -247,7 +247,7 @@ public class Territory extends Observable implements Serializable {
      * @return the item that has been removed from the tile
      */
     public Item removeItem(int x, int y) {
-        Item i = null;
+        Item i;
         synchronized (this) {
             Tile t = tiles[normalizeCoordinate(x, numberOfColumns)][normalizeCoordinate(y, numberOfRows)];
             i = t.pickItem();
@@ -581,14 +581,12 @@ public class Territory extends Observable implements Serializable {
      */
     private Item getItemFromParser(XMLStreamReader parser) {
         String type = parser.getAttributeValue(null, "type");
-        if (type.equals("Nut")) {
-            return new Nut();
-        } else if (type.equals("Accu")) {
-            return new Accu();
-        } else if (type.equals("Screw")) {
-            return new Screw();
-        }
-        return null;
+        return switch (type) {
+            case "Nut" -> new Nut();
+            case "Accu" -> new Accu();
+            case "Screw" -> new Screw();
+            default -> null;
+        };
     }
 
     /**

@@ -137,7 +137,7 @@ public class PropertiesLoader {
      * @return true, if the saving was successful, false otherwise
      */
     public static boolean finish() {
-        properties.put(LANGUAGE_PROPERTY, I18nUtils.getLocale().toString());
+        properties.put(LANGUAGE_PROPERTY, I18nUtils.getLocale().toLanguageTag());
         properties.put(SOUNDS_PROPERTY, Boolean.toString(SoundManager.getSound()));
         properties.put(DARKMODE_PROPERTY, Boolean.toString(SceneManager.getDarkmode()));
         try (FileOutputStream fos = new FileOutputStream(DIR + FILE)) {
