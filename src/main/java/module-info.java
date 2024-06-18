@@ -5,8 +5,8 @@ module RobbiSimulator {
     requires javafx.media;
     requires javafx.web;
 
-    requires com.jfoenix;
     requires eu.mihosoft.monacofx;
+    requires org.controlsfx.controls;
 
     requires java.desktop;
     requires java.rmi;
