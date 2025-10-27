@@ -12,7 +12,6 @@ module RobbiSimulator {
     requires java.rmi;
     requires java.compiler;
 
-    requires lombok;
     requires org.slf4j;
 
     requires jakarta.persistence;
@@ -20,6 +19,8 @@ module RobbiSimulator {
     requires org.hibernate.orm.core;
     requires org.apache.logging.log4j;
     requires org.apache.derby.tools;
+
+    requires static lombok;
 
     opens com.JayPi4c.RobbiSimulator.controller.examples to org.hibernate.orm.core;
     opens com.JayPi4c.RobbiSimulator.model to jakarta.xml.bind;
