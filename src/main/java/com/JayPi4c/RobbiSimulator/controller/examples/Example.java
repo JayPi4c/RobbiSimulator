@@ -18,7 +18,7 @@ import java.util.List;
 public class Example {
 
     @Id
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 

@@ -1,11 +1,11 @@
 package com.JayPi4c.RobbiSimulator.controller.examples;
 
-import com.JayPi4c.RobbiSimulator.utils.HibernateUtils;
+import com.JayPi4c.RobbiSimulator.utils.JpaUtils;
+import jakarta.persistence.EntityManager;
 import javafx.util.Pair;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,10 +37,10 @@ public class ExampleService {
         example.setTerritory(territoryXML);
         example.setTags(tags);
 
-        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            session.beginTransaction();
-            session.merge(example);
-            session.getTransaction().commit();
+        try (EntityManager em = JpaUtils.createEntityManager()) {
+            em.getTransaction().begin();
+            em.merge(example);
+            em.getTransaction().commit();
             return true;
         } catch (Exception e) {
             logger.error("Could not store example", e);
@@ -55,9 +55,8 @@ public class ExampleService {
      * @return List of examples as pairs of id and programName
      */
     public static Optional<List<Pair<Integer, String>>> query(String tag) {
-        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            List<Example> allExamples = session.createQuery("from Example", Example.class).list();
-
+        try (EntityManager em = JpaUtils.createEntityManager()) {
+            List<Example> allExamples = em.createQuery("SELECT e FROM Example e", Example.class).getResultList();
             List<Example> taggedExamples = allExamples.stream().filter(ex -> ex.getTags().contains(tag)).toList();
 
             return Optional.of(taggedExamples.stream().map(ex -> new Pair<>(ex.getId(), ex.getProgramName())).toList());
@@ -73,10 +72,10 @@ public class ExampleService {
      */
     public static Optional<Example> loadExample(int id) {
         Example example;
-        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            session.beginTransaction();
-            example = session.get(Example.class, id);
-            session.getTransaction().commit();
+        try (EntityManager em = JpaUtils.createEntityManager()) {
+            em.getTransaction().begin();
+            example = em.find(Example.class, id);
+            em.getTransaction().commit();
         }
         return Optional.ofNullable(example);
     }
@@ -88,10 +87,9 @@ public class ExampleService {
      */
     public static Optional<List<String>> getAllTags() {
         List<String> tags;
-        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
-            List<Example> allExamples = session.createQuery("from Example", Example.class).list();
-            logger.debug("Found {} examples", allExamples.size());
-            tags = allExamples.stream().flatMap(ex -> ex.getTags().stream()).distinct().toList();
+        try (EntityManager em = JpaUtils.createEntityManager()) {
+            tags = em.createQuery("SELECT DISTINCT t FROM Example e join e.tags t", String.class).getResultList();
+            logger.debug("Foung {} distinct tags", tags.size());
         }
         return Optional.of(tags);
     }

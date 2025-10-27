@@ -9,6 +9,7 @@ import com.JayPi4c.RobbiSimulator.view.MenuBar;
 import com.JayPi4c.RobbiSimulator.view.TerritoryPanel;
 import com.JayPi4c.RobbiSimulator.view.Toolbar;
 import eu.mihosoft.monacofx.MonacoFX;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.xml.bind.JAXBContext;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -26,12 +27,10 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Version;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -240,13 +239,26 @@ public class MainStageController implements Observer {
             String javaVersion = System.getProperty("java.version");
             String derbyVersion = "10.x"; // TODO: read info from derby's info.properties
             String jaxbVersion = JAXBContext.class.getPackage().getImplementationVersion();
-            String hibernateVersion = Version.getVersionString();
-            String lombokVersion = Generated.class.getPackage().getImplementationVersion();
+            // get EMF (use your existing utility)
+            EntityManagerFactory emf = JpaUtils.getEntityManagerFactory();
+
+            // provider class + package metadata (may be null)
+            String providerClass = emf.getClass().getName();
+            Package implPackage = emf.getClass().getPackage();
+            String implTitle = implPackage.getImplementationTitle();
+            String implVersion = implPackage.getImplementationVersion();
+
+            // sensible fallback
+            if (implTitle == null) implTitle = providerClass;
+            if (implVersion == null) implVersion = "unknown";
+
+            String jpaProviderDisplay = implTitle + " " + implVersion;
+            String lombokVersion = "1.18.42"; // no better way to get lombok version at runtime
             String log4jVersion = Logger.class.getPackage().getImplementationVersion();
             String monacoFxVersion = MonacoFX.class.getPackage().getImplementationVersion();
             AlertHelper.showAlertAndWait(AlertType.INFORMATION,
                     i18n("Menu.window.libraries.content", javaVersion, javaFxVersion, monacoFxVersion,
-                            derbyVersion, jaxbVersion, hibernateVersion, log4jVersion, lombokVersion),
+                            derbyVersion, jaxbVersion, jpaProviderDisplay, log4jVersion, lombokVersion),
                     mainStage, Modality.WINDOW_MODAL, i18n("Menu.window.libraries.title"),
                     i18n("Menu.window.libraries.header"));
         });

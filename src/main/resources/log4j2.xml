@@ -18,8 +18,5 @@
         <Root level="info">
             <AppenderRef ref="LogToConsole"/>
         </Root>
-        <Logger name="com.mchange.v2.c3p0" level="error">
-            <AppenderRef ref="LogToConsole"/>
-        </Logger>
     </Loggers>
 </Configuration>
