@@ -53,8 +53,34 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <jlinkZipName>app</jlinkZipName>
+                    <jlinkImageName>app</jlinkImageName>
+                    <noManPages>true</noManPages>
+                    <stripDebug>true</stripDebug>
+                    <noHeaderFiles>true</noHeaderFiles>
+                    <options>
+                        <option>-Dfile.encoding=UTF-8</option>
+                        <option>--enable-native-access=javafx.graphics</option>
+                    </options>
                     <mainClass>RobbiSimulator/com.JayPi4c.RobbiSimulator.App</mainClass>
                     <launcher>robbiSimulator</launcher>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.7.1</version>
+                <configuration>
+                    <type>APP_IMAGE</type>
+                    <vendor>JayPi4c</vendor>
+                    <name>RobbiSimulator</name>
+                    <destination>target/jpackage-image</destination>
+                    <module>RobbiSimulator/com.JayPi4c.RobbiSimulator.App</module>
+                    <runtimeImage>target/app</runtimeImage>
+                    <javaOptions>
+                        <option>-Dfile.encoding=UTF-8</option>
+                    </javaOptions>
                 </configuration>
             </plugin>
         </plugins>

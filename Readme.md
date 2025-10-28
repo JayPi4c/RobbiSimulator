@@ -31,3 +31,20 @@ Die Coverage wurde nach diesem [Template](https://github.com/cicirello/examples-
 
 Der Warnsound wurde von [hier](https://freesound.org/s/507906/) heruntergeladen.
 Die meisten Kontroll-Grafiken stammen von Dibo.
+
+
+## Build:
+Um ein Debian-Paket zu bauen, müssen die folgenden Pakete installiert sein:
+```shell
+sudo apt install -y build-essential debhelper devscripts
+```
+
+
+```shell
+./mvnw clean package jpackage:jpackage
+
+mkdir -p target/deb
+cp -r debian target/deb
+cd target/deb
+dpkg-buildpackage -us -uc
+```

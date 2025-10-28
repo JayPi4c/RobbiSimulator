@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author Jonas Pohl
  */
-@Slf4j
+@Slf4j(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class Robbi {
 

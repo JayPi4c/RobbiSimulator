@@ -1,0 +1,12 @@
+Source: robbisimulator
+Section: misc
+Maintainer: JayPi4c <jaypi4c@gmail.com>
+Priority: optional
+Build-Depends: debhelper-compat (= 13), gzip
+Standards-Version: 4.7.2
+Homepage: https://github.com/JayPi4c/RobbiSimulator
+
+Package: robbisimulator
+Architecture: amd64
+Description: RobbiSimulator does some crazy stuff.
+Depends: ${shlibs:Depends}, ${misc:Depends}
